@@ -164,11 +164,6 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
                 </div>
               )}
             </div>
-
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <CheckCircle2 size={12} />
-              {summary.analysis_status}
-            </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-gray-500 mt-0.5 font-medium">

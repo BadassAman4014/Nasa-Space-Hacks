@@ -39,10 +39,11 @@ import type { Feature, FeatureCollection, Polygon, MultiPolygon } from 'geojson'
 import { boundariesApi, type SavedField, type UserFarm } from '../../services/boundariesApi';
 import { FieldSoilCard } from './FieldSoilCard';
 import { FieldEnvironmentalCard } from './FieldEnvironmentalCard';
-import { FieldAnalyticsWorkspace } from '../analytics/FieldAnalyticsWorkspace';
 import { MapSearchBar } from '../common/MapSearchBar';
 import { MapLegend } from '../common/MapLegend';
 import type { SearchResult } from '../../services/geocodingService';
+import { fetchAllFieldsWeather, type FieldWeatherSummary } from '../../services/weatherApi';
+import { createVirtualStationDivIcon } from '../weather/VirtualWeatherStationMarker';
 
 export type LayerState = {
   ndvi: boolean;
@@ -56,6 +57,7 @@ type PageKey =
   | 'dashboard'
   | 'fields'
   | 'analytics'
+  | 'weather'
   | 'environment'
   | 'farmer-profile'
   | 'rotation-studio'
@@ -75,9 +77,9 @@ export function DashboardV2(props: {
   const [fields, setFields] = useState<SavedField[]>([]);
   const [selectedFarmId, setSelectedFarmId] = useState<string>('all');
   const [selectedFieldId, setSelectedFieldIdState] = useState<string | null>(props.selectedFieldId || null);
-  const [analyticsFieldId, setAnalyticsFieldId] = useState<string | null>(null);
   const [farmMenuOpen, setFarmMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [weatherSummaries, setWeatherSummaries] = useState<FieldWeatherSummary[]>([]);
 
   const setSelectedFieldId = useCallback((id: string | null) => {
     setSelectedFieldIdState(id);
@@ -108,12 +110,14 @@ export function DashboardV2(props: {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [farmsData, fieldsData] = await Promise.all([
+      const [farmsData, fieldsData, weatherData] = await Promise.all([
         boundariesApi.listFarms(),
         boundariesApi.listFields(selectedFarmId !== 'all' ? selectedFarmId : undefined),
+        fetchAllFieldsWeather().catch(() => []),
       ]);
       setFarms(farmsData || []);
       setFields(fieldsData || []);
+      setWeatherSummaries(weatherData || []);
       if (fieldsData && fieldsData.length > 0 && !selectedFieldId) {
         const initialId = props.selectedFieldId && fieldsData.some(f => f.id === props.selectedFieldId)
           ? props.selectedFieldId
@@ -210,20 +214,6 @@ export function DashboardV2(props: {
     }
   };
 
-  if (analyticsFieldId) {
-    return (
-      <FieldAnalyticsWorkspace
-        fieldId={analyticsFieldId}
-        onClose={() => setAnalyticsFieldId(null)}
-        notify={props.notify}
-        onSelectField={(id) => {
-          setSelectedFieldId(id);
-          setAnalyticsFieldId(id);
-        }}
-      />
-    );
-  }
-
   return (
     <div className="dashboard-grid">
       {/* Left Data & Metrics Panel */}
@@ -267,7 +257,7 @@ export function DashboardV2(props: {
               onEdit={handleOpenEdit}
               onDelete={(field) => setDeleteConfirmField(field)}
               onAddField={() => props.navigate('fields')}
-              onOpenAnalytics={(fid) => setAnalyticsFieldId(fid)}
+              onOpenAnalytics={(fid) => props.navigate('analytics', fid)}
             />
             <RegionalConditions />
           </>
@@ -278,6 +268,7 @@ export function DashboardV2(props: {
       <MapViewV2
         fields={fields}
         farms={farms}
+        weatherSummaries={weatherSummaries}
         selectedFieldId={selectedFieldId}
         setSelectedFieldId={setSelectedFieldId}
         navigate={props.navigate}
@@ -285,7 +276,7 @@ export function DashboardV2(props: {
         onMenu={props.onMenu}
         onEdit={handleOpenEdit}
         onDelete={(field) => setDeleteConfirmField(field)}
-        onOpenAnalytics={(fid) => setAnalyticsFieldId(fid)}
+        onOpenAnalytics={(fid) => props.navigate('analytics', fid)}
       />
 
       {/* Edit Field Modal */}
@@ -995,6 +986,7 @@ function MapResizer() {
 export function MapViewV2({
   fields,
   farms = [],
+  weatherSummaries = [],
   selectedFieldId,
   setSelectedFieldId,
   navigate,
@@ -1007,6 +999,7 @@ export function MapViewV2({
 }: {
   fields: SavedField[];
   farms?: UserFarm[];
+  weatherSummaries?: FieldWeatherSummary[];
   selectedFieldId: string | null;
   setSelectedFieldId: (v: string) => void;
   navigate: (p: PageKey) => void;
@@ -1149,6 +1142,21 @@ export function MapViewV2({
             />
           );
         })}
+
+        {/* Virtual Weather Station Markers (OneSoil style) */}
+        {weatherSummaries.map((station) => (
+          <Marker
+            key={`dashboard-station-${station.field_id}`}
+            position={station.coordinates}
+            icon={createVirtualStationDivIcon(station, station.field_id === selectedFieldId)}
+            eventHandlers={{
+              click: () => {
+                setSelectedFieldId(station.field_id);
+                setCardOpen(true);
+              },
+            }}
+          />
+        ))}
 
         {/* Current user location: Blue marker (independent of fields) */}
         {userLocation && (
@@ -1331,6 +1339,13 @@ export function MapViewV2({
           )}
 
           <div className="space-y-2 mt-3">
+            <button
+              onClick={() => props.navigate('weather', selected.id)}
+              className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow border border-slate-700 transition-colors"
+            >
+              <CloudSun size={14} className="text-amber-400" /> Weather &amp; 3D Cloud Simulation
+            </button>
+
             <button
               onClick={() => (onOpenAnalytics ? onOpenAnalytics(selected.id) : navigate('rotation-studio'))}
               className="w-full py-2.5 rounded-xl bg-[#1fa35b] hover:bg-[#188a4c] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow"

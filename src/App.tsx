@@ -6,6 +6,7 @@ import { SidebarV2 } from './components/shell/Sidebar';
 import { DashboardV2 } from './components/dashboard/Dashboard';
 import { FieldExplorerView } from './components/fields/FieldExplorerView';
 import { FieldAnalyticsWorkspace } from './components/analytics/FieldAnalyticsWorkspace';
+import { WeatherView } from './components/weather/WeatherView';
 import {
   Activity, ArrowLeft, BarChart3, Bell, BrainCircuit, Check, ChevronDown, ChevronRight,
   CircleHelp, CloudRain, CloudSun, Compass, Download, Droplets, Eye, FileText, Globe2,
@@ -13,11 +14,12 @@ import {
   ShieldCheck, SlidersHorizontal, Sprout, Sun, Thermometer, TrendingUp, Users, X, Zap
 } from 'lucide-react';
 
-type PageKey = 'dashboard' | 'fields' | 'analytics' | 'environment' | 'farmer-profile' | 'rotation-studio' | 'scenario-simulator' | 'reports';
+type PageKey = 'dashboard' | 'fields' | 'analytics' | 'weather' | 'environment' | 'farmer-profile' | 'rotation-studio' | 'scenario-simulator' | 'reports';
 const navItems: { id: PageKey; label: string; icon: typeof Map }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
   { id: 'fields', label: 'Field Explorer', icon: Map },
   { id: 'analytics', label: 'Field Analytics', icon: Zap },
+  { id: 'weather', label: 'Weather', icon: CloudSun },
   { id: 'environment', label: 'Environmental Profile', icon: Globe2 },
   { id: 'farmer-profile', label: 'Farmer Profile', icon: Users },
   { id: 'rotation-studio', label: 'Rotation Studio', icon: Sprout },
@@ -65,10 +67,12 @@ function App() {
     <div className="app-shell">
       <SidebarV2 page={page} navigate={navigate} mobileOpen={mobileNav} onClose={() => setMobileNav(false)} />
       <main className="workspace">
-        {page !== 'dashboard' && page !== 'fields' && page !== 'analytics' && (
+        {page !== 'dashboard' && page !== 'fields' && page !== 'analytics' && page !== 'weather' && (
           <Topbar navigate={navigate} onMenu={() => setMobileNav(true)} onNotify={() => notify('You are all caught up')} />
         )}
-        <div className={`page-content ${page === 'dashboard' || page === 'fields' || page === 'analytics' ? 'page-content--bleed' : ''}`}>
+        <div
+          className={`page-content ${page === 'dashboard' || page === 'fields' || page === 'analytics' || page === 'weather' ? 'page-content--bleed' : ''}`}
+        >
           {page === 'dashboard' && (
             <DashboardV2
               navigate={navigate}
@@ -85,6 +89,15 @@ function App() {
               onClose={() => navigate('dashboard')}
               notify={notify}
               onSelectField={(id) => setAnalyticsFieldId(id)}
+            />
+          )}
+          {page === 'weather' && (
+            <WeatherView
+              initialFieldId={analyticsFieldId}
+              onNavigateFieldAnalytics={(fieldId) => {
+                setAnalyticsFieldId(fieldId);
+                navigate('analytics', fieldId);
+              }}
             />
           )}
           {page === 'environment' && <Environment />}

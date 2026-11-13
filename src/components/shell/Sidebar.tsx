@@ -1,11 +1,12 @@
-import { BarChart3, CircleHelp, FileText, Globe2, Leaf, Map, Settings, SlidersHorizontal, Sparkles, Sprout, Users, X } from 'lucide-react';
+import { BarChart3, CircleHelp, CloudSun, FileText, Globe2, Leaf, Map, Settings, SlidersHorizontal, Sparkles, Sprout, Users, X } from 'lucide-react';
 
-type PageKey = 'dashboard' | 'fields' | 'analytics' | 'environment' | 'farmer-profile' | 'rotation-studio' | 'scenario-simulator' | 'reports';
+type PageKey = 'dashboard' | 'fields' | 'analytics' | 'weather' | 'environment' | 'farmer-profile' | 'rotation-studio' | 'scenario-simulator' | 'reports';
 
 const items: { id: PageKey; label: string; group: number; icon: typeof Map }[] = [
   { id: 'dashboard',         label: 'Dashboard',       group: 1, icon: BarChart3 },
   { id: 'fields',            label: 'Field Explorer',  group: 1, icon: Map },
   { id: 'analytics',         label: 'Field Analytics', group: 1, icon: Sparkles },
+  { id: 'weather',           label: 'Weather',         group: 1, icon: CloudSun },
   { id: 'environment',       label: 'Environmental',   group: 1, icon: Globe2 },
   { id: 'farmer-profile',    label: 'Farmer Profile',  group: 2, icon: Users },
   { id: 'rotation-studio',   label: 'Rotation Studio', group: 2, icon: Sprout },

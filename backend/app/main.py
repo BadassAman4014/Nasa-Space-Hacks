@@ -3,7 +3,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import boundaries, farms, fields, environment, soil, farmer, recommendations, scenarios, reports, ai_field_detection, field_analytics, nasa_challenge
+from app.api import boundaries, farms, fields, environment, soil, farmer, recommendations, scenarios, reports, ai_field_detection, field_analytics, nasa_challenge, weather
 
 app = FastAPI(title='FieldShift AI API', version='0.2.0')
 
@@ -27,7 +27,8 @@ for router in [
     reports.router,
     ai_field_detection.router,
     field_analytics.router,
-    nasa_challenge.router
+    nasa_challenge.router,
+    weather.router
 ]:
     app.include_router(router, prefix='/api')
 
