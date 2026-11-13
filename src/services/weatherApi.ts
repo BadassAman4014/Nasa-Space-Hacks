@@ -110,11 +110,26 @@ export interface FieldWeatherData {
   threejs_simulation: ThreeJsSimulationParams;
 }
 
+export interface AvailableField {
+  field_id: string;
+  field_name: string;
+  farm_name: string;
+  has_station: boolean;
+  station?: VirtualStation;
+  geometry?: any;
+}
+
 const API_BASE = '/api/weather';
 
 export async function fetchVirtualStations(): Promise<VirtualStation[]> {
   const res = await fetch(`${API_BASE}/stations`);
   if (!res.ok) throw new Error(`Failed to fetch stations: ${res.statusText}`);
+  return res.json();
+}
+
+export async function fetchAvailableFields(): Promise<AvailableField[]> {
+  const res = await fetch(`${API_BASE}/available-fields`);
+  if (!res.ok) throw new Error(`Failed to fetch available fields: ${res.statusText}`);
   return res.json();
 }
 
@@ -130,12 +145,35 @@ export async function fetchFieldWeather(fieldId: string): Promise<FieldWeatherDa
   return res.json();
 }
 
-export async function toggleVirtualStation(fieldId: string, isActive: boolean): Promise<VirtualStation> {
+export async function addVirtualStation(fieldId: string, stationName?: string): Promise<VirtualStation> {
   const res = await fetch(`${API_BASE}/stations/${encodeURIComponent(fieldId)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ is_active: isActive }),
+    body: JSON.stringify({ is_active: true, station_name: stationName }),
   });
-  if (!res.ok) throw new Error(`Failed to update virtual station: ${res.statusText}`);
+  if (!res.ok) throw new Error(`Failed to add virtual station: ${res.statusText}`);
   return res.json();
+}
+
+export async function deleteVirtualStation(fieldId: string): Promise<{ field_id: string; deleted: boolean }> {
+  const res = await fetch(`${API_BASE}/stations/${encodeURIComponent(fieldId)}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error(`Failed to delete virtual station: ${res.statusText}`);
+  return res.json();
+}
+
+export async function clearAllVirtualStations(): Promise<{ deleted_all: boolean }> {
+  const res = await fetch(`${API_BASE}/stations`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error(`Failed to clear virtual stations: ${res.statusText}`);
+  return res.json();
+}
+
+export async function toggleVirtualStation(fieldId: string, isActive: boolean): Promise<VirtualStation> {
+  if (!isActive) {
+    return deleteVirtualStation(fieldId) as any;
+  }
+  return addVirtualStation(fieldId);
 }

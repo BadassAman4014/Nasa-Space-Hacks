@@ -32,62 +32,83 @@ class WeatherStationService:
             """)
 
     def list_virtual_stations(self) -> List[Dict[str, Any]]:
-        """Returns all configured virtual weather stations, with automatic defaults for existing fields."""
+        """Returns all configured virtual weather stations that the user explicitly added."""
         self._init_station_table()
         fields = user_farms_repo.list_fields()
         if not fields:
             return []
 
+        field_map = {f["id"]: f for f in fields}
+
         with analytics_repo._connection() as conn:
-            rows = conn.execute("SELECT field_id, name, lat, lon, is_active, installed_at, metadata_json FROM virtual_weather_stations").fetchall()
-            existing = {r["field_id"]: dict(r) for r in rows}
+            rows = conn.execute("SELECT field_id, name, lat, lon, is_active, installed_at, metadata_json FROM virtual_weather_stations WHERE is_active = 1").fetchall()
 
         stations = []
-        now_iso = datetime.now(timezone.utc).isoformat()
-
-        for f in fields:
-            f_id = f["id"]
-            if f_id in existing:
-                rec = existing[f_id]
-                meta = json.loads(rec["metadata_json"]) if rec.get("metadata_json") else {}
-                stations.append({
-                    "field_id": f_id,
-                    "field_name": f.get("name", "Field"),
-                    "farm_name": f.get("farm_name", "My Farm"),
-                    "station_name": rec.get("name") or f"Station {f.get('name')}",
-                    "lat": float(rec["lat"]),
-                    "lon": float(rec["lon"]),
-                    "is_active": bool(rec["is_active"]),
-                    "installed_at": rec.get("installed_at") or now_iso,
-                    "metadata": meta
-                })
-            else:
-                # Calculate centroid
-                coords = f.get("geometry", {}).get("coordinates", [])
-                lat, lon = self._calculate_centroid(f.get("geometry"))
-                # Default active virtual station
-                meta = {
-                    "model": "vStation-Pro AgriMesh",
-                    "elevation_m": 42.0,
-                    "sensors": ["temp", "humidity", "wind", "clouds", "rain", "soil_temp"]
-                }
-                with analytics_repo._connection() as conn:
-                    conn.execute("""
-                        INSERT OR REPLACE INTO virtual_weather_stations (field_id, name, lat, lon, is_active, installed_at, metadata_json)
-                        VALUES (?, ?, ?, ?, 1, ?, ?)
-                    """, (f_id, f"Virtual Station ({f.get('name', 'Field')})", lat, lon, now_iso, json.dumps(meta)))
-                stations.append({
-                    "field_id": f_id,
-                    "field_name": f.get("name", "Field"),
-                    "farm_name": f.get("farm_name", "My Farm"),
-                    "station_name": f"Virtual Station ({f.get('name', 'Field')})",
-                    "lat": lat,
-                    "lon": lon,
-                    "is_active": True,
-                    "installed_at": now_iso,
-                    "metadata": meta
-                })
+        for r in rows:
+            f_id = r["field_id"]
+            if f_id not in field_map:
+                continue
+            f = field_map[f_id]
+            meta = json.loads(r["metadata_json"]) if r["metadata_json"] else {}
+            stations.append({
+                "field_id": f_id,
+                "field_name": f.get("name", "Field"),
+                "farm_name": f.get("farm_name", "My Farm"),
+                "station_name": r["name"] or f"Station {f.get('name')}",
+                "lat": float(r["lat"]),
+                "lon": float(r["lon"]),
+                "is_active": True,
+                "installed_at": r["installed_at"],
+                "metadata": meta
+            })
         return stations
+
+    def add_virtual_station(self, field_id: str, name: Optional[str] = None) -> Dict[str, Any]:
+        """Adds a virtual weather station to a specific field."""
+        self._init_station_table()
+        field = user_farms_repo.get_field(field_id)
+        if not field:
+            raise ValueError(f"Field {field_id} not found")
+
+        lat, lon = self._calculate_centroid(field.get("geometry"))
+        station_name = name or f"Virtual Station ({field.get('name', 'Field')})"
+        now_iso = datetime.now(timezone.utc).isoformat()
+        meta = {
+            "model": "vStation-Pro AgriMesh",
+            "elevation_m": 42.0,
+            "sensors": ["temp", "humidity", "wind", "clouds", "rain", "soil_temp"]
+        }
+        with analytics_repo._connection() as conn:
+            conn.execute("""
+                INSERT OR REPLACE INTO virtual_weather_stations (field_id, name, lat, lon, is_active, installed_at, metadata_json)
+                VALUES (?, ?, ?, ?, 1, ?, ?)
+            """, (field_id, station_name, lat, lon, now_iso, json.dumps(meta)))
+
+        return {
+            "field_id": field_id,
+            "field_name": field.get("name", "Field"),
+            "farm_name": field.get("farm_name", "My Farm"),
+            "station_name": station_name,
+            "lat": lat,
+            "lon": lon,
+            "is_active": True,
+            "installed_at": now_iso,
+            "metadata": meta
+        }
+
+    def delete_virtual_station(self, field_id: str) -> Dict[str, Any]:
+        """Deletes/removes a virtual weather station from a field."""
+        self._init_station_table()
+        with analytics_repo._connection() as conn:
+            conn.execute("DELETE FROM virtual_weather_stations WHERE field_id = ?", (field_id,))
+        return {"field_id": field_id, "deleted": True}
+
+    def clear_all_virtual_stations(self) -> Dict[str, Any]:
+        """Removes all virtual weather stations."""
+        self._init_station_table()
+        with analytics_repo._connection() as conn:
+            conn.execute("DELETE FROM virtual_weather_stations")
+        return {"deleted_all": True}
 
     def get_station_for_field(self, field_id: str) -> Optional[Dict[str, Any]]:
         stations = self.list_virtual_stations()
@@ -98,10 +119,9 @@ class WeatherStationService:
 
     def toggle_virtual_station(self, field_id: str, is_active: bool) -> Dict[str, Any]:
         self._init_station_table()
-        now_iso = datetime.now(timezone.utc).isoformat()
-        with analytics_repo._connection() as conn:
-            conn.execute("UPDATE virtual_weather_stations SET is_active = ? WHERE field_id = ?", (1 if is_active else 0, field_id))
-        return self.get_station_for_field(field_id) or {"field_id": field_id, "is_active": is_active}
+        if not is_active:
+            return self.delete_virtual_station(field_id)
+        return self.add_virtual_station(field_id)
 
     def get_all_fields_weather_summary(self) -> List[Dict[str, Any]]:
         """Returns current weather summary for each field with a virtual station."""
@@ -271,9 +291,9 @@ class WeatherStationService:
             "coordinates": {"lat": lat, "lon": lon},
             "geometry": field.get("geometry"),
             "virtual_station": {
-                "is_active": station["is_active"] if station else True,
+                "is_active": bool(station["is_active"]) if station else False,
                 "name": station["station_name"] if station else f"Virtual Station ({field.get('name')})",
-                "installed_at": station["installed_at"] if station else now_dt.isoformat(),
+                "installed_at": station["installed_at"] if station else None,
                 "sensors": {
                     "temperature": f"{temp_c}°C",
                     "humidity": f"{humidity}%",
