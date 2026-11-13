@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bg-panel: #e8e8e8; --bg-card: #f8f8f8; --bg-chip: #fff; --bg-inset: #f1f1f1;
+  --ink: #1b1b1b; --ink-2: #6f6f6f; --ink-3: #9a9a9a; --line: #e3e3e3;
+  --dark: #262626; --green: #1fa35b; --green-soft: #e3f5ea; --orange: #ff7a1a;
+  --amber: #f5a524; --red: #e5483d; --blue: #4a8fcc;
+  --r-card: 22px; --r-ctl: 12px; --gap: 10px;
+  /* Desktop sidebar shows labels — 200px wide */
+  --rail-w: 200px;
+  --panel-w: clamp(380px, 32vw, 520px);
+  --shadow-float: 0 8px 28px rgba(0,0,0,.18);
+}
+
+body { font-family: var(--font); color: var(--ink); background: var(--bg-panel); }
+button, input, select, textarea { font-family: var(--font); }
+strong, b, output, .metric-value, .weather-temp { font-variant-numeric: tabular-nums; }

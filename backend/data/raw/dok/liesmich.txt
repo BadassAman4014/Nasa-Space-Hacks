@@ -1,0 +1,19 @@
+Sehr geehrte Damen und Herren,
+Sie haben dieses Produkt vom Geobroker bezogen.
+Neben den Daten erhalten Sie auch Dokumentationen.
+
+Durch das Bereitstellungsverfahren im Geobroker werden automatisch weitere Felder angehängt, die in der Dokumentation nicht erwähnt werden, aber mit der Übergabe auch nicht ausgeblendet werden können.
+
+Dabei handelt es sich bei den punkthaftenThemen um
+- LAND		verfahrenstechnisch bedingtes Steuerungsfeld
+
+Bei den linienhaften Themen handelt es sich um
+- SHAPE_LEN	gis-technisch berechnete Linienlänge
+- LAND		verfahrenstechnisch bedingtes Steuerungsfeld
+
+Bei den flächenhaften Themen handelt es sich um
+- SHAPE_AREA	gis-technisch berechnete Flächengröße
+- SHAPE_LEN	gis-technisch berechneter Flächenumfang
+- LAND		verfahrenstechnisch bedingtes Steuerungsfeld
+
+Bei weiteren Fragen wenden Sie sich an den in der Dokumentation genannten technischen Ansprechpartner.

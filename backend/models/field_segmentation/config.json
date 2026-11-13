@@ -1,0 +1,24 @@
+{
+  "model_architecture": "U-Net MobileNetV3-Small",
+  "parameters_count": 1671683,
+  "input_bands": [
+    "B02",
+    "B03",
+    "B04",
+    "B08"
+  ],
+  "input_resolution_meters": 10.0,
+  "patch_size": 256,
+  "epochs": 12,
+  "batch_size": 4,
+  "initial_learning_rate": 0.0002,
+  "optimizer": "AdamW",
+  "loss": "CrossEntropy + Dice",
+  "class_weights": [
+    0.8,
+    1.0,
+    2.5
+  ],
+  "pretrained_encoder": "ImageNet1k (MobileNetV3-Small)",
+  "training_duration_seconds": 50.44
+}

@@ -1,0 +1,14 @@
+{
+  "0": {
+    "name": "background",
+    "description": "Non-agricultural/built-up/water/forest"
+  },
+  "1": {
+    "name": "field_interior",
+    "description": "Agricultural cropland or pasture interior"
+  },
+  "2": {
+    "name": "field_boundary",
+    "description": "Border, margin, hedgerow, or track separating fields"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "source_name": "Digitales Feldblockkataster (DFBK)",
+  "source_url": "https://data.geobasis-bb.de/geofachdaten/Landwirtschaft/dfbk.zip",
+  "documentation_url": "https://data.geobasis-bb.de/geofachdaten/Landwirtschaft/dok/Doku_DFBK_aktuell.html",
+  "wfs_url": "https://isk.geobasis-bb.de/ows/geobroker_l_dfbk_wfs",
+  "license": "dl-de/by-2-0",
+  "attribution": "© MLEUV, dl-de/by-2-0",
+  "attribution_modified": "© MLEUV, dl-de/by-2-0, Daten verändert",
+  "version_year": 2026,
+  "record_count": 90756,
+  "total_agricultural_hectares": 1327878.1,
+  "categories_included": [
+    "AL",
+    "GL",
+    "DK",
+    "AL-AF",
+    "GL-AF",
+    "DK-AF",
+    "AL-APV",
+    "GL-APV",
+    "DK-APV",
+    "GL-ELP",
+    "GL-ELP-AF",
+    "GL-ELP-APV",
+    "GL-MO",
+    "GL-MO-AF",
+    "GL-MO-APV"
+  ],
+  "categories_excluded": [
+    "HE",
+    "34A",
+    "34G"
+  ],
+  "processed_at": "2026-11-12T16:15:07.472628+00:00",
+  "elapsed_seconds": 7.78
+}

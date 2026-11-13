@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DBS Dokumentationsstand="09.11.2026">
+	<dfbk>
+		<_0_Ueberschrift>Landwirtschaftliche Referenzparzellen und Nicht-Beihilfefähige Flächen (DFBK-Datenbestand) des Landes Brandenburg 2026</_0_Ueberschrift>
+		<_1_Allgemeine_Angaben>
+			<Bezeichnung>Digitales Feldblockkataster des Landes Brandenburg</Bezeichnung>
+			<Kurzbezeichnung>dfbk</Kurzbezeichnung>
+			<Fachthema>Agrarförderung</Fachthema>
+			<Pflegestand>08.11.2026</Pflegestand>
+			<Historisierungsstand>09.11.2026</Historisierungsstand>
+			<Fachl_Gueltigkeit>01.01.2026 – 31.12.2026</Fachl_Gueltigkeit>
+			<Aktualisierungszyklus>mehrmals jährlich</Aktualisierungszyklus>
+			<Eigentuemer>Hr. Falk, MLEUV-EU-Zahlstelle, Norbert.Falk@MLEUV.Brandenburg.de</Eigentuemer>
+			<Fachlicher_Ansprechpartner>Fr. Lantzsch, MLEUV-33, Birgit.Lantzsch@MLEUV.Brandenburg.de</Fachlicher_Ansprechpartner>
+			<Technischer_Ansprechpartner>LGB/GIS-InVeKoS, gis-invekos@geobasis-bb.de</Technischer_Ansprechpartner>
+			<GIStechn_Ansprechpartner>LGB/GIS-InVeKoS, gis-invekos@geobasis-bb.de</GIStechn_Ansprechpartner>
+			<Datenhaltende_Stelle>LGB/GISACH, kundenservice@geobasis-bb.de</Datenhaltende_Stelle>
+		</_1_Allgemeine_Angaben>
+		<_2_Datenquellen>- Digitale Orthophotos der Landesvermessungen Brandenburg und Berlin (0,2 m Bodenauflösung; aktuelle Bildaufnahmen</_2_Datenquellen>
+		<_3_Rechtsgrundlagen_Richtlinien_Vorschriften>- VO (EU) Nr. 1306/2013
+ - Dienstanweisung 07/2022 des MLUK zur Pflege des Systems zur Identifizierung landwirtschaftlicher Parzellen (LPIS) in den Ländern Brandenburg und Berlin</_3_Rechtsgrundlagen_Richtlinien_Vorschriften>
+		<_4_Vorgehensweise_Technologie>OnScreen-Digitalisierung zur Neuerfassung und Aktualisierung von Feldblöcken; anliegenden Landschaftselementen und von Nicht-Beihilfefähigen-Flächen 
+ Feldblöcke (FB):
+ Die Aktualisierung der Referenzparzellen erfolgt durch die referenzpflegenden Stellen der Ämter für Landwirtschaft. 
+ Grundprinzip der Referenzpflege ist die Passfähigkeit zum aktuellsten Luftbild.
+ Landschaftselemente (LE) und Nicht-Beihilfefähige-Flächen (NBF):
+ Landschaftselemente und Nicht-Beihilfefähige-Flächen sind besonders zu erfassende Landschaftsmerkmale. LE können sich im und am Feldblock befinden, NBF ausschließlich im Feldblock. Die sichtbaren Konturen des Landschaftselementes bzw. der NBF bilden nicht zwingend die Grenze der Feldblöcke (Fortführung von Linien unter Baumkronen, Brücken usw.).
+ Alle gültigen Landschaftselemente sind Cross Compliance-relevant.
+ Nicht-Beihilfefähige-Flächen im Feldblock können als unregelmäßige Flächengeometrie bzw. als quadratische Standardabzugsfläche vorliegen.</_4_Vorgehensweise_Technologie>
+		<_5_Nutzungsrechte_Einschränkungen>
+			<Nutzungsrechte>uneingeschränkt (OpenData)</Nutzungsrechte>
+			<Präsentation>Bei unveränderten Daten: © MLEUV, dl_de/by-2-0, Bei veränderten Daten: © MLEUV, dl_de/by-2-0, Daten geändert</Präsentation>
+			<Einsatzmaszstab>orientiert am Erfassungsmaßstab</Einsatzmaszstab>
+		</_5_Nutzungsrechte_Einschränkungen>
+		<_6_Technische_Parameter>
+			<Bezugssystem_Lage>ETRS89 UTM Zone 33N (EPSG 25833)</Bezugssystem_Lage>
+			<GIS-Aufloesung>2,4 Meter</GIS-Aufloesung>
+			<Fehlereinfluesse>keine Angaben</Fehlereinfluesse>
+			<Datenformate>Shapefiles (in Einzelfällen multipart-Geometrien), DBF-Tabelle mit der Zuordnung der LE/NBF zu den Feldblöcken</Datenformate>
+			<Dateien>DFBK_FB.shp, DFBK_LE.shp, DFBK_NBF.shp, DFBK_ZUORDNUNG.dbf</Dateien>
+			<Datenstruktur>
+				<Feldbloecke>
+					<gid>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Eindeutige Datensatz-(Geo-)ID (entspricht ID,FID, Objekt_ID)</Beschreibung>
+						<Inhalt></Inhalt>
+					</gid>
+					<FGUE_JAHR>
+						<Datentyp>Text</Datentyp>
+						<Laenge>4</Laenge>
+						<Beschreibung>Jahresscheibe der fachlichen Gültigkeit</Beschreibung>
+						<Inhalt></Inhalt>
+					</FGUE_JAHR>
+					<FB_ID>
+						<Datentyp>Text</Datentyp>
+						<Laenge>16</Laenge>
+						<Beschreibung>Feldblockident (FLIK)</Beschreibung>
+						<Inhalt></Inhalt>
+					</FB_ID>
+					<HBN_KAT>
+						<Datentyp>Text</Datentyp>
+						<Laenge>10</Laenge>
+						<Beschreibung>Kategorie der Hauptbodennutzung des Feldblocks (siehe nachfolgende Liste)</Beschreibung>
+						<Inhalt>34A = nicht landwirtschaftliche Fläche auf ehemaligem Ackerland, nach Art. 32 (2b (i)) der VO 1307/2013 beihilfefähig  34G = nicht landwirtschaftliche Fläche auf ehemaligem Grünland, nach Art. 32 (2b (i)) der VO 1307/2013 beihilfefähig  AL = Ackerfläche AL-AF = Agroforst auf Ackerfläche AL-APV = Agri-PV auf Ackerfläche DK-AF = Agroforst auf Dauerkulturen DK-APV = Agri-PV auf Dauerkulturen DK = Dauerkulturen  GL-AF = Agroforst auf Grünland GL-APV = Agri-PV auf Grünland GL-ELP-AF = Agroforst auf Grünland - etablierte lokale Praktiken GL-ELP-APV = Agri-PV auf Grünland - etablierte lokale Praktiken GL-ELP = Grünlandbewirtschaftung unter „etablierten lokalen Praktiken“  GL = Grünland GL-MO-AF = Agroforst auf Grünland Moorflächen GL-MO-APV = Agri-PV auf Grünland Moorflächen GL-MO = Grünland, entstanden aus Ackerflächen auf Moorstandorten  HE = Heide, keine landwirtschaftliche Fläche</Inhalt>
+					</HBN_KAT>
+					<FL_BRUTTO_HA>
+						<Datentyp>Numerisch</Datentyp>
+						<Laenge>11 + 4 Nachkommastellen</Laenge>
+						<Beschreibung>Fläche des Feldblocks (inkl. zugeordnetem Landschaftselement) in Hektar, entspricht der beihilfefähigen Höchstfläche Direktzahlungen, wenn HBN_KAT ≠ HE und Fläche &gt; 0,3 ha</Beschreibung>
+						<Inhalt></Inhalt>
+					</FL_BRUTTO_HA>
+					<FL_NETTO_HA>
+						<Datentyp>Numerisch</Datentyp>
+						<Laenge>11 + 4 Nachkommastellen </Laenge>
+						<Beschreibung>Fläche des Feldblocks (exkl. zugeordnetem Landschaftselement) in Hektar</Beschreibung>
+						<Inhalt></Inhalt>
+					</FL_NETTO_HA>
+					<KREIS_NR>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Nummer des pflegezuständigen Amtes für Landwirtschaft</Beschreibung>
+						<Inhalt></Inhalt>
+					</KREIS_NR>
+					<TK10_BLATT>
+						<Datentyp>Text</Datentyp>
+						<Laenge>14</Laenge>
+						<Beschreibung>Blatt der Topographischen Karte 1:10.000, in dem der Schwerpunkt des Feldblockes liegt</Beschreibung>
+						<Inhalt></Inhalt>
+					</TK10_BLATT>
+					<GUELTVON_F>
+						<Datentyp>Datum</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Beginn der fachlichen Gültigkeit des Feldblocks</Beschreibung>
+						<Inhalt></Inhalt>
+					</GUELTVON_F>
+					<GUELTBIS_F>
+						<Datentyp>Datum</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Ende der fachlichen Gültigkeit des Feldblocks</Beschreibung>
+						<Inhalt></Inhalt>
+					</GUELTBIS_F>
+					<geom>
+						<Datentyp>Polygon</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Geometrietyp (Feldname abhängig vom Exportformat ggf. shape)</Beschreibung>
+						<Inhalt></Inhalt>
+					</geom>
+				</Feldbloecke>
+				<Landschaftselemente>
+					<gid>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Eindeutige Datensatz-(Geo-)ID (entspricht ID,FID, Objekt_ID)</Beschreibung>
+						<Inhalt></Inhalt>
+					</gid>
+					<FGUE_JAHR>
+						<Datentyp>Text</Datentyp>
+						<Laenge>4</Laenge>
+						<Beschreibung>Jahresscheibe der fachlichen Gültigkeit</Beschreibung>
+						<Inhalt></Inhalt>
+					</FGUE_JAHR>
+					<LE_ID>
+						<Datentyp>Text</Datentyp>
+						<Laenge>16</Laenge>
+						<Beschreibung>Flächenidentifikator des Landschaftselements (FLEK)</Beschreibung>
+						<Inhalt></Inhalt>
+					</LE_ID>
+					<LE_KAT>
+						<Datentyp>Text</Datentyp>
+						<Laenge>2</Laenge>
+						<Beschreibung>Kategorie des LE als Kürzel (siehe nachfolgende Liste)</Beschreibung>
+						<Inhalt>BR = Baumreihen CC EB = Einzelbaum CC FG = Feuchtgebiete CC FH = Feldgehölz CC FR = Feldraine FS = Fels- und Steinriegel sowie naturversteinte Fläche HK = Hecke/Knick CC NT = Naturstein und Trockenmauer, Lesesteinwall</Inhalt>
+					</LE_KAT>
+					<DFBK_TYP>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Kategorie des LE codiert als Zahl</Beschreibung>
+						<Inhalt></Inhalt>
+					</DFBK_TYP>
+					<FL_HA>
+						<Datentyp>Numerisch</Datentyp>
+						<Laenge>11 + 4 Nachkommastellen</Laenge>
+						<Beschreibung>Fläche des Landschaftselementes in Hektar </Beschreibung>
+						<Inhalt></Inhalt>
+					</FL_HA>
+					<KREIS_NR>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Nummer des pflegezuständigen Amtes für Landwirtschaft</Beschreibung>
+						<Inhalt></Inhalt>
+					</KREIS_NR>
+					<TK10_BLATT>
+						<Datentyp>Text</Datentyp>
+						<Laenge>14</Laenge>
+						<Beschreibung>Blatt der Topographischen Karte 1:10.000, in dem der Schwerpunkt des Landschaftselements liegt</Beschreibung>
+						<Inhalt></Inhalt>
+					</TK10_BLATT>
+					<GUELTVON_F>
+						<Datentyp>Datum</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Beginn der fachlichen Gültigkeit des LE</Beschreibung>
+						<Inhalt></Inhalt>
+					</GUELTVON_F>
+					<GUELTBIS_F>
+						<Datentyp>Datum</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Ende der fachlichen Gültigkeit des LE</Beschreibung>
+						<Inhalt></Inhalt>
+					</GUELTBIS_F>
+					<geom>
+						<Datentyp>Polygon</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Geometrietyp (Feldname abhängig vom Exportformat ggf. shape)</Beschreibung>
+						<Inhalt></Inhalt>
+					</geom>
+				</Landschaftselemente>
+				<NichtBeihilfefaehigeFlaechen>
+					<gid>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Eindeutige Datensatz-(Geo-)ID (entspricht ID,FID, Objekt_ID)</Beschreibung>
+						<Inhalt></Inhalt>
+					</gid>
+					<FGUE_JAHR>
+						<Datentyp>Text</Datentyp>
+						<Laenge>4</Laenge>
+						<Beschreibung>Jahresscheibe der fachlichen Gültigkeit</Beschreibung>
+						<Inhalt></Inhalt>
+					</FGUE_JAHR>
+					<NBF_ID>
+						<Datentyp>Text</Datentyp>
+						<Laenge>16</Laenge>
+						<Beschreibung>Flächenidentifikator der NBF (FLOB)</Beschreibung>
+						<Inhalt></Inhalt>
+					</NBF_ID>
+					<NBF_KAT>
+						<Datentyp>Text</Datentyp>
+						<Laenge>2</Laenge>
+						<Beschreibung>Kategorie des NBF als Kürzel (siehe nachfolgende Liste)</Beschreibung>
+						<Inhalt>AP = Agri-PV nicht landwirtschaftlich nutzbare Fläche BA = Sonstige Bauliche Anlagen BD = Binnendüne Be = Betonmast BG = Baumgruppen BM = Betonmasten o.ä. Bö = Böschungen BR = Baumreihen DB = Sonstige dauerhafte Bodennutzung EB = Einzelbaum FF = Fernseh-/Funktürme FG = Feuchtgebiet FH = Feldgehölz Fu = Befestigte Futtermieten Ge = Geröllflächen GF = Gebüschflächen GG = Gemüsegarten Gr = Graben He = Hecken HM = Hochspannungsmasten, sofern kein Punktobjekt HS = fester Hochstand/Hochsitz Kl = Kläranlagen KN = Kleinst-NBF (z.B. Wasserauslässe, Drainage-Schächte, ...) KO = Kleinstobjekt LR = Lesesteinriegel Mo = Moore OG = Obstgarten SB = Steinbrüche Se = Seen SF = Sonstige nicht landwirtschaftlich nutzbare Flächen So = Solitär Sö = Sölle St = Stahlskelettmast Te = Teiche TG = Tagebaue/Gruben TN = Technische Einrichtungen (Gassonden, Bohrtürme, Trafo..) TR = Terrassen Wa = Wald WB = Wasserbehälter Wi = Windrad (ohne Zuweg)</Inhalt>
+					</NBF_KAT>
+					<DFBK_TYP>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Kategorie des NBF codiert als Zahl</Beschreibung>
+						<Inhalt></Inhalt>
+					</DFBK_TYP>
+					<FL_HA>
+						<Datentyp>Numerisch</Datentyp>
+						<Laenge>11 + 4 Nachkommastellen</Laenge>
+						<Beschreibung>Fläche der NBF in Hektar </Beschreibung>
+						<Inhalt></Inhalt>
+					</FL_HA>
+					<KREIS_NR>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Nummer des pflegezuständigen Amtes für Landwirtschaft</Beschreibung>
+						<Inhalt></Inhalt>
+					</KREIS_NR>
+					<TK10_BLATT>
+						<Datentyp>Text</Datentyp>
+						<Laenge>14</Laenge>
+						<Beschreibung>Blatt der Topographischen Karte 1:10.000, in dem der Schwerpunkt der NBF liegt</Beschreibung>
+						<Inhalt></Inhalt>
+					</TK10_BLATT>
+					<GUELTVON_F>
+						<Datentyp>Datum</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Beginn der fachlichen Gültigkeit der NBF</Beschreibung>
+						<Inhalt></Inhalt>
+					</GUELTVON_F>
+					<GUELTBIS_F>
+						<Datentyp>Datum</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Ende der fachlichen Gültigkeit der NBF</Beschreibung>
+						<Inhalt></Inhalt>
+					</GUELTBIS_F>
+					<geom>
+						<Datentyp>Polygon</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Geometrietyp (Feldname abhängig vom Exportformat ggf. shape)</Beschreibung>
+						<Inhalt></Inhalt>
+					</geom>
+				</NichtBeihilfefaehigeFlaechen>
+				<LE_NBF_Zuordnung>
+					<gid>
+						<Datentyp>Integer</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Eindeutige Datensatz-(Geo-)ID (entspricht ID,FID, Objekt_ID)</Beschreibung>
+					</gid>
+					<FGUE_JAHR>
+						<Datentyp>Text</Datentyp>
+						<Laenge>4</Laenge>
+						<Beschreibung>Jahresscheibe der fachlichen Gültigkeit</Beschreibung>
+					</FGUE_JAHR>
+					<FB_ID>
+						<Datentyp>Text</Datentyp>
+						<Laenge>16</Laenge>
+						<Beschreibung>Feldblockidentifikator ("DEBBLI“+10 Ziffern)</Beschreibung>
+					</FB_ID>
+					<LE_ID>
+						<Datentyp>Text</Datentyp>
+						<Laenge>16</Laenge>
+						<Beschreibung>Identifikator ("DEBBLE“+10 Ziffern) des zugeordneten LE Identifikator ("DEBBNF“+10 Ziffern) des zugeordneten NBF</Beschreibung>
+					</LE_ID>
+					<GUELTVON_F>
+						<Datentyp>Datum</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Beginn der fachlichen Gültigkeit der NBF</Beschreibung>
+					</GUELTVON_F>
+					<GUELTBIS_F>
+						<Datentyp>Datum</Datentyp>
+						<Laenge></Laenge>
+						<Beschreibung>Ende der fachlichen Gültigkeit der NBF</Beschreibung>
+					</GUELTBIS_F>
+				</LE_NBF_Zuordnung>
+			</Datenstruktur>
+			<Objektstatistik>
+				<Feldbloecke>
+					<Anzahl>90867</Anzahl>
+					<FlSumme_ha>1328272,96</FlSumme_ha>
+				</Feldbloecke>
+				<Landschaftselemente>
+					<Anzahl>51049</Anzahl>
+					<FlSumme_ha>6196,92</FlSumme_ha>
+				</Landschaftselemente>
+				<NichtBeihilfefaehigeFlaechen>
+					<Anzahl>68876</Anzahl>
+					<FlSumme_ha>8758,32</FlSumme_ha>
+				</NichtBeihilfefaehigeFlaechen>
+				<LE_NBF_Zuordnung>
+					<Anzahl>119781</Anzahl>
+					<FlSumme_ha>NULL</FlSumme_ha>
+				</LE_NBF_Zuordnung>
+			</Objektstatistik>
+		</_6_Technische_Parameter>
+		<_7_Verfügbarkeit_Internet>
+			<AllgInformationen>https://mleuv.brandenburg.de/mleuv/de/service/foerderung/landwirtschaft</AllgInformationen>
+			<Praesentationsdienst>https://maps.brandenburg.de/apps/Feldblockkataster</Praesentationsdienst>
+			<Download>https://geobroker.geobasis-bb.de</Download>
+		</_7_Verfügbarkeit_Internet>
+	</dfbk>
+</DBS>
