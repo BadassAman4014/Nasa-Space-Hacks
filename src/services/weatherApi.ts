@@ -37,16 +37,43 @@ export interface FieldWeatherSummary {
 
 export interface HourlyForecastPoint {
   time: string;
-  iso_time: string;
+  label: string;
+  temp_c: number;
   temperature_c: number;
-  feels_like_c: number;
+  humidity_percent: number | null;
+  dew_point_c: number | null;
   cloud_cover_percent: number;
   precipitation_mm: number;
-  weather_code: number;
+  precipitation_probability: number | null;
   condition: string;
   icon: string;
   wind_speed_ms: number;
-  wind_direction_deg: number;
+  wind_direction_deg: number | null;
+  is_now?: boolean;
+}
+
+export interface DwdAlert {
+  event: string;
+  category: string;
+  label: string;
+  level: number;
+  level_label: string;
+  headline: string | null;
+  description: string | null;
+  instruction: string | null;
+  start: string | null;
+  end: string | null;
+  is_active: boolean;
+}
+
+export interface DwdAlerts {
+  available: boolean;
+  reason: string | null;
+  source: string;
+  region: string | null;
+  warn_cell_id?: string;
+  issued_at?: string | null;
+  alerts: DwdAlert[];
 }
 
 export interface IncomingCloudsInfo {
@@ -76,8 +103,10 @@ export interface DailyForecastPoint {
   temp_max_c: number;
   temp_min_c: number;
   precipitation_mm: number;
-  precipitation_probability: number;
-  wind_speed_ms: number;
+  precipitation_probability: number | null;
+  wind_speed_ms: number | null;
+  wind_gust_ms?: number | null;
+  et0_mm?: number | null;
   wind_compass: string;
   wind_arrow: string;
   condition: string;
@@ -129,21 +158,26 @@ export interface FieldWeatherData {
   virtual_station: VirtualStation;
   current: {
     temperature_c: number;
-    feels_like_c: number;
+    feels_like_c: number | null;
     humidity_percent: number;
+    dew_point_c: number | null;
     cloud_cover_percent: number;
     wind_speed_ms: number;
     wind_direction_deg: number;
     wind_compass: string;
     wind_arrow: string;
     precipitation_mm: number;
-    pressure_hpa: number;
+    pressure_hpa: number | null;
+    soil_temp_0_7_c: number | null;
+    soil_temp_7_28_c: number | null;
     weather_code: number;
     condition: string;
     icon: string;
     observation_time: string;
     timestamp: string;
   };
+  alerts?: DwdAlerts;
+  elevation_m?: number | null;
   incoming_clouds: IncomingCloudsInfo;
   forecast_hourly: HourlyForecastPoint[];
   forecast_daily?: DailyForecastPoint[];
@@ -225,7 +259,7 @@ export interface PointWeather {
   lat: number;
   lon: number;
   temperature_c: number;
-  feels_like_c: number;
+  feels_like_c: number | null;
   humidity_percent: number;
   cloud_cover_percent: number;
   wind_speed_kmh: number;
@@ -240,90 +274,9 @@ export interface PointWeather {
 }
 
 export async function fetchPointWeather(lat: number, lon: number): Promise<PointWeather> {
-  try {
-    const res = await fetch(`${API_BASE}/point?lat=${lat}&lon=${lon}`);
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch {
-    // Fall back to client-side Open-Meteo or baseline
-  }
-
-  // Direct client-side Open-Meteo query
-  try {
-    const omRes = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m&timezone=auto`
-    );
-    if (omRes.ok) {
-      const data = await omRes.json();
-      const c = data.current || {};
-      const temp = Number(c.temperature_2m ?? 18.0);
-      const wCode = Number(c.weather_code ?? 1);
-      const isCloudy = (c.cloud_cover ?? 30) > 60;
-      const condition =
-        wCode === 0
-          ? 'Clear sky'
-          : wCode <= 3
-          ? isCloudy
-            ? 'Overcast'
-            : 'Partly cloudy'
-          : wCode >= 51 && wCode <= 67
-          ? 'Rain'
-          : wCode >= 71 && wCode <= 77
-          ? 'Snow'
-          : wCode >= 95
-          ? 'Thunderstorm'
-          : 'Partly cloudy';
-      const icon =
-        wCode === 0
-          ? 'sunny'
-          : wCode <= 3
-          ? isCloudy
-            ? 'cloudy'
-            : 'partly_cloudy'
-          : wCode >= 51 && wCode <= 67
-          ? 'rain'
-          : wCode >= 71 && wCode <= 77
-          ? 'snow'
-          : 'partly_cloudy';
-
-      return {
-        lat,
-        lon,
-        temperature_c: Math.round(temp * 10) / 10,
-        feels_like_c: Math.round(Number(c.apparent_temperature ?? temp) * 10) / 10,
-        humidity_percent: Math.round(Number(c.relative_humidity_2m ?? 65)),
-        cloud_cover_percent: Math.round(Number(c.cloud_cover ?? 30)),
-        wind_speed_kmh: Math.round(Number(c.wind_speed_10m ?? 12) * 10) / 10,
-        wind_speed_ms: Math.round(((c.wind_speed_10m ?? 12) / 3.6) * 10) / 10,
-        wind_direction_deg: Number(c.wind_direction_10m ?? 240),
-        wind_compass: 'W',
-        wind_arrow: '←',
-        precipitation_mm: Number(c.precipitation ?? 0),
-        weather_code: wCode,
-        condition,
-        icon,
-      };
-    }
-  } catch {
-    // Ignore and fallback
-  }
-
-  return {
-    lat,
-    lon,
-    temperature_c: 18.4,
-    feels_like_c: 18.0,
-    humidity_percent: 65,
-    cloud_cover_percent: 35,
-    wind_speed_kmh: 14.0,
-    wind_speed_ms: 3.9,
-    wind_direction_deg: 240,
-    wind_compass: 'W',
-    wind_arrow: '←',
-    precipitation_mm: 0.0,
-    weather_code: 2,
-    condition: 'Partly cloudy',
-    icon: 'partly_cloudy',
-  };
+  // The backend is the single source: it returns 503 when Open-Meteo is unreachable.
+  // No placeholder observation is fabricated on failure.
+  const res = await fetch(`${API_BASE}/point?lat=${lat}&lon=${lon}`);
+  if (!res.ok) throw new Error(`Weather unavailable (${res.status})`);
+  return res.json();
 }

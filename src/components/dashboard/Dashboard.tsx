@@ -1075,7 +1075,7 @@ function RegionalConditions({
       <header className="flex items-center gap-3">
         <div className="shrink-0">{renderWeatherIcon()}</div>
         <strong className="text-2xl font-bold text-[#111827]">
-          {loading ? '—' : `${weather ? weather.temperature_c.toFixed(1) : '18.4'}°C`}
+          {loading ? '—' : weather ? `${weather.temperature_c.toFixed(1)}°C` : '--'}
         </strong>
         <span className="text-[11px] text-[#6b7280] leading-tight mr-auto truncate max-w-[180px]">
           <span className="font-semibold text-gray-900 block truncate" title={locationName}>
@@ -1083,7 +1083,7 @@ function RegionalConditions({
           </span>
           <span className="text-[#9ca3af] text-[10px] truncate block">
             {weather
-              ? `${weather.condition} • Feels like ${weather.feels_like_c}°C`
+              ? `${weather.condition} • ${weather.feels_like_c != null ? `Feels like ${weather.feels_like_c}°C` : ''}`
               : t('dashboard.seasonBaseline')}
           </span>
         </span>

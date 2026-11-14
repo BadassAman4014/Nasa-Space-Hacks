@@ -5,13 +5,19 @@ from Open-Meteo and NASA POWER for farm fields, and manages virtual station stat
 """
 
 from datetime import datetime, timezone, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import json
 import math
 import requests
 
 from app.services.field_analytics.repository import analytics_repo
 from app.services.user_farms_repository import user_farms_repo
+from app.services.dwd_service import dwd_service
+
+
+class WeatherUnavailable(RuntimeError):
+    """Raised when Open-Meteo cannot supply real data. No placeholder values are generated."""
+
 
 class WeatherStationService:
     OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
@@ -75,7 +81,6 @@ class WeatherStationService:
         now_iso = datetime.now(timezone.utc).isoformat()
         meta = {
             "model": "vStation-Pro AgriMesh",
-            "elevation_m": 42.0,
             "sensors": ["temp", "humidity", "wind", "clouds", "rain", "soil_temp"]
         }
         with analytics_repo._connection() as conn:
@@ -124,62 +129,119 @@ class WeatherStationService:
         return self.add_virtual_station(field_id)
 
     def get_all_fields_weather_summary(self) -> List[Dict[str, Any]]:
-        """Returns current weather summary for each field with a virtual station."""
+        """
+        Returns current weather summary for each field with a virtual station.
+        Fields whose live weather cannot be retrieved are omitted (never filled with placeholder values).
+        """
         stations = self.list_virtual_stations()
         summaries = []
         for s in stations:
             f_id = s["field_id"]
             field = user_farms_repo.get_field(f_id)
             geom = field.get("geometry") if field else None
-            lat, lon = self._calculate_centroid(geom) if geom else (s["lat"], s["lon"])
             try:
-                data = self.get_field_weather_data(f_id)
-                curr = data["current"]
-                summaries.append({
-                    "field_id": f_id,
-                    "field_name": s["field_name"],
-                    "farm_name": s["farm_name"],
-                    "coordinates": [lat, lon],
-                    "geometry": geom,
-                    "is_active": s["is_active"],
-                    "temperature_c": curr["temperature_c"],
-                    "feels_like_c": curr["feels_like_c"],
-                    "humidity_percent": curr["humidity_percent"],
-                    "wind_speed_ms": curr["wind_speed_ms"],
-                    "wind_direction_deg": curr["wind_direction_deg"],
-                    "wind_compass": curr["wind_compass"],
-                    "wind_arrow": curr["wind_arrow"],
-                    "cloud_cover_percent": curr["cloud_cover_percent"],
-                    "precipitation_mm": curr["precipitation_mm"],
-                    "condition": curr["condition"],
-                    "icon": curr["icon"],
-                })
+                lat, lon = self._calculate_centroid(geom) if geom else (s["lat"], s["lon"])
+                api_data = self._fetch_open_meteo(
+                    lat, lon, current=self._CURRENT_VARS,
+                )
+                curr = self._parse_current(api_data)
             except Exception:
-                summaries.append({
-                    "field_id": f_id,
-                    "field_name": s["field_name"],
-                    "farm_name": s["farm_name"],
-                    "coordinates": [lat, lon],
-                    "geometry": geom,
-                    "is_active": s["is_active"],
-                    "temperature_c": 8.0,
-                    "feels_like_c": 3.0,
-                    "humidity_percent": 65.0,
-                    "wind_speed_ms": 6.0,
-                    "wind_direction_deg": 270,
-                    "wind_compass": "W",
-                    "wind_arrow": "←",
-                    "cloud_cover_percent": 40,
-                    "precipitation_mm": 0.0,
-                    "condition": "Partly cloudy",
-                    "icon": "partly_cloudy",
-                })
+                continue
+            summaries.append({
+                "field_id": f_id,
+                "field_name": s["field_name"],
+                "farm_name": s["farm_name"],
+                "coordinates": [lat, lon],
+                "geometry": geom,
+                "is_active": s["is_active"],
+                "temperature_c": curr["temperature_c"],
+                "feels_like_c": curr["feels_like_c"],
+                "humidity_percent": curr["humidity_percent"],
+                "wind_speed_ms": curr["wind_speed_ms"],
+                "wind_direction_deg": curr["wind_direction_deg"],
+                "wind_compass": curr["wind_compass"],
+                "wind_arrow": curr["wind_arrow"],
+                "cloud_cover_percent": curr["cloud_cover_percent"],
+                "precipitation_mm": curr["precipitation_mm"],
+                "condition": curr["condition"],
+                "icon": curr["icon"],
+            })
         return summaries
+
+    _CURRENT_VARS = (
+        "temperature_2m,relative_humidity_2m,apparent_temperature,dew_point_2m,precipitation,"
+        "weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,surface_pressure,"
+        "soil_temperature_0_to_7cm,soil_temperature_7_to_28cm"
+    )
+
+    def _fetch_open_meteo(self, lat: float, lon: float, current: str,
+                          hourly: Optional[str] = None, daily: Optional[str] = None,
+                          forecast_days: Optional[int] = None, past_hours: Optional[int] = None) -> Dict[str, Any]:
+        params: Dict[str, Any] = {"latitude": lat, "longitude": lon, "current": current, "timezone": "auto"}
+        if hourly:
+            params["hourly"] = hourly
+        if daily:
+            params["daily"] = daily
+        if forecast_days:
+            params["forecast_days"] = forecast_days
+        if past_hours:
+            params["past_hours"] = past_hours
+        try:
+            resp = requests.get(self.OPEN_METEO_URL, params=params, timeout=8)
+            resp.raise_for_status()
+            data = resp.json()
+        except Exception as exc:
+            raise WeatherUnavailable(f"Open-Meteo request failed: {type(exc).__name__}") from exc
+        if not isinstance(data.get("current"), dict):
+            raise WeatherUnavailable("Open-Meteo returned no current observation.")
+        return data
+
+    @staticmethod
+    def _num(value: Any, ndigits: int = 1) -> Optional[float]:
+        return None if value is None else round(float(value), ndigits)
+
+    def _parse_current(self, api_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Normalises Open-Meteo 'current'. Required values raise if missing; optional ones stay None."""
+        c = api_data["current"]
+        for key in ("temperature_2m", "relative_humidity_2m", "wind_speed_10m", "wind_direction_10m", "cloud_cover", "weather_code"):
+            if c.get(key) is None:
+                raise WeatherUnavailable(f"Open-Meteo current observation is missing '{key}'.")
+        temp_c = round(float(c["temperature_2m"]), 1)
+        humidity = round(float(c["relative_humidity_2m"]), 1)
+        cloud_pct = c.get("cloud_cover")
+        wind_ms = round(float(c["wind_speed_10m"]) / 3.6, 1)
+        wind_deg = int(c["wind_direction_10m"])
+        w_code = int(c["weather_code"]) if c.get("weather_code") is not None else None
+        condition, icon = self._parse_weather_code(w_code, float(cloud_pct)) if (w_code is not None and cloud_pct is not None) else ("Unknown", "cloudy")
+        compass, arrow = self._deg_to_compass_and_arrow(wind_deg)
+        return {
+            "temperature_c": temp_c,
+            "feels_like_c": self._num(c.get("apparent_temperature")),
+            "humidity_percent": humidity,
+            "dew_point_c": self._num(c.get("dew_point_2m")),
+            "cloud_cover_percent": int(round(cloud_pct)) if cloud_pct is not None else None,
+            "wind_speed_ms": wind_ms,
+            "wind_direction_deg": wind_deg,
+            "wind_compass": compass,
+            "wind_arrow": arrow,
+            "precipitation_mm": self._num(c.get("precipitation")) or 0.0,
+            "pressure_hpa": self._num(c.get("surface_pressure")),
+            "soil_temp_0_7_c": self._num(c.get("soil_temperature_0_to_7cm")),
+            "soil_temp_7_28_c": self._num(c.get("soil_temperature_7_to_28cm")),
+            "weather_code": w_code,
+            "condition": condition,
+            "icon": icon,
+        }
+
+    @staticmethod
+    def _at(arr: List[Any], i: int) -> Any:
+        return arr[i] if i < len(arr) else None
 
     def get_field_weather_data(self, field_id: str) -> Dict[str, Any]:
         """
-        Retrieves real current weather, cloud simulation params, incoming clouds,
-        and next 24-hour hourly forecast from Open-Meteo for the field's exact location.
+        Real current weather, 24 h hourly forecast, 7-day daily forecast and a 16-day outlook from
+        Open-Meteo for the field centroid, plus official DWD warnings for fields in Germany.
+        Raises WeatherUnavailable if Open-Meteo cannot answer; no values are synthesised.
         """
         field = user_farms_repo.get_field(field_id)
         if not field:
@@ -193,243 +255,158 @@ class WeatherStationService:
         lat, lon = self._calculate_centroid(field.get("geometry"))
         station = self.get_station_for_field(field_id)
 
-        # Query Open-Meteo for real-time, hourly, and 7-day daily forecast
-        params = {
-            "latitude": lat,
-            "longitude": lon,
-            "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,surface_pressure",
-            "hourly": "temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,soil_temperature_0cm",
-            "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant",
-            "forecast_days": 7,
-            "timezone": "auto"
-        }
+        api_data = self._fetch_open_meteo(
+            lat, lon,
+            current=self._CURRENT_VARS,
+            hourly=(
+                "temperature_2m,relative_humidity_2m,dew_point_2m,precipitation_probability,precipitation,"
+                "weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,soil_temperature_0_to_7cm"
+            ),
+            daily=(
+                "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,"
+                "precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,"
+                "wind_direction_10m_dominant,et0_fao_evapotranspiration"
+            ),
+            forecast_days=16,
+            past_hours=2,
+        )
+        cur = self._parse_current(api_data)
+        temp_c = cur["temperature_c"]
+        humidity = cur["humidity_percent"]
+        cloud_pct = cur["cloud_cover_percent"]
+        wind_ms = cur["wind_speed_ms"]
+        wind_deg = cur["wind_direction_deg"]
+        precip_mm = cur["precipitation_mm"]
+        wind_compass, wind_arrow = cur["wind_compass"], cur["wind_arrow"]
 
+        # Local "now" in the field's timezone, as reported by Open-Meteo.
         try:
-            resp = requests.get(self.OPEN_METEO_URL, params=params, timeout=5)
-            resp.raise_for_status()
-            api_data = resp.json()
-        except Exception as e:
-            # Fallback baseline for Central Europe / Brandenburg
-            api_data = self._generate_fallback_weather(lat, lon)
+            now_dt = datetime.fromisoformat(api_data["current"]["time"])
+        except Exception:
+            now_dt = datetime.now()
 
-        current_raw = api_data.get("current", {})
         hourly_raw = api_data.get("hourly", {})
-
-        # Process current weather
-        temp_c = round(float(current_raw.get("temperature_2m", 7.0)), 1)
-        feels_like_c = round(float(current_raw.get("apparent_temperature", 6.5)), 1)
-        humidity = round(float(current_raw.get("relative_humidity_2m", 68.0)), 1)
-        cloud_pct = round(float(current_raw.get("cloud_cover", 45.0)), 1)
-        wind_kmh = float(current_raw.get("wind_speed_10m", 21.6))
-        wind_ms = round(wind_kmh / 3.6, 1) # convert to m/s
-        wind_deg = int(current_raw.get("wind_direction_10m", 270))
-        precip_mm = round(float(current_raw.get("precipitation", 0.0)), 1)
-        w_code = int(current_raw.get("weather_code", 2))
-        pressure_hpa = round(float(current_raw.get("surface_pressure", 1014.0)), 1)
-
-        condition_desc, icon_type = self._parse_weather_code(w_code, cloud_pct)
-        wind_compass, wind_arrow = self._deg_to_compass_and_arrow(wind_deg)
-
-        # Process hourly series (next 24 hours starting from current hour)
-        now_dt = datetime.now()
         times = hourly_raw.get("time", [])
-        h_temps = hourly_raw.get("temperature_2m", [])
-        h_clouds = hourly_raw.get("cloud_cover", [])
-        h_precip = hourly_raw.get("precipitation", [])
-        h_precip_prob = hourly_raw.get("precipitation_probability", [])
-        h_codes = hourly_raw.get("weather_code", [])
-        h_winds = hourly_raw.get("wind_speed_10m", [])
-        h_wind_dirs = hourly_raw.get("wind_direction_10m", [])
+        col = {k: hourly_raw.get(k, []) for k in (
+            "temperature_2m", "relative_humidity_2m", "dew_point_2m", "precipitation_probability",
+            "precipitation", "weather_code", "cloud_cover", "wind_speed_10m", "wind_direction_10m",
+        )}
 
-        # Find closest index
-        start_idx = 0
         now_hour_str = now_dt.strftime("%Y-%m-%dT%H:00")
-        for idx, t_str in enumerate(times):
-            if t_str >= now_hour_str:
-                start_idx = idx
-                break
+        start_idx = next((i for i, t in enumerate(times) if t >= now_hour_str), 0)
 
-        forecast_points = []
-        for i in range(start_idx, min(start_idx + 24, len(times))):
+        def hour_point(i: int) -> Optional[Dict[str, Any]]:
+            t_val = self._at(col["temperature_2m"], i)
+            w_raw = self._at(col["wind_speed_10m"], i)
+            c_val = self._at(col["cloud_cover"], i)
+            code = self._at(col["weather_code"], i)
+            if t_val is None or w_raw is None or c_val is None or code is None:
+                return None
+            desc, icon = self._parse_weather_code(int(code), float(c_val)) if (code is not None and c_val is not None) else ("Unknown", "cloudy")
+            w_dir = self._at(col["wind_direction_10m"], i)
             t_str = times[i]
-            c_val = float(h_clouds[i]) if i < len(h_clouds) else cloud_pct
-            t_val = float(h_temps[i]) if i < len(h_temps) else temp_c
-            p_val = float(h_precip[i]) if i < len(h_precip) else 0.0
-            prob_val = int(h_precip_prob[i]) if i < len(h_precip_prob) else 0
-            code_val = int(h_codes[i]) if i < len(h_codes) else 2
-            w_ms = round(float(h_winds[i]) / 3.6, 1) if i < len(h_winds) else wind_ms
-            w_dir = int(h_wind_dirs[i]) if i < len(h_wind_dirs) else wind_deg
-            c_desc, c_icon = self._parse_weather_code(code_val, c_val)
-
-            # Hour label like "14:00"
-            hour_label = t_str.split("T")[1][:5] if "T" in t_str else t_str[-5:]
-            forecast_points.append({
+            prob = self._at(col["precipitation_probability"], i)
+            return {
                 "time": t_str,
-                "label": hour_label,
-                "temp_c": round(t_val, 1),
-                "cloud_cover_percent": int(round(c_val)),
-                "precipitation_mm": round(p_val, 1),
-                "precipitation_probability": prob_val,
-                "wind_speed_ms": w_ms,
-                "wind_direction_deg": w_dir,
-                "condition": c_desc,
-                "icon": c_icon,
-                "is_now": (i == start_idx)
-            })
+                "label": t_str.split("T")[1][:5] if "T" in t_str else t_str[-5:],
+                "temp_c": round(float(t_val), 1),
+                "temperature_c": round(float(t_val), 1),
+                "humidity_percent": self._num(self._at(col["relative_humidity_2m"], i)),
+                "dew_point_c": self._num(self._at(col["dew_point_2m"], i)),
+                "cloud_cover_percent": int(round(c_val)) if c_val is not None else None,
+                "precipitation_mm": round(float(self._at(col["precipitation"], i) or 0.0), 1),
+                "precipitation_probability": int(prob) if prob is not None else None,
+                "wind_speed_ms": round(float(w_raw) / 3.6, 1),
+                "wind_direction_deg": int(w_dir) if w_dir is not None else None,
+                "condition": desc,
+                "icon": icon,
+            }
 
-        # Process 7-day daily forecast
-        daily_raw = api_data.get("daily", {})
-        d_times = daily_raw.get("time", [])
-        d_maxs = daily_raw.get("temperature_2m_max", [])
-        d_mins = daily_raw.get("temperature_2m_min", [])
-        d_precips = daily_raw.get("precipitation_sum", [])
-        d_probs = daily_raw.get("precipitation_probability_max", [])
-        d_codes = daily_raw.get("weather_code", [])
-        d_winds = daily_raw.get("wind_speed_10m_max", [])
-        d_wind_dirs = daily_raw.get("wind_direction_10m_dominant", [])
+        forecast_points: List[Dict[str, Any]] = []
+        for i in range(start_idx, min(start_idx + 24, len(times))):
+            p = hour_point(i)
+            if p:
+                p["is_now"] = not forecast_points
+                forecast_points.append(p)
 
-        forecast_daily = []
-        for i in range(len(d_times)):
-            d_str = d_times[i]
+        past_points = [p for p in (hour_point(i) for i in range(max(0, start_idx - 2), start_idx)) if p]
+
+        # Daily forecast (up to 16 days of real model output)
+        d = api_data.get("daily", {})
+        d_times = d.get("time", [])
+        daily_all: List[Dict[str, Any]] = []
+        for i, d_str in enumerate(d_times):
+            max_t, min_t = self._at(d.get("temperature_2m_max", []), i), self._at(d.get("temperature_2m_min", []), i)
+            if max_t is None or min_t is None:
+                continue
             try:
                 dt_obj = datetime.strptime(d_str, "%Y-%m-%d")
                 day_name = "Today" if i == 0 else dt_obj.strftime("%a")
-                date_formatted = dt_obj.strftime("%b %d")
+                date_label = dt_obj.strftime("%b %d")
             except Exception:
-                day_name = f"Day {i+1}"
-                date_formatted = d_str
-
-            max_t = round(float(d_maxs[i]), 1) if i < len(d_maxs) else temp_c + 2.0
-            min_t = round(float(d_mins[i]), 1) if i < len(d_mins) else temp_c - 3.0
-            p_sum = round(float(d_precips[i]), 1) if i < len(d_precips) else 0.0
-            p_prob = int(d_probs[i]) if i < len(d_probs) else 10
-            c_code = int(d_codes[i]) if i < len(d_codes) else 2
-            w_max = round(float(d_winds[i]) / 3.6, 1) if i < len(d_winds) else wind_ms
-            w_dir = int(d_wind_dirs[i]) if i < len(d_wind_dirs) else wind_deg
-            w_compass_d, w_arrow_d = self._deg_to_compass_and_arrow(w_dir)
-            cond_desc_d, cond_icon_d = self._parse_weather_code(c_code, 40)
-
-            forecast_daily.append({
+                day_name, date_label = f"Day {i + 1}", d_str
+            wind_raw = self._at(d.get("wind_speed_10m_max", []), i)
+            gust_raw = self._at(d.get("wind_gusts_10m_max", []), i)
+            w_dir = self._at(d.get("wind_direction_10m_dominant", []), i)
+            w_compass_d, w_arrow_d = self._deg_to_compass_and_arrow(int(w_dir)) if w_dir is not None else ("", "")
+            code = self._at(d.get("weather_code", []), i)
+            cond, icon = self._parse_weather_code(int(code), 40) if code is not None else ("Unknown", "cloudy")
+            prob = self._at(d.get("precipitation_probability_max", []), i)
+            et0 = self._at(d.get("et0_fao_evapotranspiration", []), i)
+            daily_all.append({
                 "date": d_str,
                 "day_name": day_name,
-                "date_label": date_formatted,
-                "temp_max_c": max_t,
-                "temp_min_c": min_t,
-                "precipitation_mm": p_sum,
-                "precipitation_probability": p_prob,
-                "wind_speed_ms": w_max,
+                "date_label": date_label,
+                "temp_max_c": round(float(max_t), 1),
+                "temp_min_c": round(float(min_t), 1),
+                "precipitation_mm": round(float(self._at(d.get("precipitation_sum", []), i) or 0.0), 1),
+                "precipitation_probability": int(prob) if prob is not None else None,
+                "wind_speed_ms": round(float(wind_raw) / 3.6, 1) if wind_raw is not None else None,
+                "wind_gust_ms": round(float(gust_raw) / 3.6, 1) if gust_raw is not None else None,
                 "wind_compass": w_compass_d,
                 "wind_arrow": w_arrow_d,
-                "condition": cond_desc_d,
-                "icon": cond_icon_d,
+                "et0_mm": round(float(et0), 1) if et0 is not None else None,
+                "condition": cond,
+                "icon": icon,
             })
+        forecast_daily = daily_all[:7]
 
-        if not forecast_daily:
-            for i in range(7):
-                f_dt = now_dt + timedelta(days=i)
-                forecast_daily.append({
-                    "date": f_dt.strftime("%Y-%m-%d"),
-                    "day_name": "Today" if i == 0 else f_dt.strftime("%a"),
-                    "date_label": f_dt.strftime("%b %d"),
-                    "temp_max_c": round(temp_c + 1.5 + (i % 3) * 0.8, 1),
-                    "temp_min_c": round(temp_c - 3.2 - (i % 2) * 0.5, 1),
-                    "precipitation_mm": 1.2 if i in (2, 5) else 0.0,
-                    "precipitation_probability": 45 if i in (2, 5) else 10,
-                    "wind_speed_ms": round(wind_ms + (i % 2) * 0.6, 1),
-                    "wind_compass": wind_compass,
-                    "wind_arrow": wind_arrow,
-                    "condition": "Rain showers" if i in (2, 5) else ("Partly cloudy" if i % 2 == 0 else "Clear sky"),
-                    "icon": "rain" if i in (2, 5) else ("partly_cloudy" if i % 2 == 0 else "sunny")
-                })
-
-        # Process monthly multi-week outlook
-        forecast_monthly = [
-            {
-                "week_label": "Week 1 (Current)",
-                "date_range": f"{now_dt.strftime('%b %d')} - {(now_dt + timedelta(days=6)).strftime('%b %d')}",
-                "avg_temp_c": round(temp_c, 1),
-                "temp_range": f"{round(temp_c - 3, 1)}°C to {round(temp_c + 2, 1)}°C",
-                "total_precip_mm": round(sum(d["precipitation_mm"] for d in forecast_daily[:7]), 1),
-                "soil_condition": "Adequate Moisture",
-                "spraying_suitability": "Optimal (Low Drift)",
-                "frost_risk": "Low (Min > 2°C)",
-                "gdd_accumulated": 42,
-                "icon": "partly_cloudy",
-                "summary": "Stable microclimate with favorable field transit conditions."
-            },
-            {
-                "week_label": "Week 2 (Extended)",
-                "date_range": f"{(now_dt + timedelta(days=7)).strftime('%b %d')} - {(now_dt + timedelta(days=13)).strftime('%b %d')}",
-                "avg_temp_c": round(temp_c - 1.2, 1),
-                "temp_range": f"{round(temp_c - 4.5, 1)}°C to {round(temp_c + 1.5, 1)}°C",
-                "total_precip_mm": 6.4,
-                "soil_condition": "Moderate Moisture",
-                "spraying_suitability": "Good Windows (Morning)",
-                "frost_risk": "Moderate (Morning Dew)",
-                "gdd_accumulated": 35,
-                "icon": "cloudy",
-                "summary": "Frontal passage expected midweek with light precipitation."
-            },
-            {
-                "week_label": "Week 3 (Outlook)",
-                "date_range": f"{(now_dt + timedelta(days=14)).strftime('%b %d')} - {(now_dt + timedelta(days=20)).strftime('%b %d')}",
-                "avg_temp_c": round(temp_c - 0.5, 1),
-                "temp_range": f"{round(temp_c - 3.8, 1)}°C to {round(temp_c + 2.8, 1)}°C",
-                "total_precip_mm": 3.8,
-                "soil_condition": "Optimal Transit",
-                "spraying_suitability": "High",
-                "frost_risk": "Low",
-                "gdd_accumulated": 38,
-                "icon": "sunny",
-                "summary": "High pressure ridge dominant, dry canopy and firm field access."
-            },
-            {
-                "week_label": "Week 4 (Monthly Transition)",
-                "date_range": f"{(now_dt + timedelta(days=21)).strftime('%b %d')} - {(now_dt + timedelta(days=27)).strftime('%b %d')}",
-                "avg_temp_c": round(temp_c - 2.0, 1),
-                "temp_range": f"{round(temp_c - 5.0, 1)}°C to {round(temp_c + 0.5, 1)}°C",
-                "total_precip_mm": 9.2,
-                "soil_condition": "High Moisture",
-                "spraying_suitability": "Variable",
-                "frost_risk": "Moderate Frost Risk",
-                "gdd_accumulated": 28,
-                "icon": "rain",
-                "summary": "Late-month precipitation cluster with cooler nights."
-            }
-        ]
-
-        # 30-day projection for monthly agricultural graph
+        forecast_monthly = self._build_outlook_weeks(daily_all)
         monthly_trend_days = []
-        for d in range(30):
-            day_dt = now_dt + timedelta(days=d)
-            day_max = round(temp_c + 2.0 + math.sin(d / 4.0) * 2.8, 1)
-            day_min = round(temp_c - 3.0 + math.sin(d / 4.0) * 2.2, 1)
-            day_avg = round((day_max + day_min) / 2.0, 1)
-            day_precip = round(max(0.0, math.sin(d / 2.3) * 3.8) if (d % 5 in (1, 2)) else 0.0, 1)
+        for n, day in enumerate(daily_all):
+            wind = day["wind_speed_ms"]
             monthly_trend_days.append({
-                "day_number": d + 1,
-                "date": day_dt.strftime("%Y-%m-%d"),
-                "label": day_dt.strftime("%d %b"),
-                "temp_max": day_max,
-                "temp_min": day_min,
-                "temp_avg": day_avg,
-                "precip_mm": day_precip,
-                "spray_safe": day_precip < 0.5 and (d % 4 != 0)
+                "day_number": n + 1,
+                "date": day["date"],
+                "label": datetime.strptime(day["date"], "%Y-%m-%d").strftime("%d %b"),
+                "temp_max": day["temp_max_c"],
+                "temp_min": day["temp_min_c"],
+                "temp_avg": round((day["temp_max_c"] + day["temp_min_c"]) / 2.0, 1),
+                "precip_mm": day["precipitation_mm"],
+                "spray_safe": self._is_spray_safe(day),
             })
 
-        # Calculate Incoming Clouds prediction
         incoming_clouds = self._calculate_incoming_clouds(forecast_points, cloud_pct)
+        radar_timeline = self._generate_radar_timeline(now_dt, past_points, forecast_points, precip_mm)
 
-        # Scrubber radar frames (past 2h, current, next 4h)
-        radar_timeline = self._generate_radar_timeline(now_dt, forecast_points, precip_mm)
+        # Official DWD warnings (Germany only; never raises)
+        dwd_alerts = dwd_service.get_alerts_for_point(lat, lon)
+
+        cloud_for_sim = cloud_pct if cloud_pct is not None else 0
+        pressure = cur["pressure_hpa"]
+        today_et0 = daily_all[0]["et0_mm"] if daily_all else None
+
+        def fmt(v: Optional[float], unit: str) -> Optional[str]:
+            return None if v is None else f"{v}{unit}"
 
         return {
             "field_id": field_id,
             "field_name": field.get("name", "Field"),
             "farm_name": field.get("farm_name", "My Farm"),
-            "area_ha": round(float(field.get("area_hectares", 10.0)), 2),
-            "crop": field.get("current_crop", "Winter wheat"),
+            "area_ha": round(float(field["area_hectares"]), 2) if field.get("area_hectares") is not None else None,
+            "crop": field.get("current_crop"),
             "coordinates": {"lat": lat, "lon": lon},
+            "elevation_m": api_data.get("elevation"),
             "geometry": field.get("geometry"),
             "virtual_station": {
                 "is_active": bool(station["is_active"]) if station else False,
@@ -439,30 +416,36 @@ class WeatherStationService:
                     "temperature": f"{temp_c}°C",
                     "humidity": f"{humidity}%",
                     "wind": f"{wind_ms} m/s {wind_compass} {wind_arrow}",
-                    "cloud_cover": f"{int(cloud_pct)}%",
-                    "barometric_pressure": f"{pressure_hpa} hPa",
-                    "dew_point": f"{round(temp_c - ((100 - humidity)/5), 1)}°C",
-                    "soil_temperature": f"{round(temp_c - 1.2, 1)}°C",
-                    "leaf_wetness_risk": "Moderate" if (humidity > 75 or precip_mm > 0.2) else "Low"
+                    "cloud_cover": fmt(cloud_pct, "%"),
+                    "barometric_pressure": fmt(pressure, " hPa"),
+                    "dew_point": fmt(cur["dew_point_c"], "°C"),
+                    "soil_temperature": fmt(cur["soil_temp_0_7_c"], "°C"),
+                    "soil_temperature_7_28cm": fmt(cur["soil_temp_7_28_c"], "°C"),
+                    "et0_today": fmt(today_et0, " mm"),
+                    "leaf_wetness_risk": "Moderate" if (humidity > 75 or precip_mm > 0.2) else "Low",
                 }
             },
             "current": {
                 "temperature_c": temp_c,
-                "feels_like_c": feels_like_c,
+                "feels_like_c": cur["feels_like_c"],
                 "humidity_percent": humidity,
-                "cloud_cover_percent": int(cloud_pct),
+                "dew_point_c": cur["dew_point_c"],
+                "cloud_cover_percent": cloud_pct,
                 "wind_speed_ms": wind_ms,
                 "wind_direction_deg": wind_deg,
                 "wind_compass": wind_compass,
                 "wind_arrow": wind_arrow,
                 "precipitation_mm": precip_mm,
-                "pressure_hpa": pressure_hpa,
-                "weather_code": w_code,
-                "condition": condition_desc,
-                "icon": icon_type,
+                "pressure_hpa": pressure,
+                "soil_temp_0_7_c": cur["soil_temp_0_7_c"],
+                "soil_temp_7_28_c": cur["soil_temp_7_28_c"],
+                "weather_code": cur["weather_code"],
+                "condition": cur["condition"],
+                "icon": cur["icon"],
                 "observation_time": now_dt.strftime("%H:%M"),
                 "timestamp": now_dt.isoformat()
             },
+            "alerts": dwd_alerts,
             "incoming_clouds": incoming_clouds,
             "forecast_hourly": forecast_points,
             "forecast_daily": forecast_daily,
@@ -470,7 +453,7 @@ class WeatherStationService:
             "monthly_trend_days": monthly_trend_days,
             "radar_timeline": radar_timeline,
             "threejs_simulation": {
-                "cloud_density": round(cloud_pct / 100.0, 2),
+                "cloud_density": round(cloud_for_sim / 100.0, 2),
                 "wind_vector": {
                     "x": round(-math.sin(math.radians(wind_deg)) * (wind_ms / 10.0), 3),
                     "z": round(math.cos(math.radians(wind_deg)) * (wind_ms / 10.0), 3)
@@ -478,16 +461,62 @@ class WeatherStationService:
                 "wind_speed_factor": round(max(0.2, min(2.5, wind_ms / 5.0)), 2),
                 "precipitation_intensity": round(min(1.0, precip_mm / 5.0), 2),
                 "sun_elevation_deg": self._estimate_sun_elevation(now_dt, lat),
-                "lighting_preset": "overcast" if cloud_pct > 75 else ("partly_cloudy" if cloud_pct > 30 else "sunny")
+                "lighting_preset": "overcast" if cloud_for_sim > 75 else ("partly_cloudy" if cloud_for_sim > 30 else "sunny")
             }
         }
 
+    @staticmethod
+    def _is_spray_safe(day: Dict[str, Any]) -> bool:
+        wind = day.get("wind_speed_ms")
+        return day["precipitation_mm"] < 0.4 and wind is not None and wind <= 6.0
+
+    def _build_outlook_weeks(self, days: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Weekly aggregates computed only from real daily forecast values (full 7-day blocks)."""
+        weeks = []
+        for w in range(len(days) // 7):
+            block = days[w * 7:(w + 1) * 7]
+            tmax = max(x["temp_max_c"] for x in block)
+            tmin = min(x["temp_min_c"] for x in block)
+            avg = round(sum((x["temp_max_c"] + x["temp_min_c"]) / 2.0 for x in block) / len(block), 1)
+            precip = round(sum(x["precipitation_mm"] for x in block), 1)
+            et0_vals = [x["et0_mm"] for x in block if x["et0_mm"] is not None]
+            et0 = round(sum(et0_vals), 1) if len(et0_vals) == len(block) else None
+            gdd = round(sum(max(0.0, (x["temp_max_c"] + x["temp_min_c"]) / 2.0 - 5.0) for x in block), 1)
+            frost_days = sum(1 for x in block if x["temp_min_c"] <= 0.0)
+            spray_days = sum(1 for x in block if self._is_spray_safe(x))
+            if et0 is None:
+                soil = f"{precip} mm rain forecast"
+            else:
+                balance = round(precip - et0, 1)
+                soil = f"Water balance {balance:+} mm (rain {precip} − ET₀ {et0})"
+            frost = (f"Frost on {frost_days} of 7 days (min {tmin}°C)" if frost_days
+                     else f"No frost forecast (min {tmin}°C)")
+            icon_counts: Dict[str, int] = {}
+            for x in block:
+                icon_counts[x["icon"]] = icon_counts.get(x["icon"], 0) + 1
+            first = datetime.strptime(block[0]["date"], "%Y-%m-%d")
+            last = datetime.strptime(block[-1]["date"], "%Y-%m-%d")
+            weeks.append({
+                "week_label": f"Week {w + 1}" + (" (Current)" if w == 0 else ""),
+                "date_range": f"{first.strftime('%b %d')} - {last.strftime('%b %d')}",
+                "avg_temp_c": avg,
+                "temp_range": f"{tmin}°C to {tmax}°C",
+                "total_precip_mm": precip,
+                "soil_condition": soil,
+                "spraying_suitability": f"{spray_days} of 7 days suitable",
+                "frost_risk": frost,
+                "gdd_accumulated": gdd,
+                "icon": max(icon_counts, key=icon_counts.get),
+                "summary": f"Model forecast: {precip} mm rain, {frost_days} frost day(s), {spray_days} spray-suitable day(s).",
+            })
+        return weeks
+
     def _calculate_centroid(self, geom: Optional[Dict[str, Any]]) -> Tuple[float, float]:
         if not geom or "coordinates" not in geom:
-            return 52.435, 13.045
+            raise ValueError("Field has no geometry; cannot determine location.")
         coords = geom["coordinates"]
         if not coords or not coords[0]:
-            return 52.435, 13.045
+            raise ValueError("Field has empty geometry; cannot determine location.")
         ring = coords[0] if isinstance(coords[0][0], (list, tuple)) else coords
         lons = [p[0] for p in ring]
         lats = [p[1] for p in ring]
@@ -549,43 +578,28 @@ class WeatherStationService:
             "next_hours": next_hours
         }
 
-    def _generate_radar_timeline(self, now_dt: datetime, forecast: List[Dict[str, Any]], current_precip: float) -> List[Dict[str, Any]]:
-        """Generates past 2h to next 4h precipitation radar frames for the scrubber bar."""
-        frames = []
-        # Past 2 hours (-120m, -60m)
-        for offset_m in [-120, -60]:
-            f_time = now_dt + timedelta(minutes=offset_m)
-            frames.append({
-                "time": f_time.strftime("%H:%M"),
-                "label": f_time.strftime("%H:%M"),
-                "is_now": False,
-                "is_past": True,
-                "precip_mm": max(0.0, round(current_precip * 0.8, 1)),
-                "intensity_level": 1 if current_precip > 0 else 0
-            })
+    def _generate_radar_timeline(self, now_dt: datetime, past: List[Dict[str, Any]], forecast: List[Dict[str, Any]], current_precip: float) -> List[Dict[str, Any]]:
+        """Past 2 h (observed/analysed hourly precipitation), now, and next 4 h from Open-Meteo."""
+        def level(mm: float) -> int:
+            return 3 if mm > 2.0 else (2 if mm > 0.5 else (1 if mm > 0 else 0))
 
-        # Current
+        frames = []
+        for pt in past:
+            frames.append({
+                "time": pt["label"], "label": pt["label"], "is_now": False, "is_past": True,
+                "precip_mm": pt["precipitation_mm"], "intensity_level": level(pt["precipitation_mm"]),
+            })
         frames.append({
             "time": now_dt.strftime("%H:%M"),
             "label": f"Now ({now_dt.strftime('%H:%M')})",
-            "is_now": True,
-            "is_past": False,
-            "precip_mm": current_precip,
-            "intensity_level": 2 if current_precip > 1.0 else (1 if current_precip > 0 else 0)
+            "is_now": True, "is_past": False,
+            "precip_mm": current_precip, "intensity_level": level(current_precip),
         })
-
-        # Next 4 hours
-        for i in range(1, min(5, len(forecast))):
-            pt = forecast[i]
+        for pt in forecast[1:5]:
             frames.append({
-                "time": pt["label"],
-                "label": pt["label"],
-                "is_now": False,
-                "is_past": False,
-                "precip_mm": pt["precipitation_mm"],
-                "intensity_level": 3 if pt["precipitation_mm"] > 2.0 else (2 if pt["precipitation_mm"] > 0.5 else (1 if pt["precipitation_mm"] > 0 else 0))
+                "time": pt["label"], "label": pt["label"], "is_now": False, "is_past": False,
+                "precip_mm": pt["precipitation_mm"], "intensity_level": level(pt["precipitation_mm"]),
             })
-
         return frames
 
     def _estimate_sun_elevation(self, dt: datetime, lat: float) -> float:
@@ -598,82 +612,26 @@ class WeatherStationService:
         return round(elev, 1)
 
     def get_point_weather(self, lat: float, lon: float) -> Dict[str, Any]:
-        """
-        Retrieves real-time atmospheric observation for specific geographical coordinates (e.g. device GPS).
-        """
-        params = {
-            "latitude": lat,
-            "longitude": lon,
-            "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m",
-            "timezone": "auto"
-        }
-        try:
-            resp = requests.get(self.OPEN_METEO_URL, params=params, timeout=5)
-            resp.raise_for_status()
-            api_data = resp.json()
-        except Exception:
-            api_data = self._generate_fallback_weather(lat, lon)
-
-        current_raw = api_data.get("current", {})
-        temp_c = round(float(current_raw.get("temperature_2m", 16.5)), 1)
-        feels_like_c = round(float(current_raw.get("apparent_temperature", 16.0)), 1)
-        humidity = round(float(current_raw.get("relative_humidity_2m", 65.0)), 1)
-        cloud_pct = round(float(current_raw.get("cloud_cover", 30.0)), 1)
-        wind_kmh = float(current_raw.get("wind_speed_10m", 14.0))
-        wind_ms = round(wind_kmh / 3.6, 1)
-        wind_deg = int(current_raw.get("wind_direction_10m", 240))
-        precip_mm = round(float(current_raw.get("precipitation", 0.0)), 1)
-        w_code = int(current_raw.get("weather_code", 1))
-
-        condition_desc, icon_type = self._parse_weather_code(w_code, cloud_pct)
-        wind_compass, wind_arrow = self._deg_to_compass_and_arrow(wind_deg)
-
+        """Real-time observation for coordinates (e.g. device GPS). Raises WeatherUnavailable on failure."""
+        api_data = self._fetch_open_meteo(lat, lon, current=self._CURRENT_VARS)
+        cur = self._parse_current(api_data)
         return {
             "lat": lat,
             "lon": lon,
-            "temperature_c": temp_c,
-            "feels_like_c": feels_like_c,
-            "humidity_percent": humidity,
-            "cloud_cover_percent": int(round(cloud_pct)),
-            "wind_speed_kmh": round(wind_kmh, 1),
-            "wind_speed_ms": wind_ms,
-            "wind_direction_deg": wind_deg,
-            "wind_compass": wind_compass,
-            "wind_arrow": wind_arrow,
-            "precipitation_mm": precip_mm,
-            "weather_code": w_code,
-            "condition": condition_desc,
-            "icon": icon_type,
+            "temperature_c": cur["temperature_c"],
+            "feels_like_c": cur["feels_like_c"],
+            "humidity_percent": cur["humidity_percent"],
+            "cloud_cover_percent": cur["cloud_cover_percent"],
+            "wind_speed_kmh": round(cur["wind_speed_ms"] * 3.6, 1),
+            "wind_speed_ms": cur["wind_speed_ms"],
+            "wind_direction_deg": cur["wind_direction_deg"],
+            "wind_compass": cur["wind_compass"],
+            "wind_arrow": cur["wind_arrow"],
+            "precipitation_mm": cur["precipitation_mm"],
+            "weather_code": cur["weather_code"],
+            "condition": cur["condition"],
+            "icon": cur["icon"],
         }
 
-    def _generate_fallback_weather(self, lat: float, lon: float) -> Dict[str, Any]:
-        """Provides realistic weather data if network query is blocked."""
-        now = datetime.now()
-        hour = now.hour
-        is_day = 7 <= hour <= 18
-        temp = 7.2 if is_day else 4.1
-        return {
-            "current": {
-                "temperature_2m": temp,
-                "apparent_temperature": temp - 2.0,
-                "relative_humidity_2m": 68.0,
-                "cloud_cover": 42.0,
-                "precipitation": 0.0,
-                "weather_code": 2,
-                "wind_speed_10m": 21.6,
-                "wind_direction_10m": 270,
-                "surface_pressure": 1015.0
-            },
-            "hourly": {
-                "time": [(now + timedelta(hours=i)).strftime("%Y-%m-%dT%H:00") for i in range(24)],
-                "temperature_2m": [round(temp + math.sin(i / 3.0) * 2.0, 1) for i in range(24)],
-                "cloud_cover": [min(95, max(15, int(42 + math.cos(i / 2.0) * 35))) for i in range(24)],
-                "precipitation": [0.0 for _ in range(24)],
-                "precipitation_probability": [min(80, max(5, int(15 + i * 2))) for i in range(24)],
-                "weather_code": [2 for _ in range(24)],
-                "wind_speed_10m": [21.6 for _ in range(24)],
-                "wind_direction_10m": [270 for _ in range(24)]
-            }
-        }
 
 weather_station_service = WeatherStationService()

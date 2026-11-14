@@ -37,11 +37,60 @@ import {
   type DailyForecastPoint,
   type MonthlyOutlookPoint,
   type MonthlyDayTrend,
+  type DwdAlerts,
 } from '../../services/weatherApi';
 import { createVirtualStationDivIcon } from './VirtualWeatherStationMarker';
 import { ThreeSatelliteViewer } from './ThreeSatelliteViewer';
 import { useI18n } from '../../i18n';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
+
+// Official DWD warnings for the selected field (Germany only)
+function DwdAlertsPanel({ alerts }: { alerts: DwdAlerts }) {
+  const fmt = (iso: string | null) =>
+    iso ? new Date(iso).toLocaleString(undefined, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+  if (!alerts.available) {
+    return alerts.reason ? (
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-semibold text-slate-500">
+        DWD warnings: {alerts.reason}
+      </div>
+    ) : null;
+  }
+  if (alerts.alerts.length === 0) {
+    return (
+      <div className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">
+        <CheckCircle2 size={14} className="text-emerald-600" />
+        <span>No active DWD warnings for {alerts.region}</span>
+      </div>
+    );
+  }
+  const tone = (level: number) =>
+    level >= 3 ? 'border-red-300 bg-red-50 text-red-900' : level === 2 ? 'border-orange-300 bg-orange-50 text-orange-900' : 'border-amber-200 bg-amber-50 text-amber-900';
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
+        <span>DWD warnings · {alerts.region}</span>
+        <span className="font-semibold text-slate-400">{alerts.source}</span>
+      </div>
+      {alerts.alerts.map((a, i) => (
+        <div key={`dwd-${i}`} className={`rounded-2xl border px-3 py-2.5 ${tone(a.level)}`}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 text-xs font-black">
+              <AlertTriangle size={14} />
+              <span>{a.label}</span>
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold">{a.level_label}</span>
+              {!a.is_active && <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold">Upcoming</span>}
+            </div>
+            <span className="text-[10px] font-semibold opacity-80">
+              {fmt(a.start)} – {fmt(a.end)}
+            </span>
+          </div>
+          {a.description && <p className="mt-1 text-[11px] font-medium leading-snug">{a.description}</p>}
+          {a.instruction && <p className="mt-1 whitespace-pre-line text-[10px] font-medium leading-snug opacity-80">{a.instruction}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // Map Recenter Helper
 function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
@@ -139,6 +188,7 @@ export function WeatherView({
   const [fieldWeather, setFieldWeather] = useState<FieldWeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [weatherError, setWeatherError] = useState<string | null>(null);
 
   // Sync selected field with dashboard selection by default
   useEffect(() => {
@@ -193,6 +243,8 @@ export function WeatherView({
     if (!selectedFieldId) return;
     let isCurrent = true;
     setLoading(true);
+    setFieldWeather(null);
+    setWeatherError(null);
 
     fetchFieldWeather(selectedFieldId)
       .then((data) => {
@@ -202,6 +254,7 @@ export function WeatherView({
       })
       .catch((err) => {
         console.error(`Failed to load weather for field ${selectedFieldId}:`, err);
+        if (isCurrent) setWeatherError(err instanceof Error ? err.message : 'Weather data unavailable');
       })
       .finally(() => {
         if (isCurrent) setLoading(false);
@@ -322,14 +375,15 @@ export function WeatherView({
   const winds12 = useMemo(() => hourly12.map((h) => h.wind_speed_ms), [hourly12]);
   const clouds12 = useMemo(() => hourly12.map((h) => h.cloud_cover_percent), [hourly12]);
   const hums12 = useMemo(
-    () => (fieldWeather?.current ? [fieldWeather.current.humidity_percent, 75, 72, 68, 65, 62, 65, 70, 74, 78, 80, 82] : [70, 70]),
-    [fieldWeather]
+    () => hourly12.map((h) => h.humidity_percent).filter((v): v is number => typeof v === 'number'),
+    [hourly12]
   );
   const dewPoints12 = useMemo(
-    () => (fieldWeather?.current ? [Math.round(fieldWeather.current.temperature_c - (100 - fieldWeather.current.humidity_percent) / 5), 2, 2, 3, 3, 2, 2, 1, 1, 0, 0, 0] : [2, 2]),
-    [fieldWeather]
+    () => hourly12.map((h) => h.dew_point_c).filter((v): v is number => typeof v === 'number'),
+    [hourly12]
   );
-
+  const spanMid = hourly12.length > 2 ? hourly12[Math.floor(hourly12.length / 2)].label : '';
+  const spanEnd = hourly12.length > 1 ? hourly12[hourly12.length - 1].label : '';
   return (
     <div className="relative w-full h-full min-h-0 flex-1 overflow-hidden bg-[#F3F4F2] font-sans select-none flex flex-col">
       {/* 1. TOP FLOATING BAR (Clean, Single Field Selector Capsule) */}
@@ -730,6 +784,13 @@ export function WeatherView({
               ) : (
                 /* CASE B: ACTIVE STATION TELEMETRY */
                 <div className="flex flex-col gap-4">
+                  {weatherError && (
+                    <div className="flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs font-semibold text-red-800">
+                      <AlertTriangle size={14} className="mt-0.5 shrink-0 text-red-600" />
+                      <span>Live weather is currently unavailable ({weatherError}). No placeholder values are shown.</span>
+                    </div>
+                  )}
+                  {fieldWeather?.alerts && <DwdAlertsPanel alerts={fieldWeather.alerts} />}
                   {/* 1. DAILY VIEW: 6 TELEMETRY METRIC CARDS WITH STEP CHARTS (Screenshot 2) */}
                   {forecastTab === 'daily' && (
                     <div className="flex flex-col gap-4">
@@ -748,8 +809,8 @@ export function WeatherView({
                             <StepSparkline data={temps12} color="#f59e0b" width={110} height={24} fillColor="rgba(245, 158, 11, 0.15)" />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
-                              <span>10:00</span>
-                              <span>22:00</span>
+                              <span>{spanMid}</span>
+                              <span>{spanEnd}</span>
                             </div>
                           </div>
                         </div>
@@ -761,14 +822,14 @@ export function WeatherView({
                             <span>Precipitation</span>
                           </div>
                           <div className="text-2xl font-black text-slate-900 my-1">
-                            {fieldWeather ? `${fieldWeather.current.precipitation_mm} mm` : '0 mm'}
+                            {fieldWeather ? `${fieldWeather.current.precipitation_mm} mm` : '--'}
                           </div>
                           <div className="pt-2">
                             <BarSparkline data={precips12} color="#0284c7" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
-                              <span>10:00</span>
-                              <span>22:00</span>
+                              <span>{spanMid}</span>
+                              <span>{spanEnd}</span>
                             </div>
                           </div>
                         </div>
@@ -780,14 +841,14 @@ export function WeatherView({
                             <span>Winds</span>
                           </div>
                           <div className="text-2xl font-black text-slate-900 my-1">
-                            {fieldWeather ? `${Math.round(fieldWeather.current.wind_speed_ms)} m/s ${fieldWeather.current.wind_arrow}` : '5 m/s'}
+                            {fieldWeather ? `${Math.round(fieldWeather.current.wind_speed_ms)} m/s ${fieldWeather.current.wind_arrow}` : '--'}
                           </div>
                           <div className="pt-2">
                             <StepSparkline data={winds12} color="#64748b" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
-                              <span>10:00</span>
-                              <span>22:00</span>
+                              <span>{spanMid}</span>
+                              <span>{spanEnd}</span>
                             </div>
                           </div>
                         </div>
@@ -799,14 +860,14 @@ export function WeatherView({
                             <span>Cloud cover</span>
                           </div>
                           <div className="text-2xl font-black text-slate-900 my-1">
-                            {fieldWeather ? `${fieldWeather.current.cloud_cover_percent}%` : '42%'}
+                            {fieldWeather ? `${fieldWeather.current.cloud_cover_percent}%` : '--'}
                           </div>
                           <div className="pt-2">
                             <StepSparkline data={clouds12} color="#64748b" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
-                              <span>10:00</span>
-                              <span>22:00</span>
+                              <span>{spanMid}</span>
+                              <span>{spanEnd}</span>
                             </div>
                           </div>
                         </div>
@@ -818,14 +879,14 @@ export function WeatherView({
                             <span>Humidity</span>
                           </div>
                           <div className="text-2xl font-black text-slate-900 my-1">
-                            {fieldWeather ? `${Math.round(fieldWeather.current.humidity_percent)}%` : '68%'}
+                            {fieldWeather ? `${Math.round(fieldWeather.current.humidity_percent)}%` : '--'}
                           </div>
                           <div className="pt-2">
                             <StepSparkline data={hums12} color="#38bdf8" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
-                              <span>10:00</span>
-                              <span>22:00</span>
+                              <span>{spanMid}</span>
+                              <span>{spanEnd}</span>
                             </div>
                           </div>
                         </div>
@@ -837,16 +898,16 @@ export function WeatherView({
                             <span>Dew point</span>
                           </div>
                           <div className="text-2xl font-black text-slate-900 my-1">
-                            {fieldWeather
-                              ? `${Math.round(fieldWeather.current.temperature_c - (100 - fieldWeather.current.humidity_percent) / 5)}°`
-                              : '1°'}
+                            {fieldWeather && fieldWeather.current.dew_point_c != null
+                              ? `${Math.round(fieldWeather.current.dew_point_c)}°`
+                              : '--'}
                           </div>
                           <div className="pt-2">
                             <StepSparkline data={dewPoints12} color="#10b981" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
-                              <span>10:00</span>
-                              <span>22:00</span>
+                              <span>{spanMid}</span>
+                              <span>{spanEnd}</span>
                             </div>
                           </div>
                         </div>
@@ -964,7 +1025,7 @@ export function WeatherView({
 
                             {/* Wind vector */}
                             <div className="w-24 text-right font-bold text-slate-600">
-                              {d.wind_arrow} {Math.round(d.wind_speed_ms)} m/s
+                              {d.wind_speed_ms != null ? `${d.wind_arrow} ${Math.round(d.wind_speed_ms)} m/s` : '--'}
                             </div>
 
                             {/* Rain amount */}
@@ -987,9 +1048,12 @@ export function WeatherView({
                       {/* Top Monthly Metrics Row */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         <div className="bg-slate-50/90 border border-slate-200 p-3 rounded-2xl">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase block">Monthly Avg Temp</span>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase block">Avg Temp (forecast)</span>
                           <span className="text-xl font-black text-slate-900">
-                            {fieldWeather?.forecast_monthly?.[0]?.avg_temp_c || 6.8}°C
+                            {(() => {
+                              const w = fieldWeather?.forecast_monthly || [];
+                              return w.length ? `${(w.reduce((a, x) => a + x.avg_temp_c, 0) / w.length).toFixed(1)}°C` : '--';
+                            })()}
                           </span>
                         </div>
                         <div className="bg-slate-50/90 border border-slate-200 p-3 rounded-2xl">
@@ -1000,12 +1064,17 @@ export function WeatherView({
                         </div>
                         <div className="bg-slate-50/90 border border-slate-200 p-3 rounded-2xl">
                           <span className="text-[10px] font-bold text-slate-500 uppercase block">Spray-Safe Days</span>
-                          <span className="text-xl font-black text-[#1fa35b]">19 / 30 Days</span>
+                          <span className="text-xl font-black text-[#1fa35b]">
+                            {(() => {
+                              const d = fieldWeather?.monthly_trend_days || [];
+                              return d.length ? `${d.filter((x) => x.spray_safe).length} / ${d.length} Days` : '--';
+                            })()}
+                          </span>
                         </div>
                         <div className="bg-slate-50/90 border border-slate-200 p-3 rounded-2xl">
                           <span className="text-[10px] font-bold text-slate-500 uppercase block">GDD (Base 5°C)</span>
                           <span className="text-xl font-black text-amber-600">
-                            {(fieldWeather?.forecast_monthly || []).reduce((acc, w) => acc + w.gdd_accumulated, 0)} GDD
+                            {Math.round((fieldWeather?.forecast_monthly || []).reduce((acc, w) => acc + w.gdd_accumulated, 0))} GDD
                           </span>
                         </div>
                       </div>
@@ -1014,9 +1083,9 @@ export function WeatherView({
                       <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
                         <div className="flex items-center justify-between mb-1">
                           <div>
-                            <h4 className="text-sm font-extrabold text-slate-900">30-Day Climatological Projection</h4>
+                            <h4 className="text-sm font-extrabold text-slate-900">16-Day Model Forecast</h4>
                             <p className="text-[11px] text-slate-500 font-medium">
-                              Temperature band (Max/Min) and rainfall distribution over the next month
+                              Temperature band (Max/Min) and rainfall from the Open-Meteo daily forecast
                             </p>
                           </div>
                           <div className="flex items-center gap-3 text-[10px] font-bold">
@@ -1040,15 +1109,28 @@ export function WeatherView({
                             <line x1="25" y1="55" x2="685" y2="55" stroke="#e2e8f0" strokeDasharray="3 3" />
                             <line x1="25" y1="90" x2="685" y2="90" stroke="#cbd5e1" strokeWidth="1.2" />
 
-                            <text x="20" y="24" fill="#94a3b8" fontSize="8" textAnchor="end" fontWeight="bold">15°</text>
-                            <text x="20" y="59" fill="#94a3b8" fontSize="8" textAnchor="end" fontWeight="bold">7°</text>
-                            <text x="20" y="94" fill="#94a3b8" fontSize="8" textAnchor="end" fontWeight="bold">0°</text>
+                            {(() => {
+                              const ds = fieldWeather?.monthly_trend_days || [];
+                              if (!ds.length) return null;
+                              const lo = Math.min(0, Math.floor(Math.min(...ds.map((x) => x.temp_min))));
+                              const hi = Math.max(16, Math.ceil(Math.max(...ds.map((x) => x.temp_max))));
+                              return (
+                                <>
+                                  <text x="20" y="24" fill="#94a3b8" fontSize="8" textAnchor="end" fontWeight="bold">{hi}°</text>
+                                  <text x="20" y="59" fill="#94a3b8" fontSize="8" textAnchor="end" fontWeight="bold">{Math.round((hi + lo) / 2)}°</text>
+                                  <text x="20" y="94" fill="#94a3b8" fontSize="8" textAnchor="end" fontWeight="bold">{lo}°</text>
+                                </>
+                              );
+                            })()}
 
                             {/* Build temperature band & rain bars */}
                             {(() => {
                               const days = fieldWeather?.monthly_trend_days || [];
                               if (days.length === 0) return null;
-                              const stepX = 660 / (days.length - 1);
+                              const stepX = 660 / Math.max(1, days.length - 1);
+                              const lo = Math.min(0, Math.floor(Math.min(...days.map((x) => x.temp_min))));
+                              const hi = Math.max(16, Math.ceil(Math.max(...days.map((x) => x.temp_max))));
+                              const yOf = (t: number) => 90 - ((t - lo) / (hi - lo)) * 75;
 
                               let maxPath = '';
                               let minPath = '';
@@ -1057,8 +1139,8 @@ export function WeatherView({
                               days.forEach((d, i) => {
                                 const x = 25 + i * stepX;
                                 // Scale 0° to 16° on y from 90 to 15
-                                const yMax = 90 - (d.temp_max / 16) * 75;
-                                const yMin = 90 - (Math.max(0, d.temp_min) / 16) * 75;
+                                const yMax = yOf(d.temp_max);
+                                const yMin = yOf(d.temp_min);
 
                                 if (i === 0) {
                                   maxPath += `M ${x} ${yMax}`;
@@ -1074,7 +1156,7 @@ export function WeatherView({
                               // Close band path by reversing minPath
                               for (let i = days.length - 1; i >= 0; i--) {
                                 const x = 25 + i * stepX;
-                                const yMin = 90 - (Math.max(0, days[i].temp_min) / 16) * 75;
+                                const yMin = yOf(days[i].temp_min);
                                 bandPath += ` L ${x} ${yMin}`;
                               }
                               bandPath += ' Z';
@@ -1202,7 +1284,7 @@ export function WeatherView({
             <div className="flex-1 w-full h-full relative">
               <ThreeSatelliteViewer
                 fieldName={currentAvailableField?.field_name}
-                timestamp={fieldWeather?.current.observation_time || '10 Nov 2026, 10:24'}
+                timestamp={fieldWeather?.current.observation_time ?? ''}
                 simulationParams={fieldWeather?.threejs_simulation}
                 isExpanded={true}
                 onToggleExpand={() => setIs3DExpanded(false)}

@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
-from app.services.weather_station_service import weather_station_service
+from app.services.weather_station_service import weather_station_service, WeatherUnavailable
 
 from app.services.user_farms_repository import user_farms_repo
 
@@ -42,7 +42,10 @@ def get_available_fields() -> List[Dict[str, Any]]:
 @router.get("/point")
 def get_point_weather(lat: float = Query(...), lon: float = Query(...)) -> Dict[str, Any]:
     """Returns real-time atmospheric observation for specific geographical coordinates (e.g. device GPS)."""
-    return weather_station_service.get_point_weather(lat, lon)
+    try:
+        return weather_station_service.get_point_weather(lat, lon)
+    except WeatherUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
 
 
 @router.get("/fields")
@@ -54,7 +57,12 @@ def get_all_fields_weather() -> List[Dict[str, Any]]:
 @router.get("/fields/{field_id}")
 def get_field_weather(field_id: str) -> Dict[str, Any]:
     """Returns complete meteorological, satellite 3JS and cloud forecast data for a field."""
-    data = weather_station_service.get_field_weather_data(field_id)
+    try:
+        data = weather_station_service.get_field_weather_data(field_id)
+    except WeatherUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
     if not data:
         raise HTTPException(status_code=404, detail=f"Field '{field_id}' not found.")
     return data
