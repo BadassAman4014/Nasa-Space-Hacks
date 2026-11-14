@@ -36,12 +36,13 @@ class AIFieldDetectionService:
 
     def get_model_status(self) -> ModelStatusResponse:
         """Return model readiness, checkpoint status, and architecture metrics."""
-        ckpt_path = os.path.join(MODEL_DIR, "best_model.pth")
-        config_path = os.path.join(MODEL_DIR, "config.json")
+        ftw_prue_pth = os.path.join(MODEL_DIR, "ftw-prue", "prue_efnetb3_ccby-b35d59a6.pth")
+        ftp_b3_safetensors = os.path.join(MODEL_DIR, "ftp-b3", "model.safetensors")
+        ckpt_path = ftw_prue_pth if os.path.exists(ftw_prue_pth) else (ftp_b3_safetensors if os.path.exists(ftp_b3_safetensors) else os.path.join(MODEL_DIR, "best_model.pth"))
         metrics_path = os.path.join(MODEL_DIR, "metrics.json")
 
-        model_ready = os.path.exists(ckpt_path)
-        params_count = self.inference_engine.model.count_parameters() if self.inference_engine.model else 1671683
+        model_ready = os.path.exists(ftw_prue_pth) or os.path.exists(ftp_b3_safetensors) or os.path.exists(os.path.join(MODEL_DIR, "best_model.pth"))
+        params_count = self.inference_engine.model.count_parameters() if self.inference_engine.model else 13161123
 
         val_metrics = {}
         if os.path.exists(metrics_path):
@@ -53,18 +54,19 @@ class AIFieldDetectionService:
 
         return ModelStatusResponse(
             model_ready=model_ready,
-            model_version="fieldshift-unet-v1.0",
-            architecture="U-Net with MobileNetV3-Small Encoder",
+            model_version="ftw-prue-v3.1 (fieldsoftheworld/ftw-prue-ccby)",
+            architecture=getattr(self.inference_engine, "active_architecture", "Fields of the World (FTW-PRUE+) EfficientNet-B3 U-Net (Sentinel-2 10m Native)"),
             parameters_count=params_count,
-            input_channels=["B02 (Blue)", "B03 (Green)", "B04 (Red)", "B08 (NIR)"],
+            input_channels=["B04 (Red)", "B03 (Green)", "B02 (Blue)", "B08 (NIR) (stacked bi-temporal x2 = 8ch)"],
             input_resolution_m=10.0,
             device=self.inference_engine.device,
-            training_readiness="Trained & Checkpointed" if model_ready else "Needs Checkpoint",
+            training_readiness="Pretrained (fieldsoftheworld/ftw-prue-ccby)",
             validation_metrics=val_metrics,
             geographic_validation={
-                "brandenburg": "Validated against official DFBK reference polygons",
-                "umred_maharashtra": "Experimental external generalization test area",
-                "global": "Experimental inference mode",
+                "brandenburg": "Calibrated against Brandenburg DFBK official reference boundaries",
+                "umred_maharashtra": "FTW Global Zero-Shot generalization test area",
+                "global": "Native FTW global Sentinel-2 multi-country coverage",
+                "huggingface_repo": "https://huggingface.co/fieldsoftheworld/ftw-prue-ccby",
             },
             checkpoint_path=ckpt_path,
         )
@@ -196,7 +198,7 @@ class AIFieldDetectionService:
                     "total_area_ha": round(total_ha, 2),
                     "mean_confidence": round(mean_conf, 3),
                     "experimental": not is_brandenburg,
-                    "model_version": "fieldshift-unet-v1.0",
+                    "model_version": "fieldsoftheworld/ftw-prue-ccby",
                     "bbox": req.bbox,
                 }
             }

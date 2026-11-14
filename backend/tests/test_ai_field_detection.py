@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from shapely.geometry import Polygon, shape
 
 from app.main import app
-from app.services.field_segmentation.model import UNetMobileNetV3Small
+from app.services.field_segmentation.model import FTWPRUESentinel2Model, FTPB3SegmentationModel, UNetMobileNetV3Small
 from app.services.field_segmentation.preprocessing import (
     normalize_reflectance,
     rasterize_dfbk_polygons,
@@ -27,6 +27,34 @@ client = TestClient(app)
 
 class TestAIFieldDetectionModel:
     """Test CNN segmentation model architecture and tensor contracts."""
+
+    def test_ftw_prue_sentinel2_model(self):
+        model = FTWPRUESentinel2Model()
+        assert model.count_parameters() > 10_000_000
+
+        x_8ch = torch.randn(2, 8, 256, 256)
+        proba = model.predict_proba(x_8ch)
+        assert proba.shape == (2, 3, 256, 256)
+        sums = torch.sum(proba, dim=1).numpy()
+        np.testing.assert_allclose(sums, 1.0, rtol=1e-5)
+
+    def test_ftp_b3_model_initialization_and_forward(self):
+        model = FTPB3SegmentationModel()
+        assert model.count_parameters() > 10_000_000
+
+        # Test with 4-channel input (Sentinel-2 adaptation)
+        x_4ch = torch.randn(2, 4, 256, 256)
+        proba_4ch = model.predict_proba(x_4ch)
+        assert proba_4ch.shape == (2, 3, 256, 256)
+        sums_4ch = torch.sum(proba_4ch, dim=1).numpy()
+        np.testing.assert_allclose(sums_4ch, 1.0, rtol=1e-5)
+
+        # Test with native 8-channel input
+        x_8ch = torch.randn(1, 8, 256, 256)
+        proba_8ch = model.predict_proba(x_8ch)
+        assert proba_8ch.shape == (1, 3, 256, 256)
+        sums_8ch = torch.sum(proba_8ch, dim=1).numpy()
+        np.testing.assert_allclose(sums_8ch, 1.0, rtol=1e-5)
 
     def test_model_initialization_and_forward_shape(self):
         model = UNetMobileNetV3Small(in_channels=4, num_classes=3, pretrained_encoder=False)
@@ -116,8 +144,9 @@ class TestAIFieldDetectionAPI:
         assert res.status_code == 200
         data = res.json()
         assert data["model_ready"] is True
-        assert "MobileNetV3" in data["architecture"]
-        assert len(data["input_channels"]) == 4
+        assert any(k in data["architecture"] for k in ["FTW-PRUE", "FTP-B3", "MobileNetV3"])
+        assert any(k in data["model_version"] for k in ["ftw-prue", "ftp-b3", "fieldshift"])
+        assert len(data["input_channels"]) >= 4
         assert "brandenburg" in data["geographic_validation"]
 
     def test_brandenburg_scan_workflow(self):

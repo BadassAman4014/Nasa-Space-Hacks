@@ -1,24 +1,27 @@
 {
-  "model_architecture": "U-Net MobileNetV3-Small",
-  "parameters_count": 1671683,
+  "huggingface_repo": "https://huggingface.co/fieldsoftheworld/ftw-prue-ccby",
+  "model_name": "ftw-prue-efnetb3",
+  "model_architecture": "Fields of the World (FTW-PRUE+) EfficientNet-B3 U-Net (Sentinel-2 10m Native)",
+  "parameters_count": 13161123,
+  "in_channels": 8,
   "input_bands": [
-    "B02",
-    "B03",
-    "B04",
-    "B08"
+    "B04 (Red)",
+    "B03 (Green)",
+    "B02 (Blue)",
+    "B08 (NIR)"
   ],
+  "input_layout": "[B04_t1, B03_t1, B02_t1, B08_t1, B04_t2, B03_t2, B02_t2, B08_t2]",
+  "input_scale": "DN / 3000.0 (reflectance * 10000 / 3000)",
   "input_resolution_meters": 10.0,
   "patch_size": 256,
-  "epochs": 12,
-  "batch_size": 4,
-  "initial_learning_rate": 0.0002,
-  "optimizer": "AdamW",
-  "loss": "CrossEntropy + Dice",
-  "class_weights": [
-    0.8,
-    1.0,
-    2.5
-  ],
-  "pretrained_encoder": "ImageNet1k (MobileNetV3-Small)",
-  "training_duration_seconds": 50.44
+  "classes": 3,
+  "class_mapping": {
+    "0": "Background",
+    "1": "Field Interior",
+    "2": "Field Boundary"
+  },
+  "encoder_name": "efficientnet-b3",
+  "decoder": "Unet",
+  "loss": "log-cosh Dice loss (FTW v3.1)",
+  "source": "Fields of the World (FTW v3.1)"
 }

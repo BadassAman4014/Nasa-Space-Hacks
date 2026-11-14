@@ -7,6 +7,7 @@ import { DashboardV2 } from './components/dashboard/Dashboard';
 import { FieldExplorerView } from './components/fields/FieldExplorerView';
 import { FieldAnalyticsWorkspace } from './components/analytics/FieldAnalyticsWorkspace';
 import { WeatherView } from './components/weather/WeatherView';
+import { AIAssistantView } from './components/ai-assistant/AIAssistantView';
 import {
   Activity, ArrowLeft, BarChart3, Bell, BrainCircuit, Check, ChevronDown, ChevronRight,
   CircleHelp, CloudRain, CloudSun, Compass, Download, Droplets, Eye, FileText, Globe2,
@@ -14,11 +15,22 @@ import {
   ShieldCheck, SlidersHorizontal, Sprout, Sun, Thermometer, TrendingUp, Users, X, Zap
 } from 'lucide-react';
 
-type PageKey = 'dashboard' | 'fields' | 'analytics' | 'weather' | 'environment' | 'farmer-profile' | 'rotation-studio' | 'scenario-simulator' | 'reports';
+type PageKey =
+  | 'dashboard'
+  | 'fields'
+  | 'analytics'
+  | 'ai-assistant'
+  | 'weather'
+  | 'environment'
+  | 'farmer-profile'
+  | 'rotation-studio'
+  | 'scenario-simulator'
+  | 'reports';
 const navItems: { id: PageKey; label: string; icon: typeof Map }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
   { id: 'fields', label: 'Field Explorer', icon: Map },
   { id: 'analytics', label: 'Field Analytics', icon: Zap },
+  { id: 'ai-assistant', label: 'AI Assistant', icon: BrainCircuit },
   { id: 'weather', label: 'Weather', icon: CloudSun },
   { id: 'environment', label: 'Environmental Profile', icon: Globe2 },
   { id: 'farmer-profile', label: 'Farmer Profile', icon: Users },
@@ -64,14 +76,24 @@ function App() {
   }, []);
 
   return (
-    <div className="app-shell">
-      <SidebarV2 page={page} navigate={navigate} mobileOpen={mobileNav} onClose={() => setMobileNav(false)} />
+    <div
+      className={`app-shell ${page === 'dashboard' ? 'app-shell--map-full' : ''} ${
+        page === 'fields' ? 'app-shell--field-explorer' : ''
+      } ${page === 'analytics' ? 'app-shell--analytics' : ''} ${
+        page === 'ai-assistant' ? 'app-shell--ai-assistant' : ''
+      }`}
+    >
+      <SidebarV2 page={page} navigate={navigate} mobileOpen={mobileNav} onClose={() => setMobileNav(false)} notify={notify} />
       <main className="workspace">
-        {page !== 'dashboard' && page !== 'fields' && page !== 'analytics' && page !== 'weather' && (
+        {page !== 'dashboard' && page !== 'fields' && page !== 'analytics' && page !== 'weather' && page !== 'ai-assistant' && (
           <Topbar navigate={navigate} onMenu={() => setMobileNav(true)} onNotify={() => notify('You are all caught up')} />
         )}
         <div
-          className={`page-content ${page === 'dashboard' || page === 'fields' || page === 'analytics' || page === 'weather' ? 'page-content--bleed' : ''}`}
+          className={`page-content ${
+            page === 'dashboard' || page === 'fields' || page === 'analytics' || page === 'weather' || page === 'ai-assistant'
+              ? 'page-content--bleed'
+              : ''
+          }`}
         >
           {page === 'dashboard' && (
             <DashboardV2
@@ -89,6 +111,13 @@ function App() {
               onClose={() => navigate('dashboard')}
               notify={notify}
               onSelectField={(id) => setAnalyticsFieldId(id)}
+            />
+          )}
+          {page === 'ai-assistant' && (
+            <AIAssistantView
+              notify={notify}
+              navigate={navigate}
+              initialFieldId={analyticsFieldId}
             />
           )}
           {page === 'weather' && (

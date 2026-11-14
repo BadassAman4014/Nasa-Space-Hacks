@@ -216,8 +216,14 @@ export function DashboardV2(props: {
 
   return (
     <div className="dashboard-grid">
-      {/* Left Data & Metrics Panel */}
-      <section className="dash-panel">
+      {/* Left Data & Metrics Panel - Floating iOS Style */}
+      <section
+        className="dash-panel"
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onDoubleClick={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
+      >
         <PanelHeader
           onAddField={() => props.navigate('fields')}
           onExport={() => props.navigate('reports')}
@@ -647,20 +653,20 @@ function PropertyHeader({
 
   return (
     <section className="card-v2 property">
-      <div>
+      <div className="flex items-center gap-1.5 relative">
         <button
           className="property-name"
           onClick={() => setFarmMenuOpen(!farmMenuOpen)}
         >
-          {farmDisplayName}
+          <span>{farmDisplayName}</span>
           <ChevronDown size={16} />
         </button>
         <button className="property-map" onClick={onAddField} title="Discover fields in Field Explorer">
-          <Map size={16} />
+          <Map size={15} />
         </button>
 
         {farmMenuOpen && (
-          <div className="farm-menu v2-menu">
+          <div className="farm-menu v2-menu absolute top-10 left-0">
             <button
               onClick={() => onSelectFarm('all')}
               className={selectedFarmId === 'all' ? 'font-bold text-[#1fa35b]' : ''}
@@ -711,7 +717,7 @@ function PropertyHeader({
       <strong>{totalAreaHa > 0 ? `${totalAreaHa.toFixed(1)} ha` : '0 ha'}</strong>
       <p>{locationText}</p>
       <span>
-        <TrendingUp size={15} /> Verified Records
+        <TrendingUp size={14} /> Verified Records
       </span>
     </section>
   );
@@ -797,11 +803,11 @@ function SavedFieldsOverview({
             <Sprout size={18} />
           </div>
           <main>
-            <strong>{crops || '—'}</strong>
+            <strong>{crops}</strong>
             <dl>
               <div>
                 <dt>Types</dt>
-                <dd>{crops > 0 ? `${crops} active` : 'None'}</dd>
+                <dd>{crops > 0 ? `${crops} active` : 'None assigned'}</dd>
               </div>
             </dl>
           </main>
@@ -847,7 +853,7 @@ function SavedFieldsList({
   return (
     <section className="card-v2 p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-[#1b1b1b] flex items-center gap-1.5">
+        <h3 className="text-sm font-bold text-[#111827] flex items-center gap-1.5">
           <Sprout size={16} className="text-[#1fa35b]" /> Your Farm Fields ({fields.length})
         </h3>
         <button
@@ -858,27 +864,32 @@ function SavedFieldsList({
         </button>
       </div>
 
-      <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+      <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
         {fields.map((f) => {
           const isSelected = f.id === selectedFieldId;
           return (
             <div
               key={f.id}
               onClick={() => onSelectField(f.id)}
-              className={`p-3 rounded-xl border transition cursor-pointer flex items-center justify-between gap-3 ${
+              className={`p-3 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${
                 isSelected
-                  ? 'bg-[#1fa35b]/10 border-[#1fa35b]'
-                  : 'bg-white hover:bg-[#f3f3f3] border-[#e6e6e6]'
+                  ? 'bg-[#eef9f2] border-[#b8e6ca]'
+                  : 'bg-white hover:bg-[#f8f9fa] border-[#ebebeb]'
               }`}
             >
               <div className="min-w-0">
-                <div className="text-xs font-bold text-[#1b1b1b] truncate">{f.name}</div>
-                <div className="text-[11px] text-[#6f6f6f] flex items-center gap-2 mt-0.5">
+                <div className="text-xs font-bold text-[#111827] truncate">{f.name}</div>
+                <div className="text-[11px] text-[#6b7280] flex items-center gap-2 mt-0.5">
                   <span>{f.area_hectares.toFixed(2)} ha</span>
-                  {f.current_crop && (
+                  {f.current_crop ? (
                     <>
                       <span>•</span>
                       <span className="text-[#1fa35b] font-medium truncate">{f.current_crop}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>•</span>
+                      <span className="text-[#888] italic truncate">No crop assigned</span>
                     </>
                   )}
                   {f.farm_name && (
@@ -910,7 +921,7 @@ function SavedFieldsList({
                     e.stopPropagation();
                     onEdit(f);
                   }}
-                  className="p-1.5 rounded-lg hover:bg-black/5 text-[#888] hover:text-[#1b1b1b]"
+                  className="p-1.5 rounded-lg hover:bg-black/5 text-[#6b7280] hover:text-[#111827]"
                   title="Rename or update field"
                 >
                   <Pencil size={13} />
@@ -921,7 +932,7 @@ function SavedFieldsList({
                     e.stopPropagation();
                     onDelete(f);
                   }}
-                  className="p-1.5 rounded-lg hover:bg-red-50 text-[#888] hover:text-red-600"
+                  className="p-1.5 rounded-lg hover:bg-red-50 text-[#9ca3af] hover:text-red-600"
                   title="Delete field"
                 >
                   <Trash2 size={13} />
@@ -938,17 +949,20 @@ function SavedFieldsList({
 function RegionalConditions() {
   return (
     <section className="card-v2 weather-v2 p-4">
-      <label className="text-xs font-bold text-[#1b1b1b] block mb-2">Regional Climate & Weather</label>
+      <div className="flex items-center gap-1.5 mb-2.5">
+        <Sprout size={15} className="text-[#1fa35b]" />
+        <label className="text-xs font-bold text-[#111827] block">Regional Climate & Weather</label>
+      </div>
       <header className="flex items-center gap-3">
-        <Cloud size={32} className="text-[#4a8fcc]" />
-        <strong className="text-2xl font-bold text-[#1b1b1b]">18.4°C</strong>
-        <span className="text-xs text-[#6f6f6f]">
+        <Cloud size={30} className="text-[#4a8fcc]" />
+        <strong className="text-2xl font-bold text-[#111827]">18.4°C</strong>
+        <span className="text-[11px] text-[#6b7280] leading-tight mr-auto">
           Potsdam, Brandenburg
           <br />
-          Season baseline
+          <span className="text-[#9ca3af]">Season baseline</span>
         </span>
-        <button className="text-xs bg-white border border-[#e3e3e3] px-2.5 py-1 rounded-lg">
-          <CloudSun size={15} /> Forecast
+        <button className="text-xs font-semibold bg-white border border-[#e5e7eb] px-3 py-1.5 rounded-xl flex items-center gap-1.5 hover:bg-gray-50 shadow-2xs text-[#374151]">
+          <CloudSun size={14} className="text-[#4a8fcc]" /> Forecast
         </button>
       </header>
     </section>
@@ -1037,7 +1051,12 @@ export function MapViewV2({
         setSelectedFieldId(result.fieldId);
         setCardOpen(true);
         if (result.bounds && map) {
-          map.fitBounds(result.bounds, { padding: [60, 60], maxZoom: 16.5 });
+          const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 851;
+          map.fitBounds(result.bounds, {
+            paddingTopLeft: isDesktop ? [60, 710] : [60, 60],
+            paddingBottomRight: isDesktop ? [380, 60] : [60, 60],
+            maxZoom: 16.5,
+          });
         } else if (result.lat && result.lon && map) {
           map.flyTo([result.lat, result.lon], 15);
         }
@@ -1090,9 +1109,10 @@ export function MapViewV2({
       const geoLayer = L.geoJSON(selected.geometry as any);
       const b = geoLayer.getBounds();
       if (b.isValid()) {
+        const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 851;
         map.flyToBounds(b, {
-          paddingTopLeft: [40, 100],
-          paddingBottomRight: [380, 60],
+          paddingTopLeft: isDesktop ? [60, 710] : [40, 40],
+          paddingBottomRight: isDesktop ? [380, 60] : [40, 40],
           maxZoom: 16.5,
           duration: 0.8,
         });
@@ -1241,7 +1261,7 @@ export function MapViewV2({
             <div>
               <h2>{selected.name}</h2>
               <p>
-                {selected.farm_name || 'Farm'} · {selected.current_crop || 'No crop set'}
+                {selected.farm_name || 'Farm'} · {selected.current_crop || 'No crop assigned'}
               </p>
             </div>
             <button onClick={() => setCardOpen(false)}>
@@ -1313,7 +1333,7 @@ export function MapViewV2({
                 </div>
                 <div>
                   <span>Current Crop</span>
-                  <b>{selected.current_crop || 'None'}</b>
+                  <b>{selected.current_crop || 'Unassigned'}</b>
                 </div>
               </div>
 

@@ -5,6 +5,7 @@ import './index.css';
 import './styles/tokens.css';
 import './styles/shell.css';
 import './styles/dashboard.css';
+import './components/layout/floating-sidebar.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

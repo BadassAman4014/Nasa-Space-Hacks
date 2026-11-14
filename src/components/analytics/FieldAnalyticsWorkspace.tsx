@@ -270,7 +270,7 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
   }
 
   return (
-    <div className="h-full w-full bg-[#f8fafc] flex flex-col overflow-y-auto print:bg-white print:overflow-visible">
+    <div className="h-full w-full bg-[#f1f4f2] flex flex-col overflow-y-auto print:bg-white print:overflow-visible">
       {/* Header */}
       <FieldHeader
         summary={summary}
@@ -286,7 +286,7 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
       />
 
       {/* Main Tab Content */}
-      <main className="flex-1 p-6 md:p-8">
+      <main className="flex-1 px-6 md:px-8 pb-10 pt-2">
         {activeTab === 'status' && (
           <StatusTab
             summary={summary}

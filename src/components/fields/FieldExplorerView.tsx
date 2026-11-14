@@ -42,6 +42,8 @@ import {
   AlertTriangle,
   Eye,
   Sliders,
+  Leaf,
+  LayoutDashboard,
 } from 'lucide-react';
 import {
   boundariesApi,
@@ -169,7 +171,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [modalMode, setModalMode] = useState<'single' | 'multi' | 'custom' | 'ai_single' | 'ai_multi'>('single');
   const [saveFieldName, setSaveFieldName] = useState('');
-  const [saveCrop, setSaveCrop] = useState('Winter wheat');
+  const [saveCrop, setSaveCrop] = useState('');
   const [selectedFarmId, setSelectedFarmId] = useState<string>('');
   const [isCreatingNewFarm, setIsCreatingNewFarm] = useState(false);
   const [newFarmName, setNewFarmName] = useState('');
@@ -432,9 +434,8 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
   const openSaveSingle = (feature: BoundaryFeature) => {
     setActiveFeature(feature);
     setModalMode('single');
-    const cat = feature.properties.land_use_category || 'Field';
     setSaveFieldName(`Field 1`);
-    setSaveCrop(cat === 'AL' ? 'Winter wheat' : cat === 'GL' ? 'Grassland pasture' : 'Cover crop');
+    setSaveCrop('');
 
     if (userFarms.length === 0) {
       setIsCreatingNewFarm(true);
@@ -453,7 +454,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
     if (selectedIds.size === 0) return;
     setModalMode('multi');
     setSaveFieldName('Field');
-    setSaveCrop('Winter wheat');
+    setSaveCrop('');
 
     if (userFarms.length === 0) {
       setIsCreatingNewFarm(true);
@@ -475,7 +476,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
     }
     setModalMode('custom');
     setSaveFieldName(`Custom Field ${Date.now().toString().slice(-4)}`);
-    setSaveCrop('Cover crop');
+    setSaveCrop('');
 
     if (userFarms.length === 0) {
       setIsCreatingNewFarm(true);
@@ -592,7 +593,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
   const openSaveSinglePrediction = (pred: PredictionFeature) => {
     setActivePrediction(pred);
     setSaveFieldName(pred.properties.name || `Field ${savedFields.length + 1}`);
-    setSaveCrop('Winter wheat');
+    setSaveCrop('');
     setModalMode('ai_single');
 
     if (userFarms.length === 0) {
@@ -609,7 +610,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
 
   const openSaveMultiPredictions = () => {
     setSaveFieldName(`AI Batch Field`);
-    setSaveCrop('Winter wheat');
+    setSaveCrop('');
     setModalMode('ai_multi');
 
     if (userFarms.length === 0) {
@@ -791,27 +792,43 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
 
   return (
     <div className="relative w-full h-full flex-1 min-h-0 flex flex-col overflow-hidden bg-[#1a1a1a] text-white">
-      {/* Top Controls Toolbar */}
-      <div className="flex-none bg-[#242424] border-b border-[#333] px-4 py-3 flex flex-wrap items-center justify-between gap-3 z-10">
-        {/* Left: Mode Toggle & Search & Near Me */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="inline-flex rounded-lg bg-[#1a1a1a] p-1 border border-[#3a3a3a]">
+      {/* Top Controls Toolbar — spans full width at the very top */}
+      <div className="flex-none bg-[#0d110f] border-b border-[#222] px-4 h-[54px] flex items-center justify-between gap-3 z-40 relative">
+        {/* Left: Brand Logo & Discovery/Draw Toggle & Search & Near Me */}
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Brand Logo & Name */}
+          <div
+            className="flex items-center gap-2 mr-1 cursor-pointer select-none shrink-0"
+            onClick={onNavigateDashboard}
+            title="Return to Dashboard"
+          >
+            <div className="w-7 h-7 rounded-lg bg-[#1fa35b]/20 text-[#1fa35b] flex items-center justify-center">
+              <Leaf size={16} strokeWidth={2.4} />
+            </div>
+            <span className="font-bold text-sm tracking-tight text-white flex items-center">
+              FieldShift<span className="text-[#1fa35b]">AI</span>
+            </span>
+          </div>
+
+          <div className="inline-flex rounded-lg bg-[#141414] p-1 border border-[#333]">
             <button
               onClick={() => setMode('discover')}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition ${mode === 'discover' ? 'bg-[#1fa35b] text-white shadow-sm' : 'text-[#888] hover:text-white'
-                }`}
+              className={`px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition ${
+                mode === 'discover' ? 'bg-[#1fa35b] text-white shadow-sm' : 'text-[#888] hover:text-white'
+              }`}
             >
-              <Globe2 size={14} /> Official DFBK Discovery
+              <Globe2 size={13} /> Official DFBK Discovery
             </button>
             <button
               onClick={() => {
                 setMode('draw');
                 setDrawnPoints([]);
               }}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition ${mode === 'draw' ? 'bg-[#ff7a1a] text-white shadow-sm' : 'text-[#888] hover:text-white'
-                }`}
+              className={`px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition ${
+                mode === 'draw' ? 'bg-[#ff7a1a] text-white shadow-sm' : 'text-[#888] hover:text-white'
+              }`}
             >
-              <Pencil size={14} /> Draw Custom Field
+              <Pencil size={13} /> Draw Custom Field
             </button>
           </div>
 
@@ -834,10 +851,11 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                 type="button"
                 onClick={handleLocateMe}
                 disabled={locating}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition border ${userLocation
-                  ? 'bg-[#1fa35b]/20 border-[#1fa35b] text-[#1fa35b] hover:bg-[#1fa35b]/30'
-                  : 'bg-[#1a1a1a] hover:bg-[#2a2a2a] border-[#3a3a3a] text-white hover:border-[#4a4a4a]'
-                  }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition border ${
+                  userLocation
+                    ? 'bg-[#1fa35b]/20 border-[#1fa35b] text-[#1fa35b] hover:bg-[#1fa35b]/30'
+                    : 'bg-[#141414] hover:bg-[#222] border-[#333] text-white hover:border-[#444]'
+                }`}
                 title="Fetch your exact location to find agricultural fields near you"
               >
                 <LocateFixed
@@ -852,7 +870,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                   <select
                     value={nearbyRadius}
                     onChange={(e) => handleRadiusChange(Number(e.target.value))}
-                    className="bg-[#1a1a1a] border border-[#3a3a3a] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#1fa35b]"
+                    className="bg-[#141414] border border-[#333] rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-[#1fa35b]"
                     title="Search radius around your exact location"
                   >
                     <option value={1000}>1 km radius</option>
@@ -868,7 +886,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                       setUserLocation(null);
                       onNotify('Cleared location filter.');
                     }}
-                    className="p-1.5 rounded-lg bg-[#2a2a2a] hover:bg-[#333] text-[#888] hover:text-white transition"
+                    className="p-1.5 rounded-lg bg-[#222] hover:bg-[#333] text-[#888] hover:text-white transition"
                     title="Clear location filter"
                   >
                     <X size={13} />
@@ -886,7 +904,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                 <button
                   key={r.name}
                   onClick={() => setTargetFly({ lat: r.lat, lon: r.lon, zoom: r.zoom })}
-                  className="px-2 py-1 rounded bg-[#1f1f1f] hover:bg-[#2f2f2f] hover:text-white text-[11px] border border-[#333] transition"
+                  className="px-2 py-1 rounded bg-[#161a18] hover:bg-[#222] hover:text-white text-[11px] border border-[#2c332e] transition"
                 >
                   {r.name}
                 </button>
@@ -896,14 +914,14 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
         </div>
 
         {/* Right: Category filter & Dashboard link */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 shrink-0">
           {mode === 'discover' && (
-            <div className="flex items-center gap-2">
-              <SlidersHorizontal size={14} className="text-[#888]" />
+            <div className="flex items-center gap-1.5">
+              <SlidersHorizontal size={13} className="text-[#888]" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-[#1a1a1a] border border-[#3a3a3a] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#1fa35b]"
+                className="bg-[#141414] border border-[#333] rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#1fa35b] cursor-pointer"
               >
                 <option value="ALL">All Categories</option>
                 <option value="AL">Arable Land (AL)</option>
@@ -917,7 +935,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
 
           {/* Always Available Confidence Threshold Selector for AI Field Detection */}
           {(isOutsideCoverage || hasScanned || predictions.length > 0) && (
-            <div className="flex items-center gap-2 bg-[#1a1a1a] border border-[#a855f7]/40 rounded-lg px-2.5 py-1 text-xs">
+            <div className="flex items-center gap-2 bg-[#141414] border border-[#a855f7]/40 rounded-lg px-2.5 py-1 text-xs">
               <Sliders size={12} className="text-[#c084fc]" />
               <span className="text-[11px] text-[#aaa]">AI Threshold:</span>
               <input
@@ -939,9 +957,11 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
           {onNavigateDashboard && (
             <button
               onClick={onNavigateDashboard}
-              className="px-3 py-1.5 rounded-lg bg-[#333] hover:bg-[#444] text-xs font-medium text-white flex items-center gap-1.5 transition"
+              className="px-3 py-1.5 rounded-lg bg-[#222] hover:bg-[#2c2c2c] border border-[#333] text-xs font-semibold text-white flex items-center gap-1.5 transition shadow-sm"
+              title="Return to Dashboard"
             >
-              <span>Dashboard ({savedFields.length})</span> <ArrowRight size={13} />
+              <LayoutDashboard size={13} className="text-[#1fa35b]" />
+              <span>Dashboard ({savedFields.length})</span>
             </button>
           )}
         </div>
@@ -1294,8 +1314,9 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
           </div>
         )}
 
-        {/* Map Selection Legend (bottom-left) */}
+        {/* Map Selection Legend (bottom-left, offset from floating sidebar) */}
         <MapLegend
+          className="explorer-map-legend"
           mode="explorer"
           hasSavedFields={savedFields.length > 0}
           hasSelectedField={selectedIds.size > 0 || selectedPredictionIds.size > 0 || !!activeFeature || !!activePrediction}
@@ -1795,7 +1816,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                   type="text"
                   value={saveCrop}
                   onChange={(e) => setSaveCrop(e.target.value)}
-                  placeholder="e.g. Winter wheat, Field peas, Cover crop"
+                  placeholder="e.g. Winter wheat, Field peas (leave blank for unassigned)"
                   className="w-full bg-[#1a1a1a] border border-[#3a3a3a] rounded-lg px-3 py-2 text-xs text-white placeholder-[#666] focus:outline-none focus:border-[#1fa35b]"
                 />
               </div>

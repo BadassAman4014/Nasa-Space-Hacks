@@ -102,7 +102,7 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
               Variable-Rate Application (VRA)
             </span>
             <span className="text-xs text-emerald-200">
-              {summary.current_crop || 'Active Crop'} · {areaHa.toFixed(2)} ha
+              {summary.current_crop || 'No crop assigned'} · {areaHa.toFixed(2)} ha
             </span>
           </div>
           <h2 className="text-2xl font-bold">Prescription Map Generator — {summary.name}</h2>

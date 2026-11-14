@@ -6,7 +6,8 @@ import json
 import urllib.request
 import numpy as np
 
-CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "satellite_cache")
+BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+CACHE_DIR = os.path.join(BACKEND_DIR, "data", "satellite_cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 class Sentinel2AcquisitionService:
@@ -180,7 +181,7 @@ class Sentinel2AcquisitionService:
 
         if is_brandenburg:
             # Query local DFBK polygons if available to ground spectral signatures in actual field geometry
-            gpkg_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "dfbk_agricultural.gpkg")
+            gpkg_path = os.path.join(BACKEND_DIR, "data", "dfbk_agricultural.gpkg")
             fields_mask = np.zeros((height, width), dtype=bool)
             boundaries_mask = np.zeros((height, width), dtype=bool)
 

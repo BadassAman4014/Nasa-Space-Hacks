@@ -44,17 +44,18 @@ function Write-BrandHeader {
 
 function Stop-PortProcess([int]$Port) {
     try {
-        $connections = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
-        if ($connections) {
-            foreach ($conn in $connections) {
-                $pidToKill = $conn.OwningProcess
-                if ($pidToKill -and $pidToKill -ne 0 -and $pidToKill -ne $PID) {
-                    Write-Host "  [CLEANUP] Stopping existing process on port $Port (PID: $pidToKill)..." -ForegroundColor Yellow
-                    Stop-Process -Id $pidToKill -Force -ErrorAction SilentlyContinue
+        $lines = netstat -ano | Select-String ":$Port\s"
+        foreach ($line in $lines) {
+            $parts = ($line -split '\s+') | Where-Object { $_ -ne '' }
+            if ($parts.Count -gt 4) {
+                $procPid = $parts[-1]
+                if ($procPid -and $procPid -as [int] -and [int]$procPid -ne 0 -and [int]$procPid -ne $PID) {
+                    Write-Host "  [CLEANUP] Stopping process on port $Port (PID: $procPid)..." -ForegroundColor Yellow
+                    Stop-Process -Id [int]$procPid -Force -ErrorAction SilentlyContinue
                 }
             }
-            Start-Sleep -Milliseconds 600
         }
+        Start-Sleep -Milliseconds 500
     }
     catch {}
 }

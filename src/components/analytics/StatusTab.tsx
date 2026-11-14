@@ -208,7 +208,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
       {/* ── Section 1: Field Information Cards ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card 1: Crop */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Current Crop</span>
             <span className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
@@ -216,21 +216,21 @@ export const StatusTab: React.FC<StatusTabProps> = ({
             </span>
           </div>
           <div className="my-3">
-            <h3 className="text-xl font-bold text-gray-900">{summary.current_crop || 'No crop set'}</h3>
+            <h3 className="text-xl font-bold text-gray-900">{summary.current_crop || 'No crop assigned'}</h3>
             <p className="text-xs text-gray-500 mt-0.5">
-              {targetYield} • {summary.area_ha.toFixed(2)} ha arable land
+              {summary.current_crop ? `${targetYield} • ` : ''}{summary.area_ha.toFixed(2)} ha arable land{!summary.current_crop ? ' • Awaiting crop assignment' : ''}
             </p>
           </div>
-          <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+          <div className="pt-2 border-t border-black/[0.04] flex items-center justify-between text-xs text-gray-500">
             <span>Rotational Group: {cropGroup}</span>
-            <span className="text-emerald-700 font-semibold flex items-center gap-1">
+            <span className={summary.current_crop ? "text-emerald-700 font-semibold flex items-center gap-1" : "text-amber-700 font-semibold flex items-center gap-1"}>
               {summary.current_crop ? 'Active Season' : 'Unallocated'}
             </span>
           </div>
         </div>
 
         {/* Card 2: Planting Date */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Planting Date</span>
             <button
@@ -279,14 +279,14 @@ export const StatusTab: React.FC<StatusTabProps> = ({
             )}
           </div>
 
-          <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+          <div className="pt-2 border-t border-black/[0.04] flex items-center justify-between text-xs text-gray-500">
             <span>Durable Field Record</span>
             <span className="text-gray-700 font-medium">{seedingSeason}</span>
           </div>
         </div>
 
         {/* Card 3: Current Weather */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Current Weather</span>
             <span className="p-2 rounded-xl bg-blue-50 text-blue-600">
@@ -316,7 +316,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
             </div>
           </div>
 
-          <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+          <div className="pt-2 border-t border-black/[0.04] flex items-center justify-between text-xs text-gray-400">
             <span className="truncate max-w-[200px]">
               {summary.current_weather?.station_or_provider || 'Weather station sync pending'}
             </span>
@@ -326,9 +326,9 @@ export const StatusTab: React.FC<StatusTabProps> = ({
       </div>
 
       {/* ── Section 2: Historical Satellite & NDVI Map Visualizer ── */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-5">
+      <div className="bg-white rounded-2xl p-6 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] space-y-5">
         {/* Date Selector Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/[0.04]">
           <div>
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
               <Eye size={18} className="text-emerald-600" />
@@ -350,8 +350,8 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                     setSelectedSeason(season);
                   }}
                   className={`px-2.5 py-1 rounded-lg transition ${selectedSeason === season
-                      ? 'bg-white text-gray-900 shadow-xs'
-                      : 'text-gray-500 hover:text-gray-900'
+                    ? 'bg-white text-gray-900 shadow-xs'
+                    : 'text-gray-500 hover:text-gray-900'
                     }`}
                 >
                   {season === 'all' ? 'All' : season}
@@ -649,7 +649,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
       {/* ── Section 3: Time Series Interactive Charts ── */}
       <div className="space-y-6">
         {/* Chart 1: Historical NDVI Series */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
+        <div className="bg-white rounded-2xl p-6 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
@@ -778,7 +778,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
         {/* Chart 2: Accumulated Precipitation & GDD Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Card: Accumulated Precipitation */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
+          <div className="bg-white rounded-2xl p-6 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
@@ -833,7 +833,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
           </div>
 
           {/* Card: Growing Degree-Days (GDD) */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
+          <div className="bg-white rounded-2xl p-6 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">

@@ -69,12 +69,12 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
   }, [fieldDropdownOpen]);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30 shadow-xs">
+    <header className="bg-[#f1f4f2]/90 backdrop-blur-md px-6 md:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30 transition-all">
       {/* Left: Back button & Field Title/Subtitle */}
       <div className="flex items-center gap-3.5">
         <button
           onClick={onClose}
-          className="p-2 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition flex items-center justify-center border border-gray-200"
+          className="p-2 rounded-xl text-gray-600 hover:text-gray-900 bg-white/80 hover:bg-white transition flex items-center justify-center border border-black/[0.06] shadow-xs cursor-pointer"
           title="Close / Back to Map"
           aria-label="Back to Map"
         >
@@ -88,7 +88,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setFieldDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-1.5 px-2 py-0.5 -ml-2 rounded-xl hover:bg-gray-100 transition group border border-transparent hover:border-gray-200 text-left cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 py-1 -ml-2 rounded-xl hover:bg-white/80 transition group border border-transparent hover:border-black/[0.04] text-left cursor-pointer"
                 aria-expanded={fieldDropdownOpen}
                 aria-haspopup="listbox"
                 title="Click to switch field"
@@ -141,9 +141,13 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
                             <div className="space-y-0.5 min-w-0 pr-2">
                               <div className="flex items-center gap-2">
                                 <span className="font-bold truncate text-gray-900">{f.name}</span>
-                                {f.current_crop && (
+                                {f.current_crop ? (
                                   <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.2 rounded font-normal">
                                     {f.current_crop}
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] bg-amber-50 text-amber-700/80 border border-amber-200/50 px-1.5 py-0.2 rounded font-normal">
+                                    Unassigned
                                   </span>
                                 )}
                               </div>
@@ -183,12 +187,12 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
       </div>
 
       {/* Middle: 5 Navigation Tabs (OneSoil Architecture) */}
-      <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200 flex-shrink-0">
+      <div className="flex items-center bg-slate-200/50 p-1 rounded-2xl border border-black/[0.04] flex-shrink-0">
         {/* Tab 1: Status */}
         <button
           type="button"
           onClick={() => setActiveTab('status')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition whitespace-nowrap ${
+          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
             activeTab === 'status'
               ? 'bg-white text-gray-900 shadow-xs'
               : 'text-gray-600 hover:text-gray-900'
@@ -201,7 +205,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('report')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition whitespace-nowrap flex items-center gap-1 ${
+          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap flex items-center gap-1 cursor-pointer ${
             activeTab === 'report'
               ? 'bg-white text-gray-900 shadow-xs'
               : 'text-gray-600 hover:text-gray-900'
@@ -215,7 +219,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('prescription')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition whitespace-nowrap ${
+          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
             activeTab === 'prescription'
               ? 'bg-white text-gray-900 shadow-xs'
               : 'text-gray-600 hover:text-gray-900'
@@ -228,7 +232,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('data')}
-          className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition whitespace-nowrap flex items-center gap-1.5 ${
+          className={`px-2.5 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
             activeTab === 'data'
               ? 'bg-white text-gray-900 shadow-xs'
               : 'text-gray-600 hover:text-gray-900'
@@ -244,7 +248,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('yield')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition whitespace-nowrap ${
+          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
             activeTab === 'yield'
               ? 'bg-white text-gray-900 shadow-xs'
               : 'text-gray-600 hover:text-gray-900'
@@ -259,7 +263,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         {/* Prescription map action */}
         <button
           onClick={() => setActiveTab('prescription')}
-          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 transition hidden xl:flex items-center gap-1.5"
+          className="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition hidden xl:flex items-center gap-1.5 cursor-pointer"
           title="Create variable-rate prescription"
         >
           <FileSpreadsheet size={14} className="text-emerald-600" />
@@ -269,7 +273,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         {/* Soil sampling map action */}
         <button
           onClick={() => notify('Soil Sampling Map Planner: 1.0 ha sample grid points generated.')}
-          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 transition hidden xl:flex items-center gap-1.5"
+          className="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition hidden xl:flex items-center gap-1.5 cursor-pointer"
           title="Agrochemical soil sampling points"
         >
           <FlaskConical size={14} className="text-amber-600" />
@@ -279,7 +283,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         {/* Upload data action */}
         <button
           onClick={() => notify('Ingest data: Select Harvester Yield Shapefile, ISO-XML, or GeoTIFF.')}
-          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 transition hidden md:flex items-center gap-1.5"
+          className="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition hidden md:flex items-center gap-1.5 cursor-pointer"
           title="Upload harvester, drone, or tractor logs"
         >
           <UploadCloud size={14} className="text-blue-600" />
@@ -290,7 +294,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         <button
           onClick={onRefresh}
           disabled={refreshing}
-          className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition disabled:opacity-50"
+          className="p-2 rounded-xl text-gray-500 hover:text-gray-900 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition disabled:opacity-50 cursor-pointer"
           title="Refresh satellite analysis"
         >
           <RefreshCw size={15} className={refreshing ? 'animate-spin text-emerald-600' : ''} />
@@ -300,7 +304,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-            className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition"
+            className="p-2 rounded-xl text-gray-500 hover:text-gray-900 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition cursor-pointer"
             title="More actions"
           >
             <MoreVertical size={16} />

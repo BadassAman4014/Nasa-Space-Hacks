@@ -42,7 +42,7 @@ export const YieldAnalysisTab: React.FC<YieldAnalysisTabProps> = ({
   notify,
 }) => {
   const cropInfo = useMemo(() => {
-    const cropName = summary.current_crop || 'Winter wheat';
+    const cropName = summary.current_crop || '';
     return CROP_BASELINES[cropName] || { baselineYield: 6.5, defaultPrice: 210, unit: 't/ha', optimalN: 160 };
   }, [summary.current_crop]);
 
@@ -121,12 +121,12 @@ export const YieldAnalysisTab: React.FC<YieldAnalysisTabProps> = ({
               <TrendingUp size={13} /> Harvest & Trial Intelligence
             </span>
             <span className="text-xs text-blue-200">
-              {summary.name} · {summary.current_crop || 'Winter wheat'} · {areaHa.toFixed(2)} ha
+              {summary.name} · {summary.current_crop ? summary.current_crop : 'Unassigned Crop (Baseline model)'} · {areaHa.toFixed(2)} ha
             </span>
           </div>
           <h2 className="text-2xl font-bold">Yield Analysis & On-Farm Trials — {summary.name}</h2>
           <p className="text-xs text-blue-100/80 mt-1 max-w-2xl leading-relaxed">
-            Evaluates productivity across {summary.name}'s verified soil and satellite zones. Compares targeted variable-rate nutrition against uniform checks for {summary.current_crop || 'Winter wheat'}.
+            Evaluates productivity across {summary.name}'s verified soil and satellite zones. Compares targeted variable-rate nutrition against uniform checks{summary.current_crop ? ` for ${summary.current_crop}` : ' (showing standard arable crop baseline)'}.
           </p>
         </div>
 

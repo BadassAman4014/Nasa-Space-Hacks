@@ -1,9 +1,12 @@
-"""U-Net with MobileNetV3-Small Encoder for Agricultural Field Boundary Segmentation.
+"""Fields of the World (FTW-PRUE+) and Fields of the Planet (FTP-B3) Field Segmentation Models.
 
-Architecture:
-- Encoder: MobileNetV3-Small with adapted 4-channel input (B02, B03, B04, B08).
-- Decoder: U-Net feature upsampling with bilinear interpolation, skip connections, and DoubleConv blocks.
-- Output: 3-channel pixel-wise probability maps (0: Background, 1: Field Interior, 2: Field Boundary).
+Primary Model:
+- Repository: https://huggingface.co/fieldsoftheworld/ftw-prue-ccby
+- Model: FTW-PRUE+ EfficientNet-B3 U-Net (Sentinel-2 Native)
+- Architecture: U-Net decoder with an EfficientNet-B3 encoder (segmentation_models_pytorch).
+- Input: 8 channels (bi-temporal surface reflectance: 2 dates x [B04 Red, B03 Green, B02 Blue, B08 NIR]).
+  Single 4-band Sentinel-2 inputs are formatted as [B04, B03, B02, B08, B04, B03, B02, B08] and scaled by 10000/3000.
+- Output: 3-class pixel-wise probability maps (0: Background, 1: Field Interior, 2: Field Boundary).
 """
 
 from typing import Optional, Tuple
@@ -11,11 +14,200 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision.models as models
+import numpy as np
 
+# Try importing segmentation_models_pytorch
+try:
+    import segmentation_models_pytorch as smp
+    HAS_SMP = True
+except ImportError:
+    smp = None
+    HAS_SMP = False
+
+LOCAL_FTW_PRUE_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../../models/field_segmentation/ftw-prue")
+)
+LOCAL_FTW_PRUE_WEIGHTS = os.path.join(LOCAL_FTW_PRUE_DIR, "prue_efnetb3_ccby-b35d59a6.pth")
+HF_FTW_REPO_ID = "fieldsoftheworld/ftw-prue-ccby"
+
+LOCAL_FTP_B3_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../../models/field_segmentation/ftp-b3")
+)
+HF_FTP_REPO_ID = "fieldsoftheworld/ftp-b3"
+
+
+class FTWPRUESentinel2Model(nn.Module):
+    """Fields of the World (FTW-PRUE+) Sentinel-2 Field Boundary Segmentation Model.
+    
+    Source: https://huggingface.co/fieldsoftheworld/ftw-prue-ccby
+    Backbone: EfficientNet-B3
+    Decoder: U-Net
+    Input Resolution: 10m (Sentinel-2 Native)
+    Input Layout: [B04, B03, B02, B08, B04, B03, B02, B08] (Red, Green, Blue, NIR)
+    Output Classes: 3 (0: Background, 1: Field Interior, 2: Field Boundary)
+    """
+
+    def __init__(
+        self,
+        weights_path: Optional[str] = None,
+        in_channels: int = 8,
+        num_classes: int = 3,
+        device: Optional[str] = None
+    ):
+        super().__init__()
+        self.in_channels = in_channels
+        self.num_classes = num_classes
+        self.weights_path = weights_path or LOCAL_FTW_PRUE_WEIGHTS
+        self._device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.backbone_name = "efficientnet-b3"
+        self.architecture_name = "Fields of the World (FTW-PRUE+) EfficientNet-B3 U-Net (Sentinel-2 10m Native)"
+
+        self.net = self._init_model()
+
+    def _init_model(self) -> nn.Module:
+        """Instantiate smp.Unet and load FTW-PRUE+ weights."""
+        if not HAS_SMP:
+            raise RuntimeError("segmentation_models_pytorch is required for FTW-PRUE model.")
+
+        model = smp.Unet(
+            encoder_name=self.backbone_name,
+            in_channels=self.in_channels,
+            classes=self.num_classes,
+            encoder_weights=None
+        )
+
+        # 1. Check local checkpoint
+        if os.path.exists(self.weights_path):
+            try:
+                state = torch.load(self.weights_path, map_location=self._device)
+                if isinstance(state, dict) and "state_dict" in state:
+                    state = {k.replace("model.", ""): v for k, v in state["state_dict"].items()}
+                model.load_state_dict(state, strict=False)
+                return model
+            except Exception:
+                pass
+
+        # 2. Check Hugging Face hub cached file
+        try:
+            from huggingface_hub import hf_hub_download
+            p = hf_hub_download(repo_id=HF_FTW_REPO_ID, filename="prue_efnetb3_ccby-b35d59a6.pth")
+            state = torch.load(p, map_location=self._device)
+            if isinstance(state, dict) and "state_dict" in state:
+                state = {k.replace("model.", ""): v for k, v in state["state_dict"].items()}
+            model.load_state_dict(state, strict=False)
+            return model
+        except Exception:
+            pass
+
+        return model
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass expecting (B, 8, H, W) in [B04, B03, B02, B08, B04, B03, B02, B08]."""
+        B, C, H, W = x.shape
+        if C == 8:
+            adapted = x
+        elif C == 4:
+            # Replicate 4 bands into 8-channel bi-temporal representation
+            adapted = torch.cat([x, x], dim=1)
+        elif C == 3:
+            adapted = torch.cat([x, x, x[:, :2]], dim=1)
+        elif C < 8:
+            reps = (8 + C - 1) // C
+            adapted = x.repeat(1, reps, 1, 1)[:, :8, :, :]
+        else:
+            adapted = x[:, :8, :, :]
+
+        return self.net(adapted)
+
+    @torch.inference_mode()
+    def predict_proba(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass returning softmax probabilities across classes (B, 3, H, W)."""
+        logits = self.forward(x)
+        return F.softmax(logits, dim=1)
+
+    def count_parameters(self) -> int:
+        return sum(p.numel() for p in self.parameters())
+
+
+class FTPB3SegmentationModel(nn.Module):
+    """Fields of the Planet (FTP-B3) Field Boundary Segmentation Model (PlanetScope 3m Native)."""
+
+    def __init__(
+        self,
+        model_source: Optional[str] = None,
+        in_channels: int = 8,
+        num_classes: int = 3,
+        device: Optional[str] = None
+    ):
+        super().__init__()
+        self.in_channels = in_channels
+        self.num_classes = num_classes
+        self.model_source = model_source or LOCAL_FTP_B3_DIR
+        self._device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.backbone_name = "efficientnet-b3"
+        self.architecture_name = "Fields of the Planet (FTP-B3) EfficientNet-B3 U-Net (PlanetScope 3m Native)"
+
+        self.net = self._init_smp_model()
+
+    def _init_smp_model(self) -> nn.Module:
+        if not HAS_SMP:
+            raise RuntimeError("segmentation_models_pytorch is required.")
+
+        candidate_paths = [
+            self.model_source,
+            LOCAL_FTP_B3_DIR,
+            os.path.expanduser("~/.cache/huggingface/hub/models--fieldsoftheworld--ftp-b3/snapshots/301701bb04e62b1b55c7d807556a53600e6f386a"),
+        ]
+
+        for p in candidate_paths:
+            if p and os.path.isdir(p) and (
+                os.path.exists(os.path.join(p, "config.json")) or
+                os.path.exists(os.path.join(p, "model.safetensors"))
+            ):
+                try:
+                    return smp.from_pretrained(p)
+                except Exception:
+                    pass
+
+        try:
+            return smp.from_pretrained(HF_FTP_REPO_ID)
+        except Exception:
+            pass
+
+        return smp.Unet(
+            encoder_name=self.backbone_name,
+            encoder_weights=None,
+            in_channels=self.in_channels,
+            classes=self.num_classes,
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        B, C, H, W = x.shape
+        if C == 8:
+            adapted_x = x
+        elif C == 4:
+            adapted_x = torch.cat([x, x], dim=1)
+        elif C == 3:
+            adapted_x = torch.cat([x, x, x[:, :2]], dim=1)
+        elif C < 8:
+            reps = (8 + C - 1) // C
+            adapted_x = x.repeat(1, reps, 1, 1)[:, :8, :, :]
+        else:
+            adapted_x = x[:, :8, :, :]
+
+        return self.net(adapted_x)
+
+    @torch.inference_mode()
+    def predict_proba(self, x: torch.Tensor) -> torch.Tensor:
+        logits = self.forward(x)
+        return F.softmax(logits, dim=1)
+
+    def count_parameters(self) -> int:
+        return sum(p.numel() for p in self.parameters())
+
+
+# Legacy architecture retained for reference and fallback compatibility
 class DoubleConv(nn.Module):
-    """Two Conv2D-BatchNorm-ReLU layers with residual-friendly layout."""
-
     def __init__(self, in_ch: int, out_ch: int):
         super().__init__()
         self.net = nn.Sequential(
@@ -30,9 +222,8 @@ class DoubleConv(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
 
-class UpBlock(nn.Module):
-    """Bilinear upsampling block followed by skip-connection concatenation and DoubleConv."""
 
+class UpBlock(nn.Module):
     def __init__(self, in_ch: int, skip_ch: int, out_ch: int):
         super().__init__()
         self.conv = DoubleConv(in_ch + skip_ch, out_ch)
@@ -47,9 +238,8 @@ class UpBlock(nn.Module):
             x = torch.cat([skip, x], dim=1)
         return self.conv(x)
 
-class UNetMobileNetV3Small(nn.Module):
-    """Agricultural field segmentation network using MobileNetV3-Small backbone."""
 
+class UNetMobileNetV3Small(nn.Module):
     def __init__(
         self,
         in_channels: int = 4,
@@ -58,29 +248,13 @@ class UNetMobileNetV3Small(nn.Module):
         weights_path: Optional[str] = None
     ):
         super().__init__()
+        import torchvision.models as models
         self.in_channels = in_channels
         self.num_classes = num_classes
-        self.pretrained_encoder = pretrained_encoder
 
-        # Load MobileNetV3-Small backbone
         base = models.mobilenet_v3_small(weights=None)
         features = base.features
 
-        # Pretrained backbone loading if requested
-        if pretrained_encoder:
-            try:
-                hub_cache = os.path.expanduser("~/.cache/torch/hub/checkpoints/mobilenet_v3_small-047dcff4.pth")
-                if os.path.exists(hub_cache):
-                    state_dict = torch.load(hub_cache, map_location="cpu")
-                    base.load_state_dict(state_dict)
-                else:
-                    weights = models.MobileNet_V3_Small_Weights.DEFAULT
-                    base = models.mobilenet_v3_small(weights=weights)
-                    features = base.features
-            except Exception:
-                pass  # Fall back to random init if offline/unavailable
-
-        # Adapt first conv layer for 4 channels (B02 Blue, B03 Green, B04 Red, B08 NIR)
         orig_conv = features[0][0]
         first_conv = nn.Conv2d(
             in_channels,
@@ -90,79 +264,52 @@ class UNetMobileNetV3Small(nn.Module):
             padding=1,
             bias=False
         )
-
         with torch.no_grad():
             if in_channels >= 3:
                 first_conv.weight[:, :3] = orig_conv.weight[:, :3]
             if in_channels >= 4:
-                # Initialize Near-Infrared (B8) channel with average of Red and Green weights
                 first_conv.weight[:, 3:4] = (orig_conv.weight[:, 0:1] + orig_conv.weight[:, 1:2]) / 2.0
 
-        # Encoder stages with hierarchical feature map resolutions
-        self.encoder0 = nn.Sequential(first_conv, features[0][1], features[0][2])  # 1/2 resolution (16 ch)
-        self.encoder1 = nn.Sequential(features[1])                                  # 1/4 resolution (16 ch)
-        self.encoder2 = nn.Sequential(features[2], features[3])                    # 1/8 resolution (24 ch)
-        self.encoder3 = nn.Sequential(features[4], features[5], features[6], features[7], features[8])  # 1/16 resolution (48 ch)
-        self.encoder4 = nn.Sequential(features[9], features[10], features[11], features[12])            # 1/32 resolution (576 ch bottleneck)
+        self.encoder0 = nn.Sequential(first_conv, features[0][1], features[0][2])
+        self.encoder1 = nn.Sequential(features[1])
+        self.encoder2 = nn.Sequential(features[2], features[3])
+        self.encoder3 = nn.Sequential(features[4], features[5], features[6], features[7], features[8])
+        self.encoder4 = nn.Sequential(features[9], features[10], features[11], features[12])
 
-        # U-Net decoder with multi-scale skip connections
-        self.up4 = UpBlock(in_ch=576, skip_ch=48, out_ch=96)  # 1/32 -> 1/16
-        self.up3 = UpBlock(in_ch=96,  skip_ch=24, out_ch=48)  # 1/16 -> 1/8
-        self.up2 = UpBlock(in_ch=48,  skip_ch=16, out_ch=32)  # 1/8  -> 1/4
-        self.up1 = UpBlock(in_ch=32,  skip_ch=16, out_ch=24)  # 1/4  -> 1/2
-        self.up0 = UpBlock(in_ch=24,  skip_ch=0,  out_ch=16)  # 1/2  -> 1/1 (full input res)
+        self.up4 = UpBlock(in_ch=576, skip_ch=48, out_ch=96)
+        self.up3 = UpBlock(in_ch=96,  skip_ch=24, out_ch=48)
+        self.up2 = UpBlock(in_ch=48,  skip_ch=16, out_ch=32)
+        self.up1 = UpBlock(in_ch=32,  skip_ch=16, out_ch=24)
+        self.up0 = UpBlock(in_ch=24,  skip_ch=0,  out_ch=16)
 
-        # Final 1x1 classification head
         self.head = nn.Conv2d(16, num_classes, kernel_size=1)
 
-        # If a full custom checkpoint was provided, load it
         if weights_path and os.path.exists(weights_path):
             self.load_checkpoint(weights_path)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass returning unnormalized logits of shape (B, num_classes, H, W)."""
-        # Encoder passes
-        e0 = self.encoder0(x)  # [B, 16, H/2, W/2]
-        e1 = self.encoder1(e0) # [B, 16, H/4, W/4]
-        e2 = self.encoder2(e1) # [B, 24, H/8, W/8]
-        e3 = self.encoder3(e2) # [B, 48, H/16, W/16]
-        e4 = self.encoder4(e3) # [B, 576, H/32, W/32]
+        e0 = self.encoder0(x)
+        e1 = self.encoder1(e0)
+        e2 = self.encoder2(e1)
+        e3 = self.encoder3(e2)
+        e4 = self.encoder4(e3)
 
-        # Decoder passes with skip connections
-        d4 = self.up4(e4, e3)  # [B, 96, H/16, W/16]
-        d3 = self.up3(d4, e2)  # [B, 48, H/8, W/8]
-        d2 = self.up2(d3, e1)  # [B, 32, H/4, W/4]
-        d1 = self.up1(d2, e0)  # [B, 24, H/2, W/2]
-        d0 = self.up0(d1)      # [B, 16, H, W]
-
-        logits = self.head(d0) # [B, 3, H, W]
-        return logits
+        d4 = self.up4(e4, e3)
+        d3 = self.up3(d4, e2)
+        d2 = self.up2(d3, e1)
+        d1 = self.up1(d2, e0)
+        d0 = self.up0(d1)
+        return self.head(d0)
 
     @torch.inference_mode()
     def predict_proba(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass returning softmax probabilities across classes (B, 3, H, W)."""
         logits = self.forward(x)
         return F.softmax(logits, dim=1)
 
     def count_parameters(self) -> int:
-        """Return total trainable parameters count."""
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
-    def save_checkpoint(self, path: str, extra_meta: Optional[dict] = None) -> None:
-        """Save model weights and metadata."""
-        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-        payload = {
-            "model_state_dict": self.state_dict(),
-            "in_channels": self.in_channels,
-            "num_classes": self.num_classes,
-            "architecture": "U-Net MobileNetV3-Small",
-            "parameters": self.count_parameters(),
-            "metadata": extra_meta or {},
-        }
-        torch.save(payload, path)
-
     def load_checkpoint(self, path: str, device: str = "cpu") -> None:
-        """Load state dict from a checkpoint file."""
         checkpoint = torch.load(path, map_location=device)
         if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
             self.load_state_dict(checkpoint["model_state_dict"])

@@ -242,7 +242,7 @@ class FieldReportService:
         minx, miny, maxx, maxy = poly.bounds
         lat = (miny + maxy) / 2.0
         lon = (minx + maxx) / 2.0
-        crop = field.get("current_crop", "Winter wheat")
+        crop = field.get("current_crop") or ""
 
         return weather_service.get_gdd_series(field_id, crop, lat, lon, base_temperature_c=base_temp)
 
@@ -281,7 +281,7 @@ class FieldReportService:
             analytics_repo.save_observations(field_id, raw_obs)
 
         # 3. Productivity Zones
-        crop = field.get("current_crop") or "Winter wheat"
+        crop = field.get("current_crop") or ""
         try:
             prod_data = productivity_service.calculate_productivity_report(
                 field_id, area_ha, raw_obs, crop=crop

@@ -7,8 +7,8 @@
   --dark: #262626; --green: #1fa35b; --green-soft: #e3f5ea; --orange: #ff7a1a;
   --amber: #f5a524; --red: #e5483d; --blue: #4a8fcc;
   --r-card: 22px; --r-ctl: 12px; --gap: 10px;
-  /* Desktop sidebar shows labels — 200px wide */
-  --rail-w: 200px;
+  /* Desktop floating sidebar: 200px width + 12px left margin + 12px gap = 224px */
+  --rail-w: 224px;
   --panel-w: clamp(380px, 32vw, 520px);
   --shadow-float: 0 8px 28px rgba(0,0,0,.18);
 }

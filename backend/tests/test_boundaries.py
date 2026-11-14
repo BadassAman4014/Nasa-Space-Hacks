@@ -154,6 +154,8 @@ class TestBoundaryDiscovery(unittest.TestCase):
         self.assertEqual(import_data["imported_count"], 2)
         self.assertEqual(import_data["fields"][0]["name"], "North Block Field")
         self.assertEqual(import_data["fields"][1]["name"], "South Pasture")
+        self.assertEqual(import_data["fields"][0]["current_crop"], "")
+        self.assertEqual(import_data["fields"][1]["current_crop"], "")
 
         # 3. Verify farm field listing
         fields_data = get_farm_fields(farm_id)
@@ -169,6 +171,7 @@ class TestBoundaryDiscovery(unittest.TestCase):
         update_req = EditGeometryRequest(geometry=edited_polygon)
         field_resp = save_field_geometry(field_id, update_req)
         self.assertEqual(field_resp["field"]["geometry"], edited_polygon)
+        self.assertEqual(field_resp["field"]["current_crop"], "")
         self.assertGreater(field_resp["field"]["area_hectares"], 0)
 
     def test_invekos_service_fallback(self):

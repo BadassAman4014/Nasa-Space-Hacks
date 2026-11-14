@@ -186,7 +186,7 @@ class BoundaryProvider:
                 continue
 
             name = custom_names.get(b_id) or f"Field {boundary['external_id'][-4:]} · {boundary['land_use_category']}"
-            crop = current_crop or ("Winter wheat" if boundary["land_use_category"] == "AL" else "Grassland pasture")
+            crop = (current_crop or "").strip()
 
             field_record = self.user_repo.create_field(
                 farm_id=farm_id,
@@ -231,7 +231,7 @@ class BoundaryProvider:
             farm_id=farm_id,
             name=f"Custom Field {field_id[-4:]}",
             geometry=new_geometry,
-            current_crop="Cover crop",
+            current_crop="",
             boundary_source="User-drawn",
             land_use_category="AL"
         )
