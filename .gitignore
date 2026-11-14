@@ -28,3 +28,5 @@ backend/data/raw/DFBK_FB.shp
 backend/data/dfbk.zip
 
 .env
+*.example
+*.example
