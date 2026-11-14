@@ -21,4 +21,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Large GIS and data files (>50MB / GitHub restrictions)
+*.gpkg
+backend/data/dfbk_agricultural.gpkg
+backend/data/raw/DFBK_FB.shp
+backend/data/dfbk.zip
+
 .env
