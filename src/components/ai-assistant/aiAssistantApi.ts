@@ -7,10 +7,14 @@ import type {
   FieldCategory,
 } from './types';
 
-const API_BASE = 'http://localhost:8000/api/ai-assistant';
+const API_BASE = '/api/ai-assistant';
 
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const urls = [`${API_BASE}${endpoint}`, `/api/ai-assistant${endpoint}`];
+  const urls = [
+    `${API_BASE}${endpoint}`,
+    `http://127.0.0.1:8000/api/ai-assistant${endpoint}`,
+    `http://localhost:8000/api/ai-assistant${endpoint}`,
+  ];
   let lastError: Error | null = null;
 
   for (const url of urls) {

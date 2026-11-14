@@ -8,7 +8,6 @@ import { FieldExplorerView } from './components/fields/FieldExplorerView';
 import { FieldAnalyticsWorkspace } from './components/analytics/FieldAnalyticsWorkspace';
 import { WeatherView } from './components/weather/WeatherView';
 import { AIAssistantView } from './components/ai-assistant/AIAssistantView';
-import { LanguageSelectModal } from './components/common/LanguageSelectModal';
 import { SettingsModal } from './components/common/SettingsModal';
 import { useI18n } from './i18n';
 import {
@@ -42,7 +41,10 @@ function App() {
   useEffect(() => {
     async function resolveActiveField() {
       try {
-        const resp = await fetch('http://localhost:8000/api/fields');
+        let resp = await fetch('/api/fields');
+        if (!resp.ok) {
+          resp = await fetch('http://127.0.0.1:8000/api/fields');
+        }
         if (resp.ok) {
           const list = await resp.json();
           if (Array.isArray(list) && list.length > 0) {
@@ -77,9 +79,6 @@ function App() {
         page === 'ai-assistant' ? 'app-shell--ai-assistant' : ''
       }`}
     >
-      {/* First Launch Language Selector Modal */}
-      <LanguageSelectModal />
-
       {/* Global Settings Modal with Language & Units */}
       <SettingsModal
         isOpen={settingsOpen}

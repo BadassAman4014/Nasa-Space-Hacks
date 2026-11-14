@@ -122,7 +122,7 @@ Stop-PortProcess -Port 5173
 # 3. Launching services
 Write-Host "`n [3/4] Starting servers..." -ForegroundColor Cyan
 
-$backendScript = "python -m uvicorn --app-dir backend app.main:app --host 127.0.0.1 --port 8000 --reload"
+$backendScript = "python -m uvicorn --app-dir backend app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir backend"
 $frontendScript = "npm run dev -- --host 127.0.0.1 --port 5173"
 
 if ($SeparateWindows) {
@@ -134,7 +134,8 @@ if ($SeparateWindows) {
 }
 else {
     Write-Host "   -> Starting FastAPI Backend (http://127.0.0.1:8000)..." -ForegroundColor White
-    $backendProcess = Start-Process powershell -ArgumentList "-Command", "cd '$RootPath'; $backendScript" -WindowStyle Hidden -PassThru
+    $backendLogFile = "$RootPath\backend.log"
+    $backendProcess = Start-Process powershell -ArgumentList "-Command", "cd '$RootPath'; $backendScript *>&1 | Tee-Object -FilePath '$backendLogFile'" -WindowStyle Hidden -PassThru
 
     Write-Host "   -> Starting Vite Frontend (http://127.0.0.1:5173)..." -ForegroundColor White
     $frontendProcess = Start-Process powershell -ArgumentList "-Command", "cd '$RootPath'; $frontendScript" -WindowStyle Hidden -PassThru
@@ -144,17 +145,17 @@ else {
 Write-Host "`n [4/4] Awaiting health readiness..." -ForegroundColor Cyan
 $backendReady = $false
 $frontendReady = $false
-$retries = 30
+$retries = 35
 
 for ($i = 0; $i -lt $retries; $i++) {
     Start-Sleep -Milliseconds 500
 
     if (-not $backendReady) {
-        if (Test-PortOpen "127.0.0.1" 8000) { $backendReady = $true }
+        if (Test-PortOpen "127.0.0.1" 8000 -or Test-PortOpen "localhost" 8000) { $backendReady = $true }
     }
 
     if (-not $frontendReady) {
-        if (Test-PortOpen "127.0.0.1" 5173) { $frontendReady = $true }
+        if (Test-PortOpen "127.0.0.1" 5173 -or Test-PortOpen "localhost" 5173) { $frontendReady = $true }
     }
 
     if ($backendReady -and $frontendReady) { break }
@@ -167,6 +168,9 @@ if ($backendReady) {
 }
 else {
     Write-Host "   [WAITING] Backend starting up on http://127.0.0.1:8000..." -ForegroundColor Yellow
+    if (Test-Path "$RootPath\backend.log") {
+        Write-Host "   [LOG] Check backend.log for initialization status." -ForegroundColor DarkGray
+    }
 }
 
 if ($frontendReady) {
@@ -187,6 +191,7 @@ if (-not $NoBrowser) {
 Write-Host ""
 Write-Host " ==================================================================" -ForegroundColor Green
 Write-Host "   All systems are live and synchronized!" -ForegroundColor White
+Write-Host "   Tip: Use '.\run.ps1 -SeparateWindows' to see live backend logs" -ForegroundColor DarkGray
 Write-Host "   Press [Ctrl + C] or [Q] in this window to stop all services." -ForegroundColor Yellow
 Write-Host " ==================================================================" -ForegroundColor Green
 Write-Host ""
@@ -200,8 +205,16 @@ try {
                 break
             }
         }
-        if ($backendProcess.HasExited -and $frontendProcess.HasExited) {
-            Write-Host "`nBoth processes have terminated." -ForegroundColor DarkGray
+        if ($backendProcess.HasExited) {
+            Write-Host "`n [ALERT] Backend process terminated!" -ForegroundColor Red
+            if (Test-Path "$RootPath\backend.log") {
+                Write-Host " --- Recent backend.log excerpt ---" -ForegroundColor DarkGray
+                Get-Content "$RootPath\backend.log" -Tail 15 | ForEach-Object { Write-Host "   $_" -ForegroundColor DarkGray }
+            }
+            break
+        }
+        if ($frontendProcess.HasExited) {
+            Write-Host "`n [ALERT] Frontend process terminated." -ForegroundColor DarkGray
             break
         }
         Start-Sleep -Milliseconds 500

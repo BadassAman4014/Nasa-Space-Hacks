@@ -30,3 +30,4 @@ backend/data/dfbk.zip
 .env
 *.example
 *.example
+backend/.env.example
