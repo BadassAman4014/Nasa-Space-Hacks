@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Globe2, Sparkles, X, ArrowRight, ShieldCheck, Sprout } from 'lucide-react';
+import { UKFlag, GermanFlag } from './FlagIcons';
 import { useI18n } from '../../i18n';
 import type { Language } from '../../i18n/types';
 
@@ -98,9 +99,7 @@ export const LanguageSelectModal: React.FC<LanguageSelectModalProps> = ({ forceO
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl sm:text-4xl shadow-xs select-none" role="img" aria-label="UK flag">
-                    🇬🇧
-                  </span>
+                  <UKFlag className="w-9 h-7 rounded-md" />
                   <div>
                     <h3 className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                       English
@@ -152,9 +151,7 @@ export const LanguageSelectModal: React.FC<LanguageSelectModalProps> = ({ forceO
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl sm:text-4xl shadow-xs select-none" role="img" aria-label="German flag">
-                    🇩🇪
-                  </span>
+                  <GermanFlag className="w-9 h-7 rounded-md" />
                   <div>
                     <h3 className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                       Deutsch

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check, Globe } from 'lucide-react';
+import { UKFlag, GermanFlag } from './FlagIcons';
 import { useI18n } from '../../i18n';
 import type { Language } from '../../i18n/types';
 
@@ -64,9 +65,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           }`}
           title={language === 'en' ? 'Select language / Sprache wählen' : 'Sprache wählen / Select language'}
         >
-          <span className="text-sm" role="img" aria-label={language === 'en' ? 'UK flag' : 'German flag'}>
-            {language === 'en' ? '🇬🇧' : '🇩🇪'}
-          </span>
+          {language === 'en' ? <UKFlag size="sm" /> : <GermanFlag size="sm" />}
           <span className="font-bold">{language === 'en' ? 'EN' : 'DE'}</span>
           <ChevronDown
             size={13}
@@ -108,7 +107,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-base" role="img" aria-label="UK flag">🇬🇧</span>
+                <UKFlag size="sm" />
                 <div className="text-left">
                   <div className="leading-tight font-semibold">English</div>
                   <div className={`text-[10px] ${dark ? 'text-[#888]' : 'text-slate-400'} font-normal`}>English (UK)</div>
@@ -135,7 +134,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-base" role="img" aria-label="German flag">🇩🇪</span>
+                <GermanFlag size="sm" />
                 <div className="text-left">
                   <div className="leading-tight font-semibold">Deutsch</div>
                   <div className={`text-[10px] ${dark ? 'text-[#888]' : 'text-slate-400'} font-normal`}>Deutsch (DE)</div>
@@ -172,7 +171,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           }`}
           title="Switch to English"
         >
-          <span className="text-xs" role="img" aria-label="UK flag">🇬🇧</span>
+          <UKFlag size="sm" />
           <span>EN</span>
         </button>
 
@@ -190,7 +189,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           }`}
           title="Zu Deutsch wechseln"
         >
-          <span className="text-xs" role="img" aria-label="German flag">🇩🇪</span>
+          <GermanFlag size="sm" />
           <span>DE</span>
         </button>
       </div>
