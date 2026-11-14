@@ -1,4 +1,4 @@
-export type FieldCategory = 'crop' | 'field' | 'soil' | 'fertilizer';
+export type FieldCategory = 'crop' | 'field' | 'soil' | 'fertilizer' | 'advisor';
 
 export interface FieldOption {
   id: string;

@@ -1,6 +1,7 @@
 import json
 from typing import Any, Optional
 
+from app.services.ai_assistant.advisor_context import advisor_context_builder
 from app.services.ai_assistant.schemas import AssistantCategory, FieldContextResponse
 from app.services.field_analytics.report_service import report_service
 from app.services.soilgrids.service import soilgrids_service
@@ -33,6 +34,9 @@ class FieldContextBuilder:
         category: AssistantCategory,
         field_id: Optional[str] = None,
     ) -> FieldContextResponse:
+        if category == "advisor":
+            return advisor_context_builder.build(field_id)
+
         if category == "general" or not field_id or field_id.lower() == "general":
             return self._build_general_context()
 

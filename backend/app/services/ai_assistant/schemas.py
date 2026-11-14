@@ -1,7 +1,7 @@
 from typing import Any, Literal, Optional
 from pydantic import BaseModel, Field
 
-AssistantCategory = Literal['crop', 'field', 'soil', 'fertilizer', 'all', 'general']
+AssistantCategory = Literal['crop', 'field', 'soil', 'fertilizer', 'all', 'general', 'advisor']
 
 class ImageAttachment(BaseModel):
     name: Optional[str] = None
@@ -61,6 +61,7 @@ class SendMessageRequest(BaseModel):
     selected_category: Optional[str] = None
     images: list[ImageAttachment] = []
     attachments: list[ImageAttachment] = []
+    topic: Optional[Literal['crop', 'field', 'soil', 'fertilizer']] = None
 
 class SendMessageResponse(BaseModel):
     conversation_id: str

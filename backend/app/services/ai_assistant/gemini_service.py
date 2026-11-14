@@ -8,6 +8,17 @@ import httpx
 
 from app.services.ai_assistant.schemas import ChatMessage, ImageAttachment
 
+ADVISOR_SYSTEM_INSTRUCTION = """You are the FieldShift AI Advisor, a farming assistant for farmers in Brandenburg, Germany. You answer using only the verified field data supplied below.
+
+RULES (always follow):
+1. CITE SOURCES: Every answer must name the data source(s) it draws from, using the source names given in the context (for example "ISRIC SoilGrids v2.0", "Open-Meteo", "NASA SMAP", "NASA POWER", "Deutscher Wetterdienst (DWD) warnings"). Put them in a final line starting with "Sources:". If the answer uses no field data, say "Sources: general agronomic knowledge, not your field data."
+2. NO PROFIT PROMISES: Never state or imply a specific profit, revenue, margin or yield-income figure. You may describe risks and trade-offs in qualitative terms.
+3. PLAIN LANGUAGE: Write for a farmer, not an engineer. Do not quote raw sensor values or indices (soil moisture fractions, NDVI, raw pH decimals beyond one place, coordinates, IDs). Say "the soil is on the dry side" rather than a sensor number. Everyday figures such as temperature in degrees C, rain in mm, days and dates are fine.
+4. WHEN UNSURE: If the data is missing, conflicting or too coarse to support the advice, say so plainly and recommend consulting a local agronomist (for example the Landwirtschaftskammer or a certified Pflanzenbauberater).
+5. NEVER GUESS MISSING DATA: Items under "NOT AVAILABLE" in the context are not known. If the farmer asks about them (legal nitrogen ceiling, Red Zone status, crop history, plant-available water capacity), tell them the platform does not have it yet. Do not estimate it. Do not give legal advice; for Düngeverordnung (DüV) limits refer them to their official Düngebedarfsermittlung or the local authority.
+6. STYLE: Start with the direct answer in one or two sentences. Then at most 3 short bullets. No tables, no headings, no LaTeX, no closing questions. Keep it under 150 words.
+"""
+
 BASE_SYSTEM_INSTRUCTION = """You are FieldShift AI, an agronomic decision-support assistant for commercial farmers in Brandenburg, Germany.
 
 CORE RESPONSE REQUIREMENTS:
@@ -36,7 +47,9 @@ CORE RESPONSE REQUIREMENTS:
 class GeminiService:
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY", "").strip()
-        self.primary_model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+        self.primary_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        # gemini-2.5-flash (named in plan.md) is retired for new API keys (HTTP 404); 3.5-flash is the live equivalent.
+        self.advisor_model = os.getenv("GEMINI_ADVISOR_MODEL", "gemini-3.5-flash")
 
     def _get_api_key(self) -> str:
         key = os.getenv("GEMINI_API_KEY", "").strip()
@@ -116,12 +129,21 @@ class GeminiService:
                     field_context=field_context,
                     history=conversation_history,
                     attachments=attachments or [],
+                    category=category,
                 )
                 if reply and reply.strip():
                     cleaned = self._sanitize_response(reply)
                     return cleaned, model
             except Exception as e:
                 print(f"[GeminiService] Gemini API call exception: {e}. Falling back to internal Agronomic Engine.")
+
+        if category == "advisor":
+            # Never serve canned agronomy as if it were this field's data.
+            return (
+                "The AI Advisor can't reach its language model right now, so I can't give a grounded answer. "
+                "Please try again in a moment. For urgent decisions, consult a local agronomist.\n\n"
+                "Sources: none (no answer generated)."
+            ), "unavailable"
 
         # Fallback to local data-grounded agronomic engine
         fallback_text = self._generate_agronomic_fallback(
@@ -139,9 +161,12 @@ class GeminiService:
         field_context: str,
         history: list[ChatMessage],
         attachments: list[ImageAttachment],
+        category: Optional[str] = None,
     ) -> tuple[str, str]:
+        is_advisor = category == "advisor"
+        base_instruction = ADVISOR_SYSTEM_INSTRUCTION if is_advisor else BASE_SYSTEM_INSTRUCTION
         # Formulate full system instruction including the field context
-        full_system_text = f"{BASE_SYSTEM_INSTRUCTION}\n\n=== VERIFIED AGRICULTURAL CONTEXT FOR THIS SESSION ===\n{field_context}"
+        full_system_text = f"{base_instruction}\n\n=== VERIFIED AGRICULTURAL CONTEXT FOR THIS SESSION ===\n{field_context}"
 
         # Build contents from recent history (last 10 turns)
         contents = []
@@ -185,24 +210,30 @@ class GeminiService:
         }
 
         # Candidate models supported by Gemini API
-        models_to_try = [
-            self.primary_model,
-            "gemini-3.5-flash",
-            "gemini-3.1-flash-lite",
-            "gemini-flash-latest",
-            "gemini-3.8-flash",
-        ]
+        if is_advisor:
+            models_to_try = [self.advisor_model, "gemini-3.8-flash", "gemini-flash-latest"]
+        else:
+            models_to_try = [
+                self.primary_model,
+                "gemini-3.5-flash",
+                "gemini-3.1-flash-lite",
+                "gemini-flash-latest",
+                "gemini-3.8-flash",
+            ]
         seen = set()
 
-        async with httpx.AsyncClient(timeout=18.0) as client:
+        async with httpx.AsyncClient(timeout=30.0 if is_advisor else 18.0) as client:
             for model_candidate in models_to_try:
                 if model_candidate in seen:
                     continue
                 seen.add(model_candidate)
 
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_candidate}:generateContent?key={api_key}"
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_candidate}:generateContent"
                 try:
-                    resp = await client.post(url, json=payload, headers={"Content-Type": "application/json"})
+                    resp = await client.post(
+                        url, json=payload,
+                        headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
+                    )
 
                     if resp.status_code == 200:
                         data = resp.json()

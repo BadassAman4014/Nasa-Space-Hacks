@@ -147,6 +147,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
   // Boundaries loaded in current viewport
   const [boundaries, setBoundaries] = useState<BoundaryFeature[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [coverage, setCoverage] = useState<{ count?: number; total_in_view?: number; truncated?: boolean } | null>(null);
   const [status, setStatus] = useState<BoundaryStatusResponse | null>(null);
 
   // Selected field blocks for multi-import
@@ -244,6 +245,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
         if (!inBB) {
           // Official DFBK is unavailable outside Brandenburg
           setBoundaries([]);
+          setCoverage(null);
           return;
         }
 
@@ -255,10 +257,11 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
             east: bounds.getEast(),
             north: bounds.getNorth(),
             land_use_category: selectedCategory !== 'ALL' ? selectedCategory : undefined,
-            limit: 150,
+            limit: 1000,
             zoom: zoom,
           });
           setBoundaries(res.features || []);
+          setCoverage(res.properties ?? null);
         } catch (err) {
           console.error('Failed to fetch viewport boundaries:', err);
         } finally {
@@ -300,11 +303,12 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
             lat,
             lon,
             radius: 3000,
-            limit: 50,
+            limit: 1000,
             land_use_category: selectedCategory !== 'ALL' ? selectedCategory : undefined,
           });
           if (boundRes.features && boundRes.features.length > 0) {
             setBoundaries(boundRes.features);
+            setCoverage(boundRes.properties ?? null);
             onNotify(`Loaded ${boundRes.features.length} agricultural field blocks near ${res.title}`);
           } else {
             onNotify(`Navigated to ${res.title}. No DFBK blocks in immediate 3 km.`);
@@ -349,12 +353,13 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
             lat,
             lon,
             radius: nearbyRadius,
-            limit: 100,
+            limit: 1000,
             land_use_category: selectedCategory !== 'ALL' ? selectedCategory : undefined,
           });
 
           if (res.features && res.features.length > 0) {
             setBoundaries(res.features);
+            setCoverage(res.properties ?? null);
             onNotify(
               `Located! Found ${res.features.length} field blocks within ${(nearbyRadius / 1000).toFixed(1)} km of your position.`
             );
@@ -403,10 +408,11 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
         lat: userLocation.lat,
         lon: userLocation.lon,
         radius: newRadius,
-        limit: 100,
+        limit: 1000,
         land_use_category: selectedCategory !== 'ALL' ? selectedCategory : undefined,
       });
       setBoundaries(res.features || []);
+      setCoverage(res.properties ?? null);
       onNotify(`Updated: ${res.features?.length || 0} fields within ${(newRadius / 1000).toFixed(1)} km.`);
     } catch {
       // fallback
@@ -1163,6 +1169,11 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
           </div>
         )}
 
+        {coverage?.truncated && !loading && (
+          <div className="absolute top-4 left-4 z-[500] bg-amber-100/95 text-amber-900 px-3 py-1.5 rounded-lg border border-amber-300 text-xs font-semibold shadow-lg">
+            Showing {coverage.count} of {coverage.total_in_view} field blocks in view. Zoom in to see all of them.
+          </div>
+        )}
         {/* Draw Mode Tool floating header */}
         {mode === 'draw' && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[500] bg-[#222]/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-[#ff7a1a]/40 shadow-xl flex items-center gap-4 text-xs">

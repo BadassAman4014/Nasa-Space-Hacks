@@ -36,7 +36,7 @@ def get_boundaries_viewport(
     land_use_category: Annotated[Optional[str], Query(description="Category filter (AL, GL, DK, etc.)")] = None,
     min_area: Annotated[Optional[float], Query(ge=0, description="Minimum area in hectares")] = None,
     max_area: Annotated[Optional[float], Query(ge=0, description="Maximum area in hectares")] = None,
-    limit: Annotated[int, Query(ge=1, le=500, description="Maximum number of polygons to return")] = 150,
+    limit: Annotated[int, Query(ge=1, le=2000, description="Maximum number of polygons to return")] = 150,
     zoom: Annotated[float, Query(ge=1.0, le=22.0, description="Current map zoom level for simplification")] = 14.0
 ):
     """
@@ -72,7 +72,7 @@ def get_boundaries_nearby(
     land_use_category: Annotated[Optional[str], Query(description="Category filter")] = None,
     min_area: Annotated[Optional[float], Query(ge=0)] = None,
     max_area: Annotated[Optional[float], Query(ge=0)] = None,
-    limit: Annotated[int, Query(ge=1, le=200)] = 50
+    limit: Annotated[int, Query(ge=1, le=1000)] = 50
 ):
     """Return agricultural field blocks near a specific coordinate."""
     try:
@@ -99,7 +99,7 @@ def search_boundaries(
     land_use_category: Annotated[Optional[str], Query()] = None,
     min_area: Annotated[Optional[float], Query(ge=0)] = None,
     max_area: Annotated[Optional[float], Query(ge=0)] = None,
-    limit: Annotated[int, Query(ge=1, le=200)] = 50
+    limit: Annotated[int, Query(ge=1, le=1000)] = 50
 ):
     """Search agricultural boundaries by location/municipality name or coordinates."""
     try:

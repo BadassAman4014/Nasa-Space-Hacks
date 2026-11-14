@@ -8,6 +8,7 @@ Attribution: © MLEUV, dl-de/by-2-0
 
 import json
 import math
+import re
 from pathlib import Path
 from typing import Any, Optional
 import pyogrio
@@ -38,6 +39,8 @@ BRANDENBURG_MUNICIPALITIES: dict[str, tuple[float, float]] = {
 }
 
 class DFBKService:
+    MAX_READ = 5000  # hard ceiling on geometries read per request
+
     def __init__(self):
         self.base_dir = Path(__file__).resolve().parent.parent.parent.parent
         self.gpkg_path = self.base_dir / "data" / "dfbk_agricultural.gpkg"
@@ -80,10 +83,14 @@ class DFBKService:
         min_area: Optional[float] = None,
         max_area: Optional[float] = None,
         limit: int = 150,
-        zoom: float = 14.0
+        zoom: float = 14.0,
+        center: Optional[tuple[float, float]] = None,
     ) -> dict[str, Any]:
         """
         Query agricultural field boundaries intersecting a WGS84 bounding box.
+        Attribute filters run inside the spatial query (before any cap), so they never hide
+        blocks that exist. When more than `limit` blocks match, the nearest to `center`
+        (default: box centre) are returned and the response says it was truncated.
         Executes sub-100ms spatial indexed query directly via GeoPackage.
         """
         if not self.is_available():
@@ -99,36 +106,34 @@ class DFBKService:
         if (maxx - minx) > 3.0 or (maxy - miny) > 3.0:
             raise ValueError("Requested viewport bounding box is too large. Please zoom in closer to inspect fields.")
 
-        # Spatial index bounding box query
-        df = pyogrio.read_dataframe(
-            self.gpkg_path,
-            bbox=(minx, miny, maxx, maxy),
-            max_features=limit * 3  # read slightly more to allow attribute filtering
-        )
-
-        if df.empty:
-            return {
-                "type": "FeatureCollection",
-                "features": [],
-                "properties": {
-                    "count": 0,
-                    "source": "DFBK",
-                    "attribution": "© MLEUV, dl-de/by-2-0"
-                }
-            }
-
-        # Apply category filter
+        where_parts = []
         if land_use_category and land_use_category.upper() != "ALL":
-            df = df[df["land_use_category"] == land_use_category.upper()]
-
-        # Apply area filters (hectares)
+            cat = land_use_category.upper()
+            if not re.fullmatch(r"[A-Z\-]{1,12}", cat):
+                raise ValueError("Invalid land use category.")
+            where_parts.append(f"land_use_category = '{cat}'")
         if min_area is not None:
-            df = df[df["official_net_ha"] >= min_area]
+            where_parts.append(f"official_net_ha >= {float(min_area)}")
         if max_area is not None:
-            df = df[df["official_net_ha"] <= max_area]
+            where_parts.append(f"official_net_ha <= {float(max_area)}")
+        where = " AND ".join(where_parts) or None
+        bbox = (minx, miny, maxx, maxy)
 
-        # Apply final limit
-        df = df.head(limit)
+        # Exact number of matching blocks in view (cheap: no geometry read).
+        total_in_view = len(
+            pyogrio.read_dataframe(self.gpkg_path, bbox=bbox, where=where, columns=["land_use_category"], read_geometry=False)
+        )
+        empty_props = {"count": 0, "total_in_view": 0, "truncated": False, "source": "DFBK", "attribution": "© MLEUV, dl-de/by-2-0"}
+        if total_in_view == 0:
+            return {"type": "FeatureCollection", "features": [], "properties": empty_props}
+
+        df = pyogrio.read_dataframe(self.gpkg_path, bbox=bbox, where=where, max_features=self.MAX_READ)
+        if len(df) > limit:
+            cx, cy = center if center else ((minx + maxx) / 2.0, (miny + maxy) / 2.0)
+            bounds = df.geometry.bounds
+            kx = math.cos(math.radians(cy))
+            dist = ((bounds.minx + bounds.maxx) / 2.0 - cx).mul(kx) ** 2 + ((bounds.miny + bounds.maxy) / 2.0 - cy) ** 2
+            df = df.loc[dist.sort_values().index[:limit]]
 
         features = []
         for _, row in df.iterrows():
@@ -164,6 +169,8 @@ class DFBKService:
             "features": features,
             "properties": {
                 "count": len(features),
+                "total_in_view": total_in_view,
+                "truncated": total_in_view > len(features),
                 "total_area_ha": round(sum(f["properties"]["official_net_ha"] for f in features), 2),
                 "source": "DFBK",
                 "attribution": "© MLEUV, dl-de/by-2-0"
@@ -201,7 +208,8 @@ class DFBKService:
             min_area=min_area,
             max_area=max_area,
             limit=limit,
-            zoom=15
+            zoom=15,
+            center=(lon, lat),
         )
         return res
 
@@ -254,7 +262,7 @@ class DFBKService:
         # Exact query
         df = pyogrio.read_dataframe(
             self.gpkg_path,
-            where=f"external_id = '{boundary_id}'",
+            where="external_id = '" + boundary_id.replace("'", "''") + "'",
             max_features=1
         )
         if df.empty:

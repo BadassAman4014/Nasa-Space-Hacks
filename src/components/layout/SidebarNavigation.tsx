@@ -3,7 +3,6 @@ import {
   BarChart3,
   Map,
   Sparkles,
-  Bot,
   CloudSun,
   Globe2,
   Users,
@@ -41,7 +40,6 @@ export const NAV_ITEMS: NavItemConfig[] = [
   { id: 'dashboard',          labelKey: 'nav.dashboard',        defaultLabel: 'Dashboard',        group: 1, icon: BarChart3 },
   { id: 'fields',             labelKey: 'nav.fields',           defaultLabel: 'Field Explorer',   group: 1, icon: Map },
   { id: 'analytics',          labelKey: 'nav.analytics',        defaultLabel: 'Field Analytics',  group: 1, icon: Sparkles },
-  { id: 'ai-assistant',       labelKey: 'nav.aiAssistant',      defaultLabel: 'AI Assistant',     group: 1, icon: Bot, badge: 'AI' },
   { id: 'weather',            labelKey: 'nav.weather',          defaultLabel: 'Weather',          group: 1, icon: CloudSun },
   { id: 'environment',        labelKey: 'nav.environment',      defaultLabel: 'Environmental',    group: 1, icon: Globe2 },
 

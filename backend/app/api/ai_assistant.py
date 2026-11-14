@@ -15,6 +15,7 @@ from app.services.ai_assistant.schemas import (
     ConversationSummary,
     CreateConversationRequest,
     FieldContextResponse,
+    ImageAttachment,
     SendMessageRequest,
     SendMessageResponse,
     VoiceTranscriptionRequest,
@@ -155,7 +156,7 @@ async def send_chat_message(payload: SendMessageRequest):
     resolved_field_id = payload.field_id or payload.selected_field_id
     raw_category = payload.category or payload.selected_category or "field"
     active_category: AssistantCategory = (
-        raw_category if raw_category in ["crop", "field", "soil", "fertilizer", "all", "general"] else "field"
+        raw_category if raw_category in ["crop", "field", "soil", "fertilizer", "all", "general", "advisor"] else "field"
     )
 
     # Normalize attachments
@@ -205,9 +206,12 @@ async def send_chat_message(payload: SendMessageRequest):
 
     # 3. Call Gemini with context, history, and multi-modal attachments
     history = conv.messages if conv else []
+    context_text = context_res.context_text
+    if active_category == "advisor" and payload.topic:
+        context_text += f"\n\nThe farmer wants help with: {payload.topic}. Focus on that topic."
     reply_text, model_name = await gemini_service.generate_response(
         user_message=payload.message,
-        field_context=context_res.context_text,
+        field_context=context_text,
         conversation_history=history,
         attachments=normalized_attachments,
         category=active_category,

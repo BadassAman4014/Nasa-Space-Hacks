@@ -24,7 +24,9 @@ export interface BoundaryProperties {
 }
 
 export type BoundaryFeature = Feature<Polygon | MultiPolygon, BoundaryProperties>;
-export type BoundaryFeatureCollection = FeatureCollection<Polygon | MultiPolygon, BoundaryProperties>;
+export type BoundaryFeatureCollection = FeatureCollection<Polygon | MultiPolygon, BoundaryProperties> & {
+  properties?: { count?: number; total_in_view?: number; truncated?: boolean; total_area_ha?: number };
+};
 
 export interface BoundaryProviderInfo {
   name: string;

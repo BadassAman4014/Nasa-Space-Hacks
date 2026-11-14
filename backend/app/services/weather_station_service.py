@@ -611,6 +611,36 @@ class WeatherStationService:
         elev = max(0.0, max_elev - (diff * 7.5))
         return round(elev, 1)
 
+    def get_recent_rain(self, lat: float, lon: float, past_days: int = 14, threshold_mm: float = 1.0) -> Dict[str, Any]:
+        """
+        Days since the last rainy day (>= threshold_mm) from Open-Meteo's past daily precipitation.
+        Returns days_since_rain=None if no such day occurred within the window.
+        Raises WeatherUnavailable if Open-Meteo cannot answer.
+        """
+        try:
+            resp = requests.get(
+                self.OPEN_METEO_URL,
+                params={
+                    "latitude": lat, "longitude": lon, "daily": "precipitation_sum",
+                    "past_days": past_days, "forecast_days": 1, "timezone": "auto",
+                },
+                timeout=8,
+            )
+            resp.raise_for_status()
+            daily = resp.json()["daily"]
+            days, sums = daily["time"], daily["precipitation_sum"]
+        except Exception as exc:
+            raise WeatherUnavailable(f"Open-Meteo past precipitation failed: {type(exc).__name__}") from exc
+
+        # Last element is today (partial day); consider completed days first, then today.
+        total = round(sum(v for v in sums[:-1] if v is not None), 1)
+        days_since = None
+        for offset, v in enumerate(reversed(sums)):
+            if v is not None and v >= threshold_mm:
+                days_since = offset
+                break
+        return {"days_since_rain": days_since, "window_days": past_days, "rain_total_mm": total, "threshold_mm": threshold_mm}
+
     def get_point_weather(self, lat: float, lon: float) -> Dict[str, Any]:
         """Real-time observation for coordinates (e.g. device GPS). Raises WeatherUnavailable on failure."""
         api_data = self._fetch_open_meteo(lat, lon, current=self._CURRENT_VARS)

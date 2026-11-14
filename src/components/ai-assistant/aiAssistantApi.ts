@@ -66,6 +66,7 @@ export const aiAssistantApi = {
     message: string;
     fieldId?: string | null;
     category?: FieldCategory | null;
+    topic?: Exclude<FieldCategory, 'advisor'> | null;
     images?: ImageAttachment[];
   }): Promise<{
     conversation_id: string;
@@ -75,6 +76,7 @@ export const aiAssistantApi = {
     field_id?: string | null;
     category?: FieldCategory | null;
     created_at: string;
+    grounded_data?: { sources?: string[]; unavailable?: string[]; [key: string]: unknown };
   }> {
     return fetchJson('/chat', {
       method: 'POST',
@@ -83,6 +85,7 @@ export const aiAssistantApi = {
         message: params.message,
         field_id: params.fieldId,
         category: params.category,
+        topic: params.topic ?? undefined,
         images: params.images || [],
       }),
     });

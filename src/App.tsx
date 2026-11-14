@@ -8,6 +8,7 @@ import { FieldExplorerView } from './components/fields/FieldExplorerView';
 import { FieldAnalyticsWorkspace } from './components/analytics/FieldAnalyticsWorkspace';
 import { WeatherView } from './components/weather/WeatherView';
 import { AIAssistantView } from './components/ai-assistant/AIAssistantView';
+import { AdvisorDrawer } from './components/advisor/AdvisorDrawer';
 import { SettingsModal } from './components/common/SettingsModal';
 import { useI18n } from './i18n';
 import {
@@ -144,6 +145,7 @@ function App() {
           {page === 'reports' && <Reports notify={notify} />}
         </div>
       </main>
+      {page !== 'ai-assistant' && <AdvisorDrawer onOpenFields={() => navigate('fields')} />}
       {toast && (
         <div className="toast" role="alert" aria-live="polite">
           <div className="toast-icon">
