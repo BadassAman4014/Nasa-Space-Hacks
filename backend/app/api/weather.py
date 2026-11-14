@@ -39,6 +39,12 @@ def get_available_fields() -> List[Dict[str, Any]]:
     return result
 
 
+@router.get("/point")
+def get_point_weather(lat: float = Query(...), lon: float = Query(...)) -> Dict[str, Any]:
+    """Returns real-time atmospheric observation for specific geographical coordinates (e.g. device GPS)."""
+    return weather_station_service.get_point_weather(lat, lon)
+
+
 @router.get("/fields")
 def get_all_fields_weather() -> List[Dict[str, Any]]:
     """Returns weather overview for user fields with installed virtual stations."""

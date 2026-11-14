@@ -27,6 +27,7 @@ import {
   GDDTimeSeriesResponse,
   SatelliteObservation,
 } from '../../services/fieldAnalyticsApi';
+import { useI18n } from '../../i18n';
 
 interface StatusTabProps {
   summary: FieldStatusSummary;
@@ -53,6 +54,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
   selectedBaseTemp,
   batchProgress,
 }) => {
+  const { t, formatDate } = useI18n();
   // Observations from props (ordered newest first)
   const observations = useMemo(() => ndviData?.observations || [], [ndviData]);
 
@@ -210,21 +212,21 @@ export const StatusTab: React.FC<StatusTabProps> = ({
         {/* Card 1: Crop */}
         <div className="bg-white rounded-2xl p-5 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Current Crop</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{t('analyticsTabs.currentCrop')}</span>
             <span className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
               <Sprout size={18} />
             </span>
           </div>
           <div className="my-3">
-            <h3 className="text-xl font-bold text-gray-900">{summary.current_crop || 'No crop assigned'}</h3>
+            <h3 className="text-xl font-bold text-gray-900">{summary.current_crop || t('analytics.noCropAssigned')}</h3>
             <p className="text-xs text-gray-500 mt-0.5">
-              {summary.current_crop ? `${targetYield} • ` : ''}{summary.area_ha.toFixed(2)} ha arable land{!summary.current_crop ? ' • Awaiting crop assignment' : ''}
+              {summary.current_crop ? `${targetYield} • ` : ''}{summary.area_ha.toFixed(2)} ha arable land{!summary.current_crop ? ` • ${t('analyticsTabs.unallocated')}` : ''}
             </p>
           </div>
           <div className="pt-2 border-t border-black/[0.04] flex items-center justify-between text-xs text-gray-500">
-            <span>Rotational Group: {cropGroup}</span>
+            <span>{t('analyticsTabs.rotationalGroup', { group: cropGroup })}</span>
             <span className={summary.current_crop ? "text-emerald-700 font-semibold flex items-center gap-1" : "text-amber-700 font-semibold flex items-center gap-1"}>
-              {summary.current_crop ? 'Active Season' : 'Unallocated'}
+              {summary.current_crop ? t('analyticsTabs.activeSeason') : t('analyticsTabs.unallocated')}
             </span>
           </div>
         </div>
@@ -232,11 +234,11 @@ export const StatusTab: React.FC<StatusTabProps> = ({
         {/* Card 2: Planting Date */}
         <div className="bg-white rounded-2xl p-5 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Planting Date</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{t('analyticsTabs.plantingDate')}</span>
             <button
               onClick={() => setIsEditingDate(!isEditingDate)}
               className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition"
-              title="Edit planting date"
+              title={t('analyticsTabs.editDateTooltip')}
             >
               <Pencil size={15} />
             </button>
@@ -263,24 +265,20 @@ export const StatusTab: React.FC<StatusTabProps> = ({
               <>
                 <h3 className="text-xl font-bold text-gray-900">
                   {summary.planting_date
-                    ? new Date(summary.planting_date).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })
-                    : 'Not set'}
+                    ? formatDate(summary.planting_date)
+                    : t('analyticsTabs.notSet')}
                 </h3>
                 <p className="text-xs text-gray-500 mt-0.5">
                   {summary.planting_date
-                    ? `${summary.days_since_planting || 0} days since emergence`
-                    : 'Click edit to record emergence date'}
+                    ? t('analyticsTabs.daysSinceEmergence', { days: summary.days_since_planting || 0 })
+                    : t('analyticsTabs.recordEmergencePrompt')}
                 </p>
               </>
             )}
           </div>
 
           <div className="pt-2 border-t border-black/[0.04] flex items-center justify-between text-xs text-gray-500">
-            <span>Durable Field Record</span>
+            <span>{t('analyticsTabs.durableRecord')}</span>
             <span className="text-gray-700 font-medium">{seedingSeason}</span>
           </div>
         </div>
@@ -288,7 +286,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
         {/* Card 3: Current Weather */}
         <div className="bg-white rounded-2xl p-5 border border-black/[0.05] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Current Weather</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{t('analyticsTabs.currentWeather')}</span>
             <span className="p-2 rounded-xl bg-blue-50 text-blue-600">
               <CloudSun size={18} />
             </span>
@@ -300,18 +298,17 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                 {summary.current_weather?.temperature_c ?? 18.4}°C
               </div>
               <p className="text-xs font-medium text-gray-500">
-                {summary.current_weather?.condition ?? 'Partly cloudy'} • Feels like{' '}
-                {summary.current_weather?.feels_like_c ?? 18.0}°C
+                {summary.current_weather?.condition ?? 'Partly cloudy'} • {t('analyticsTabs.feelsLike', { temp: summary.current_weather?.feels_like_c ?? 18.0 })}
               </p>
             </div>
             <div className="text-right text-xs text-gray-500 space-y-0.5">
               <div className="flex items-center gap-1 justify-end">
                 <Droplets size={12} className="text-blue-500" />
-                <span>Rain: {summary.current_weather?.precipitation_mm != null ? `${summary.current_weather.precipitation_mm} mm` : '—'}</span>
+                <span>{t('analyticsTabs.rain', { amount: summary.current_weather?.precipitation_mm != null ? `${summary.current_weather.precipitation_mm} mm` : '—' })}</span>
               </div>
               <div className="flex items-center gap-1 justify-end">
                 <Wind size={12} className="text-gray-400" />
-                <span>Wind: {summary.current_weather?.wind_speed_kmh != null ? `${summary.current_weather.wind_speed_kmh} km/h` : '—'}</span>
+                <span>{t('analyticsTabs.wind', { speed: summary.current_weather?.wind_speed_kmh != null ? `${summary.current_weather.wind_speed_kmh} km/h` : '—' })}</span>
               </div>
             </div>
           </div>
@@ -332,10 +329,10 @@ export const StatusTab: React.FC<StatusTabProps> = ({
           <div>
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
               <Eye size={18} className="text-emerald-600" />
-              Sentinel-2 Satellite & Spatial NDVI Analysis
+              {t('analyticsTabs.satelliteTitle')}
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              10-meter surface reflectance clipped to actual field polygon
+              {t('analyticsTabs.satelliteSubtitle')}
             </p>
           </div>
 
@@ -505,7 +502,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700">
-                  Satellite Image History
+                  {t('analyticsTabs.satelliteImageHistory')}
                 </h4>
               </div>
 
@@ -516,14 +513,14 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                   className={`px-2 py-0.5 rounded transition ${imageryMode === 'rgb' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
                     }`}
                 >
-                  True Color (RGB)
+                  {t('analyticsTabs.trueColorRgb')}
                 </button>
                 <button
                   onClick={() => setImageryMode('false_color')}
                   className={`px-2 py-0.5 rounded transition ${imageryMode === 'false_color' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
                     }`}
                 >
-                  False Color (NIR)
+                  {t('analyticsTabs.falseColorNir')}
                 </button>
               </div>
             </div>

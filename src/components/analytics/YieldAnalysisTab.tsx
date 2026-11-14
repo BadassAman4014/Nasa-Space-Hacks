@@ -13,6 +13,7 @@ import {
   Info
 } from 'lucide-react';
 import { FieldStatusSummary, FullFieldReportResponse } from '../../services/fieldAnalyticsApi';
+import { useI18n } from '../../i18n';
 
 interface YieldAnalysisTabProps {
   summary: FieldStatusSummary;
@@ -41,6 +42,7 @@ export const YieldAnalysisTab: React.FC<YieldAnalysisTabProps> = ({
   fullReport,
   notify,
 }) => {
+  const { t } = useI18n();
   const cropInfo = useMemo(() => {
     const cropName = summary.current_crop || '';
     return CROP_BASELINES[cropName] || { baselineYield: 6.5, defaultPrice: 210, unit: 't/ha', optimalN: 160 };

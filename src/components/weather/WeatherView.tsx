@@ -40,6 +40,8 @@ import {
 } from '../../services/weatherApi';
 import { createVirtualStationDivIcon } from './VirtualWeatherStationMarker';
 import { ThreeSatelliteViewer } from './ThreeSatelliteViewer';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 
 // Map Recenter Helper
 function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
@@ -296,10 +298,11 @@ export function WeatherView({
       } else if (wind > 4.5 || rain > 0.1) {
         status = 'caution';
       }
+      const labelText = (h as any).label || (h.time ? h.time.slice(11, 16) : `${idx * 3}:00`);
       return {
-        label: idx === 0 ? 'Now' : h.label,
+        label: idx === 0 ? 'Now' : labelText,
         wind_speed: wind,
-        wind_arrow: h.wind_arrow,
+        wind_arrow: (h as any).wind_arrow || '↑',
         rain_mm: rain,
         status,
       };
@@ -314,7 +317,7 @@ export function WeatherView({
     return (fieldWeather?.forecast_hourly || []).slice(0, 12);
   }, [fieldWeather]);
 
-  const temps12 = useMemo(() => hourly12.map((h) => h.temp_c), [hourly12]);
+  const temps12 = useMemo(() => hourly12.map((h) => h.temperature_c), [hourly12]);
   const precips12 = useMemo(() => hourly12.map((h) => h.precipitation_mm), [hourly12]);
   const winds12 = useMemo(() => hourly12.map((h) => h.wind_speed_ms), [hourly12]);
   const clouds12 = useMemo(() => hourly12.map((h) => h.cloud_cover_percent), [hourly12]);
@@ -395,11 +398,10 @@ export function WeatherView({
       <div className="absolute top-4 right-4 z-[500] flex flex-col gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/90 shadow-lg">
         <button
           onClick={() => setActiveLayer('satellite')}
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeLayer === 'satellite'
-              ? 'bg-[#1fa35b] text-white shadow-sm ring-2 ring-[#1fa35b]/30'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-          }`}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${activeLayer === 'satellite'
+            ? 'bg-[#1fa35b] text-white shadow-sm ring-2 ring-[#1fa35b]/30'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
         >
           <Layers size={15} />
           <span className="hidden sm:inline">Satellite</span>
@@ -407,11 +409,10 @@ export function WeatherView({
 
         <button
           onClick={() => setActiveLayer('ndvi')}
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeLayer === 'ndvi'
-              ? 'bg-[#1fa35b] text-white shadow-sm ring-2 ring-[#1fa35b]/30'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-          }`}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${activeLayer === 'ndvi'
+            ? 'bg-[#1fa35b] text-white shadow-sm ring-2 ring-[#1fa35b]/30'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
         >
           <Sparkles size={15} />
           <span className="hidden sm:inline">NDVI</span>
@@ -419,11 +420,10 @@ export function WeatherView({
 
         <button
           onClick={() => setActiveLayer('weather')}
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeLayer === 'weather'
-              ? 'bg-[#1fa35b] text-white shadow-sm ring-2 ring-[#1fa35b]/30'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-          }`}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${activeLayer === 'weather'
+            ? 'bg-[#1fa35b] text-white shadow-sm ring-2 ring-[#1fa35b]/30'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
         >
           <CloudRain size={15} />
           <span className="hidden sm:inline">Weather</span>
@@ -511,10 +511,10 @@ export function WeatherView({
                     activeLayer === 'ndvi'
                       ? '#16a34a'
                       : isSelected
-                      ? '#1fa35b'
-                      : isStationActive
-                      ? '#22c55e'
-                      : '#38bdf8',
+                        ? '#1fa35b'
+                        : isStationActive
+                          ? '#22c55e'
+                          : '#38bdf8',
                   fillOpacity: activeLayer === 'ndvi' ? 0.45 : isSelected ? 0.28 : isStationActive ? 0.2 : 0.1,
                   dashArray: isStationActive ? undefined : '4 2',
                 }}
@@ -644,11 +644,10 @@ export function WeatherView({
                       : `${currentAvailableField?.field_name || 'Field'}`}
                   </span>
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                      hasStation
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                        : 'bg-amber-50 text-amber-800 border-amber-200'
-                    }`}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${hasStation
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}
                   >
                     {hasStation ? 'Station Active' : 'No Station'}
                   </span>
@@ -665,31 +664,28 @@ export function WeatherView({
                 <div className="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200 shadow-inner">
                   <button
                     onClick={() => setForecastTab('daily')}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      forecastTab === 'daily'
-                        ? 'bg-[#1fa35b] text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${forecastTab === 'daily'
+                      ? 'bg-[#1fa35b] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     Daily
                   </button>
                   <button
                     onClick={() => setForecastTab('weekly')}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      forecastTab === 'weekly'
-                        ? 'bg-[#1fa35b] text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${forecastTab === 'weekly'
+                      ? 'bg-[#1fa35b] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     Weekly
                   </button>
                   <button
                     onClick={() => setForecastTab('monthly')}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      forecastTab === 'monthly'
-                        ? 'bg-[#1fa35b] text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${forecastTab === 'monthly'
+                      ? 'bg-[#1fa35b] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     Monthly
                   </button>
@@ -866,13 +862,12 @@ export function WeatherView({
                             </p>
                           </div>
                           <div
-                            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
-                              currentSprayStatus === 'safe'
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                                : currentSprayStatus === 'caution'
+                            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${currentSprayStatus === 'safe'
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : currentSprayStatus === 'caution'
                                 ? 'bg-amber-50 text-amber-800 border-amber-200'
                                 : 'bg-red-50 text-red-800 border-red-200'
-                            }`}
+                              }`}
                           >
                             {currentSprayStatus === 'safe' ? (
                               <CheckCircle2 size={13} className="text-emerald-600" />
@@ -885,8 +880,8 @@ export function WeatherView({
                               {currentSprayStatus === 'safe'
                                 ? 'Safe Window Open'
                                 : currentSprayStatus === 'caution'
-                                ? 'Moderate Caution'
-                                : 'Do Not Spray'}
+                                  ? 'Moderate Caution'
+                                  : 'Do Not Spray'}
                             </span>
                           </div>
                         </div>
@@ -914,13 +909,12 @@ export function WeatherView({
 
                               {/* Color Status Bar Segment */}
                               <div
-                                className={`w-full h-1.5 rounded-full ${
-                                  slot.status === 'safe'
-                                    ? 'bg-emerald-500'
-                                    : slot.status === 'caution'
+                                className={`w-full h-1.5 rounded-full ${slot.status === 'safe'
+                                  ? 'bg-emerald-500'
+                                  : slot.status === 'caution'
                                     ? 'bg-amber-400'
                                     : 'bg-rose-500'
-                                }`}
+                                  }`}
                               />
 
                               {/* Time label */}
@@ -1267,11 +1261,10 @@ export function WeatherView({
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm ${
-                          station
-                            ? 'bg-emerald-100 text-[#1fa35b]'
-                            : 'bg-slate-100 text-slate-400'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm ${station
+                          ? 'bg-emerald-100 text-[#1fa35b]'
+                          : 'bg-slate-100 text-slate-400'
+                          }`}
                       >
                         <Radio size={16} />
                       </div>

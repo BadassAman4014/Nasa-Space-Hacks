@@ -34,6 +34,7 @@ import {
   ArrowRight,
   FlaskConical,
   Satellite,
+  CloudSnow,
 } from 'lucide-react';
 import type { Feature, FeatureCollection, Polygon, MultiPolygon } from 'geojson';
 import { boundariesApi, type SavedField, type UserFarm } from '../../services/boundariesApi';
@@ -41,8 +42,9 @@ import { FieldSoilCard } from './FieldSoilCard';
 import { FieldEnvironmentalCard } from './FieldEnvironmentalCard';
 import { MapSearchBar } from '../common/MapSearchBar';
 import { MapLegend } from '../common/MapLegend';
-import type { SearchResult } from '../../services/geocodingService';
-import { fetchAllFieldsWeather, type FieldWeatherSummary } from '../../services/weatherApi';
+import { useI18n } from '../../i18n';
+import { reverseGeocodeLocation, type SearchResult } from '../../services/geocodingService';
+import { fetchAllFieldsWeather, fetchPointWeather, type FieldWeatherSummary, type PointWeather } from '../../services/weatherApi';
 import { createVirtualStationDivIcon } from '../weather/VirtualWeatherStationMarker';
 
 export type LayerState = {
@@ -73,6 +75,7 @@ export function DashboardV2(props: {
   selectedFieldId?: string | null;
   onSelectField?: (id: string) => void;
 }) {
+  const { t, formatHectares } = useI18n();
   const [farms, setFarms] = useState<UserFarm[]>([]);
   const [fields, setFields] = useState<SavedField[]>([]);
   const [selectedFarmId, setSelectedFarmId] = useState<string>('all');
@@ -164,11 +167,11 @@ export function DashboardV2(props: {
         current_crop: editCrop.trim(),
         farm_id: editFarmId || editModalField.farm_id,
       });
-      props.notify(`Field "${editName}" updated successfully.`);
+      props.notify(t('dashboard.updateSuccess', { name: editName }));
       setEditModalField(null);
       await loadData();
-    } catch (err) {
-      props.notify(`Failed to update field: ${err}`);
+    } catch (err: any) {
+      props.notify(t('dashboard.updateError', { error: err?.message || String(err) }));
     } finally {
       setSavingEdit(false);
     }
@@ -180,14 +183,14 @@ export function DashboardV2(props: {
     setDeleting(true);
     try {
       await boundariesApi.deleteField(deleteConfirmField.id);
-      props.notify(`Field "${deleteConfirmField.name}" deleted from your farm.`);
+      props.notify(t('dashboard.deleteFieldSuccess', { name: deleteConfirmField.name }));
       if (selectedFieldId === deleteConfirmField.id) {
         setSelectedFieldId(null);
       }
       setDeleteConfirmField(null);
       await loadData();
-    } catch (err) {
-      props.notify(`Failed to delete field: ${err}`);
+    } catch (err: any) {
+      props.notify(t('dashboard.deleteFieldError', { error: err?.message || String(err) }));
     } finally {
       setDeleting(false);
     }
@@ -199,7 +202,7 @@ export function DashboardV2(props: {
     setDeleting(true);
     try {
       await boundariesApi.deleteFarm(deleteConfirmFarm.id);
-      props.notify(`Farm "${deleteConfirmFarm.name}" and all associated fields were deleted.`);
+      props.notify(t('dashboard.deleteFarmSuccess', { name: deleteConfirmFarm.name }));
       if (selectedFarmId === deleteConfirmFarm.id) {
         setSelectedFarmId('all');
       }
@@ -207,8 +210,8 @@ export function DashboardV2(props: {
       setDeleteConfirmFarm(null);
       setManageFarmsModalOpen(false);
       await loadData();
-    } catch (err) {
-      props.notify(`Failed to delete farm: ${err}`);
+    } catch (err: any) {
+      props.notify(t('dashboard.deleteFarmError', { error: err?.message || String(err) }));
     } finally {
       setDeleting(false);
     }
@@ -265,7 +268,10 @@ export function DashboardV2(props: {
               onAddField={() => props.navigate('fields')}
               onOpenAnalytics={(fid) => props.navigate('analytics', fid)}
             />
-            <RegionalConditions />
+            <RegionalConditions
+              onNavigateWeather={() => props.navigate('weather')}
+              notify={props.notify}
+            />
           </>
         )}
       </section>
@@ -289,42 +295,42 @@ export function DashboardV2(props: {
       {editModalField && (
         <div className="fixed inset-0 z-[1000] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#242424] border border-[#3a3a3a] rounded-2xl w-full max-w-md p-6 shadow-2xl text-white">
-            <h3 className="text-base font-bold mb-1">Edit Saved Field</h3>
+            <h3 className="text-base font-bold mb-1">{t('dashboard.editTitle')}</h3>
             <p className="text-xs text-[#aaa] mb-4">
-              Update field name, crop, or farm assignment.
+              {t('dashboard.editDesc')}
             </p>
 
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-xs font-medium text-[#bbb] mb-1.5">
-                  Field Name *
+                  {t('dashboard.fieldNameLabel')}
                 </label>
                 <input
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   className="w-full bg-[#1a1a1a] border border-[#3a3a3a] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#1fa35b]"
-                  placeholder="Field name"
+                  placeholder={t('dashboard.fieldNamePlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-[#bbb] mb-1.5">
-                  Current Crop (Optional)
+                  {t('dashboard.currentCropLabel')}
                 </label>
                 <input
                   type="text"
                   value={editCrop}
                   onChange={(e) => setEditCrop(e.target.value)}
                   className="w-full bg-[#1a1a1a] border border-[#3a3a3a] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#1fa35b]"
-                  placeholder="e.g. Winter wheat, Field peas, Cover crop"
+                  placeholder={t('dashboard.currentCropPlaceholder')}
                 />
               </div>
 
               {farms.length > 1 && (
                 <div>
                   <label className="block text-xs font-medium text-[#bbb] mb-1.5">
-                    Assigned Farm
+                    {t('dashboard.assignedFarmLabel')}
                   </label>
                   <select
                     value={editFarmId}
@@ -347,7 +353,7 @@ export function DashboardV2(props: {
                 onClick={() => setEditModalField(null)}
                 className="px-4 py-2 rounded-lg bg-[#333] hover:bg-[#444] text-xs font-medium text-[#ccc]"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -355,7 +361,7 @@ export function DashboardV2(props: {
                 disabled={savingEdit || !editName.trim()}
                 className="px-5 py-2 rounded-lg bg-[#1fa35b] hover:bg-[#188a4c] font-semibold text-xs text-white disabled:opacity-50"
               >
-                {savingEdit ? 'Saving...' : 'Save Changes'}
+                {savingEdit ? t('dashboard.savingBtn') : t('dashboard.saveChangesBtn')}
               </button>
             </div>
           </div>
@@ -366,11 +372,12 @@ export function DashboardV2(props: {
       {deleteConfirmField && (
         <div className="fixed inset-0 z-[1000] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#242424] border border-[#3a3a3a] rounded-2xl w-full max-w-sm p-6 shadow-2xl text-white">
-            <h3 className="text-base font-bold text-red-400 mb-1">Delete Saved Field</h3>
+            <h3 className="text-base font-bold text-red-400 mb-1">{t('dashboard.deleteFieldTitle')}</h3>
             <p className="text-xs text-[#aaa] mb-4">
-              Are you sure you want to remove <strong>"{deleteConfirmField.name}"</strong> (
-              {deleteConfirmField.area_hectares.toFixed(2)} ha) from your farm? This does not affect
-              the official DFBK reference boundary.
+              {t('dashboard.deleteFieldConfirm', {
+                name: deleteConfirmField.name,
+                area: deleteConfirmField.area_hectares.toFixed(2),
+              })}
             </p>
 
             <div className="flex justify-end gap-2">
@@ -379,7 +386,7 @@ export function DashboardV2(props: {
                 onClick={() => setDeleteConfirmField(null)}
                 className="px-4 py-2 rounded-lg bg-[#333] hover:bg-[#444] text-xs font-medium text-[#ccc]"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -387,7 +394,7 @@ export function DashboardV2(props: {
                 disabled={deleting}
                 className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 font-semibold text-xs text-white disabled:opacity-50"
               >
-                {deleting ? 'Deleting...' : 'Confirm Delete'}
+                {deleting ? t('dashboard.deletingBtn') : t('dashboard.confirmDeleteBtn')}
               </button>
             </div>
           </div>
@@ -402,13 +409,17 @@ export function DashboardV2(props: {
               <div className="w-8 h-8 rounded-xl bg-red-500/20 flex items-center justify-center">
                 <Trash2 size={16} />
               </div>
-              <h3 className="text-base font-bold">Delete Farm</h3>
+              <h3 className="text-base font-bold">{t('dashboard.deleteFarmTitle')}</h3>
             </div>
             <p className="text-xs text-[#aaa] mb-3 leading-relaxed">
-              Are you sure you want to permanently delete <strong>"{deleteConfirmFarm.name}"</strong>?
+              {t('dashboard.deleteFarmConfirm', { name: deleteConfirmFarm.name })}
             </p>
             <div className="p-3 bg-red-950/30 border border-red-800/40 rounded-xl text-[11px] text-red-300 mb-4">
-              <strong>Warning:</strong> This will also remove all <strong>{deleteConfirmFarm.field_count} fields</strong> ({deleteConfirmFarm.total_area_ha.toFixed(1)} ha) belonging to this farm from your records.
+              <strong>{t('common.error')}:</strong>{' '}
+              {t('dashboard.deleteFarmWarning', {
+                count: deleteConfirmFarm.field_count,
+                area: deleteConfirmFarm.total_area_ha.toFixed(1),
+              })}
             </div>
 
             <div className="flex justify-end gap-2">
@@ -417,7 +428,7 @@ export function DashboardV2(props: {
                 onClick={() => setDeleteConfirmFarm(null)}
                 className="px-4 py-2 rounded-lg bg-[#333] hover:bg-[#444] text-xs font-medium text-[#ccc]"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -426,7 +437,7 @@ export function DashboardV2(props: {
                 className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 font-semibold text-xs text-white flex items-center gap-1.5 disabled:opacity-50"
               >
                 <Trash2 size={13} />
-                <span>{deleting ? 'Deleting...' : 'Delete Farm & Fields'}</span>
+                <span>{deleting ? t('dashboard.deletingBtn') : t('dashboard.deleteFarmAction')}</span>
               </button>
             </div>
           </div>
@@ -440,7 +451,7 @@ export function DashboardV2(props: {
             <div className="flex items-center justify-between border-b border-[#333] pb-3">
               <div className="flex items-center gap-2">
                 <Layers size={18} className="text-[#1fa35b]" />
-                <h3 className="text-base font-bold text-white">Manage & Delete Farms</h3>
+                <h3 className="text-base font-bold text-white">{t('dashboard.manageFarmsTitle')}</h3>
               </div>
               <button
                 onClick={() => setManageFarmsModalOpen(false)}
@@ -451,7 +462,7 @@ export function DashboardV2(props: {
             </div>
 
             <p className="text-xs text-[#aaa]">
-              Review your saved farms. You can permanently delete any farm along with all its saved fields.
+              {t('dashboard.manageFarmsDesc')}
             </p>
 
             <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -463,7 +474,10 @@ export function DashboardV2(props: {
                   <div>
                     <strong className="text-xs text-white block">{f.name}</strong>
                     <span className="text-[11px] text-[#888]">
-                      {f.field_count} fields · {f.total_area_ha.toFixed(1)} ha
+                      {t('dashboard.fieldsAndArea', {
+                        count: f.field_count,
+                        area: f.total_area_ha.toFixed(1),
+                      })}
                       {f.location ? ` · ${f.location}` : ''}
                     </span>
                   </div>
@@ -475,13 +489,13 @@ export function DashboardV2(props: {
                     className="px-2.5 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-400 hover:text-red-300 border border-red-800/40 text-xs font-semibold flex items-center gap-1 transition"
                   >
                     <Trash2 size={12} />
-                    <span>Delete</span>
+                    <span>{t('common.delete')}</span>
                   </button>
                 </div>
               ))}
               {farms.length === 0 && (
                 <div className="text-center py-6 text-xs text-[#888]">
-                  No user farms found.
+                  {t('dashboard.noUserFarms')}
                 </div>
               )}
             </div>
@@ -492,7 +506,7 @@ export function DashboardV2(props: {
                 onClick={() => setManageFarmsModalOpen(false)}
                 className="px-4 py-2 rounded-lg bg-[#333] hover:bg-[#444] text-xs font-medium text-white"
               >
-                Close
+                {t('common.close')}
               </button>
             </div>
           </div>
@@ -523,6 +537,7 @@ function PanelHeader({
   onOpenDeleteFarm: (farm: UserFarm) => void;
   onOpenManageFarms: () => void;
 }) {
+  const { t } = useI18n();
   const [hasUnread, setHasUnread] = useState(true);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -530,14 +545,14 @@ function PanelHeader({
     <div className="dash-head relative">
       {/* LEFT: Add Field button & Overflow menu */}
       <div className="dash-head-left relative">
-        <button onClick={onAddField} className="dash-add-btn" title="Add new field">
-          <Plus size={16} /> <span>Add Field</span>
+        <button onClick={onAddField} className="dash-add-btn" title={t('dashboard.addField')}>
+          <Plus size={16} /> <span>{t('dashboard.addField')}</span>
         </button>
         <button
           onClick={() => setMoreMenuOpen(!moreMenuOpen)}
           className={`dash-more ${moreMenuOpen ? 'bg-gray-100 ring-2 ring-[#1fa35b]' : ''}`}
-          title="More options"
-          aria-label="More options"
+          title={t('dashboard.moreOptions')}
+          aria-label={t('dashboard.moreOptions')}
         >
           <MoreVertical size={18} />
         </button>
@@ -555,7 +570,7 @@ function PanelHeader({
                 className="w-full text-left px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 font-semibold flex items-center gap-2 transition"
               >
                 <Trash2 size={14} className="text-red-500" />
-                <span className="truncate">Delete Farm "{activeFarm.name}"</span>
+                <span className="truncate">{t('dashboard.deleteFarmOption', { name: activeFarm.name })}</span>
               </button>
             )}
 
@@ -568,7 +583,7 @@ function PanelHeader({
               className="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 font-medium flex items-center gap-2 text-red-600 transition"
             >
               <Trash2 size={14} className="text-red-500" />
-              <span>Delete a Farm...</span>
+              <span>{t('dashboard.deleteAFarmOption')}</span>
             </button>
 
             <button
@@ -580,7 +595,7 @@ function PanelHeader({
               className="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 font-medium flex items-center gap-2 text-gray-700 transition"
             >
               <Layers size={14} className="text-emerald-600" />
-              <span>Manage Farms ({farms.length})</span>
+              <span>{t('dashboard.manageFarms')} ({farms.length})</span>
             </button>
 
             <div className="border-t border-gray-100 my-1" />
@@ -594,17 +609,17 @@ function PanelHeader({
               className="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 font-medium flex items-center gap-2 text-gray-700 transition"
             >
               <Plus size={14} className="text-gray-500" />
-              <span>Add New Field</span>
+              <span>{t('dashboard.addNewFieldOption')}</span>
             </button>
           </div>
         )}
       </div>
 
       {/* RIGHT: Export button & Notifications button */}
-      <div className="dash-head-right">
+      <div className="dash-head-right flex items-center gap-2">
         {onExport && (
           <button className="dash-export-btn" onClick={onExport} title="Export reports & evidence">
-            <Download size={14} /> <span>Export</span>
+            <Download size={14} /> <span>{t('dashboard.exportBtn')}</span>
           </button>
         )}
         {onNotify && (
@@ -612,9 +627,9 @@ function PanelHeader({
             className="dash-bell-btn"
             onClick={() => {
               setHasUnread(false);
-              onNotify('You are all caught up');
+              onNotify(t('common.allCaughtUp'));
             }}
-            title="Notifications"
+            title={t('dashboard.notificationsBtn')}
           >
             <Bell size={18} />
             {hasUnread && <i className="dash-notification-dot" />}
@@ -648,7 +663,8 @@ function PropertyHeader({
   onOpenDeleteFarm: (farm: UserFarm) => void;
   onOpenManageFarms: () => void;
 }) {
-  const farmDisplayName = activeFarm ? activeFarm.name : farms.length > 0 ? 'All farms' : 'My Farms';
+  const { t, formatHectares } = useI18n();
+  const farmDisplayName = activeFarm ? activeFarm.name : farms.length > 0 ? t('dashboard.allFarms') : t('dashboard.myFarms');
   const locationText = activeFarm ? activeFarm.location : 'Brandenburg, Germany';
 
   return (
@@ -671,7 +687,7 @@ function PropertyHeader({
               onClick={() => onSelectFarm('all')}
               className={selectedFarmId === 'all' ? 'font-bold text-[#1fa35b]' : ''}
             >
-              All Farms ({farms.length})
+              {t('dashboard.allFarms')} ({farms.length})
             </button>
             {farms.map((f) => (
               <div key={f.id} className="flex items-center justify-between w-full hover:bg-gray-50 rounded-lg pr-1">
@@ -702,44 +718,45 @@ function PropertyHeader({
               }}
               className="text-red-600 hover:text-red-700 font-semibold border-t border-gray-100 mt-1 pt-1.5 flex items-center gap-1.5 text-xs w-full text-left"
             >
-              <Trash2 size={13} /> Delete a Farm...
+              <Trash2 size={13} /> {t('dashboard.deleteAFarmOption')}
             </button>
             <button
               onClick={onAddField}
               className="text-[#1fa35b] font-semibold border-t border-gray-100 mt-1 pt-1 flex items-center gap-1.5 text-xs w-full text-left"
             >
-              <Plus size={14} /> + Add New Field
+              <Plus size={14} /> + {t('dashboard.addNewFieldOption')}
             </button>
           </div>
         )}
       </div>
 
-      <strong>{totalAreaHa > 0 ? `${totalAreaHa.toFixed(1)} ha` : '0 ha'}</strong>
+      <strong>{totalAreaHa > 0 ? formatHectares(totalAreaHa) : '0 ha'}</strong>
       <p>{locationText}</p>
       <span>
-        <TrendingUp size={14} /> Verified Records
+        <TrendingUp size={14} /> {t('dashboard.verifiedRecords')}
       </span>
     </section>
   );
 }
 
 function EmptyDashboardState({ onAddField }: { onAddField: () => void }) {
+  const { t } = useI18n();
   return (
     <div className="card-v2 text-center p-8 flex flex-col items-center justify-center gap-3">
       <div className="w-12 h-12 rounded-2xl bg-[#1fa35b]/10 text-[#1fa35b] flex items-center justify-center">
         <Sprout size={28} />
       </div>
       <div>
-        <h3 className="text-base font-bold text-[#1b1b1b]">No Saved Fields Yet</h3>
+        <h3 className="text-base font-bold text-[#1b1b1b]">{t('dashboard.noSavedFieldsTitle')}</h3>
         <p className="text-xs text-[#6f6f6f] max-w-xs mt-1">
-          Explore official Brandenburg DFBK agricultural boundaries or draw custom fields to add them to your farm records.
+          {t('dashboard.noSavedFieldsDesc')}
         </p>
       </div>
       <button
         onClick={onAddField}
-        className="mt-2 px-5 py-2.5 rounded-xl bg-[#1fa35b] hover:bg-[#188a4c] font-semibold text-xs text-white shadow-md flex items-center gap-1.5"
+        className="mt-2 px-5 py-2.5 rounded-xl bg-[#1fa35b] hover:bg-[#188a4c] font-semibold text-xs text-white shadow-md flex items-center gap-1.5 cursor-pointer"
       >
-        <Plus size={16} /> Add Your First Field
+        <Plus size={16} /> {t('dashboard.addFirstField')}
       </button>
     </div>
   );
@@ -752,6 +769,7 @@ function SavedFieldsOverview({
   fields: SavedField[];
   totalAreaHa: number;
 }) {
+  const { t, formatHectares } = useI18n();
   const crops = useMemo(() => {
     const set = new Set(fields.map((f) => f.current_crop).filter(Boolean));
     return set.size;
@@ -764,15 +782,15 @@ function SavedFieldsOverview({
       <div className="metrics-v2">
         <div className="metric-v2">
           <div>
-            <span>Saved Fields</span>
+            <span>{t('dashboard.savedFields')}</span>
             <Layers size={18} />
           </div>
           <main>
             <strong>{fields.length}</strong>
             <dl>
               <div>
-                <dt>Status</dt>
-                <dd>{fields.length > 0 ? 'Verified' : 'Empty'}</dd>
+                <dt>{t('common.status')}</dt>
+                <dd>{fields.length > 0 ? t('dashboard.statusVerified') : t('dashboard.statusEmpty')}</dd>
               </div>
             </dl>
           </main>
@@ -780,17 +798,16 @@ function SavedFieldsOverview({
 
         <div className="metric-v2">
           <div>
-            <span>Total Area</span>
+            <span>{t('dashboard.totalArea')}</span>
             <Map size={18} />
           </div>
           <main>
             <strong>
-              {totalAreaHa.toFixed(1)}
-              <small>ha</small>
+              {totalAreaHa > 0 ? formatHectares(totalAreaHa) : '0 ha'}
             </strong>
             <dl>
               <div>
-                <dt>Average</dt>
+                <dt>{t('dashboard.averageSize')}</dt>
                 <dd>{avgSize} ha</dd>
               </div>
             </dl>
@@ -799,15 +816,15 @@ function SavedFieldsOverview({
 
         <div className="metric-v2">
           <div>
-            <span>Crops</span>
+            <span>{t('dashboard.crops')}</span>
             <Sprout size={18} />
           </div>
           <main>
             <strong>{crops}</strong>
             <dl>
               <div>
-                <dt>Types</dt>
-                <dd>{crops > 0 ? `${crops} active` : 'None assigned'}</dd>
+                <dt>{t('dashboard.cropTypes')}</dt>
+                <dd>{crops > 0 ? t('dashboard.activeCount', { count: crops }) : t('dashboard.noneAssigned')}</dd>
               </div>
             </dl>
           </main>
@@ -815,15 +832,15 @@ function SavedFieldsOverview({
 
         <div className="metric-v2">
           <div>
-            <span>DFBK Status</span>
+            <span>{t('dashboard.dfbkStatus')}</span>
             <CheckCircle2 size={18} />
           </div>
           <main>
             <strong>100%</strong>
             <dl>
               <div>
-                <dt>Sync</dt>
-                <dd>Durable</dd>
+                <dt>{t('common.sync')}</dt>
+                <dd>{t('dashboard.syncDurable')}</dd>
               </div>
             </dl>
           </main>
@@ -850,17 +867,18 @@ function SavedFieldsList({
   onAddField: () => void;
   onOpenAnalytics?: (fieldId: string) => void;
 }) {
+  const { t, formatHectares } = useI18n();
   return (
     <section className="card-v2 p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-[#111827] flex items-center gap-1.5">
-          <Sprout size={16} className="text-[#1fa35b]" /> Your Farm Fields ({fields.length})
+          <Sprout size={16} className="text-[#1fa35b]" /> {t('dashboard.yourFarmFields')} ({fields.length})
         </h3>
         <button
           onClick={onAddField}
           className="text-xs text-[#1fa35b] font-semibold hover:underline flex items-center gap-1"
         >
-          <Plus size={13} /> Add
+          <Plus size={13} /> {t('dashboard.addShort')}
         </button>
       </div>
 
@@ -880,7 +898,7 @@ function SavedFieldsList({
               <div className="min-w-0">
                 <div className="text-xs font-bold text-[#111827] truncate">{f.name}</div>
                 <div className="text-[11px] text-[#6b7280] flex items-center gap-2 mt-0.5">
-                  <span>{f.area_hectares.toFixed(2)} ha</span>
+                  <span>{formatHectares(f.area_hectares)}</span>
                   {f.current_crop ? (
                     <>
                       <span>•</span>
@@ -889,7 +907,7 @@ function SavedFieldsList({
                   ) : (
                     <>
                       <span>•</span>
-                      <span className="text-[#888] italic truncate">No crop assigned</span>
+                      <span className="text-[#888] italic truncate">{t('dashboard.noCropAssigned')}</span>
                     </>
                   )}
                   {f.farm_name && (
@@ -910,7 +928,7 @@ function SavedFieldsList({
                       onOpenAnalytics(f.id);
                     }}
                     className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition"
-                    title="Open Field Analytics Workspace"
+                    title={t('dashboard.openAnalyticsTooltip')}
                   >
                     <Sparkles size={13} />
                   </button>
@@ -922,7 +940,7 @@ function SavedFieldsList({
                     onEdit(f);
                   }}
                   className="p-1.5 rounded-lg hover:bg-black/5 text-[#6b7280] hover:text-[#111827]"
-                  title="Rename or update field"
+                  title={t('dashboard.editTooltip')}
                 >
                   <Pencil size={13} />
                 </button>
@@ -933,7 +951,7 @@ function SavedFieldsList({
                     onDelete(f);
                   }}
                   className="p-1.5 rounded-lg hover:bg-red-50 text-[#9ca3af] hover:text-red-600"
-                  title="Delete field"
+                  title={t('dashboard.deleteTooltip')}
                 >
                   <Trash2 size={13} />
                 </button>
@@ -946,24 +964,139 @@ function SavedFieldsList({
   );
 }
 
-function RegionalConditions() {
+function RegionalConditions({
+  onNavigateWeather,
+  notify,
+}: {
+  onNavigateWeather?: () => void;
+  notify?: (msg: string) => void;
+}) {
+  const { t } = useI18n();
+  const [weather, setWeather] = useState<PointWeather | null>(null);
+  const [locationName, setLocationName] = useState<string>('Potsdam, Brandenburg');
+  const [isLiveGps, setIsLiveGps] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [locating, setLocating] = useState<boolean>(false);
+
+  const loadWeatherForCoords = useCallback(async (lat: number, lon: number, isGps = false) => {
+    try {
+      const [wData, locName] = await Promise.all([
+        fetchPointWeather(lat, lon),
+        reverseGeocodeLocation(lat, lon),
+      ]);
+      setWeather(wData);
+      if (locName) {
+        setLocationName(locName);
+      }
+      setIsLiveGps(isGps);
+    } catch (err) {
+      console.warn('Failed to fetch weather for coordinates:', err);
+    } finally {
+      setLoading(false);
+      setLocating(false);
+    }
+  }, []);
+
+  const detectDeviceLocation = useCallback(() => {
+    if (!('geolocation' in navigator)) {
+      // Geolocation not supported, fallback to default Potsdam
+      loadWeatherForCoords(52.415, 13.045, false);
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        loadWeatherForCoords(latitude, longitude, true);
+      },
+      (err) => {
+        console.warn('Device location unavailable or permission denied:', err.message);
+        // Fallback gracefully to Brandenburg regional baseline
+        loadWeatherForCoords(52.415, 13.045, false);
+      },
+      { timeout: 8000, enableHighAccuracy: false, maximumAge: 300000 }
+    );
+  }, [loadWeatherForCoords]);
+
+  useEffect(() => {
+    detectDeviceLocation();
+  }, [detectDeviceLocation]);
+
+  // Weather icon selector
+  const renderWeatherIcon = () => {
+    if (loading || locating) {
+      return <CloudSun size={28} className="text-[#4a8fcc] animate-pulse" />;
+    }
+    const iconType = weather?.icon || 'partly_cloudy';
+    if (iconType === 'sunny') {
+      return <Sun size={28} className="text-amber-500" />;
+    }
+    if (iconType === 'rain') {
+      return <CloudRain size={28} className="text-blue-500" />;
+    }
+    if (iconType === 'snow') {
+      return <CloudSnow size={28} className="text-sky-300" />;
+    }
+    if (iconType === 'cloudy') {
+      return <Cloud size={28} className="text-slate-500" />;
+    }
+    return <CloudSun size={28} className="text-[#4a8fcc]" />;
+  };
+
   return (
     <section className="card-v2 weather-v2 p-4">
-      <div className="flex items-center gap-1.5 mb-2.5">
-        <Sprout size={15} className="text-[#1fa35b]" />
-        <label className="text-xs font-bold text-[#111827] block">Regional Climate & Weather</label>
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-1.5">
+          <Sprout size={15} className="text-[#1fa35b]" />
+          <label className="text-xs font-bold text-[#111827] block">
+            {t('dashboard.regionalClimateTitle')}
+          </label>
+        </div>
+        {isLiveGps ? (
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+            <span>Live GPS</span>
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={detectDeviceLocation}
+            disabled={locating}
+            className="text-[10px] text-gray-500 hover:text-gray-900 flex items-center gap-1 hover:underline transition cursor-pointer"
+            title="Fetch current device location via GPS"
+          >
+            <Navigation size={10} className={locating ? 'animate-spin text-[#1fa35b]' : ''} />
+            <span>{locating ? 'Locating...' : 'Use My GPS'}</span>
+          </button>
+        )}
       </div>
+
       <header className="flex items-center gap-3">
-        <Cloud size={30} className="text-[#4a8fcc]" />
-        <strong className="text-2xl font-bold text-[#111827]">18.4°C</strong>
-        <span className="text-[11px] text-[#6b7280] leading-tight mr-auto">
-          Potsdam, Brandenburg
-          <br />
-          <span className="text-[#9ca3af]">Season baseline</span>
+        <div className="shrink-0">{renderWeatherIcon()}</div>
+        <strong className="text-2xl font-bold text-[#111827]">
+          {loading ? '—' : `${weather ? weather.temperature_c.toFixed(1) : '18.4'}°C`}
+        </strong>
+        <span className="text-[11px] text-[#6b7280] leading-tight mr-auto truncate max-w-[180px]">
+          <span className="font-semibold text-gray-900 block truncate" title={locationName}>
+            {locationName}
+          </span>
+          <span className="text-[#9ca3af] text-[10px] truncate block">
+            {weather
+              ? `${weather.condition} • Feels like ${weather.feels_like_c}°C`
+              : t('dashboard.seasonBaseline')}
+          </span>
         </span>
-        <button className="text-xs font-semibold bg-white border border-[#e5e7eb] px-3 py-1.5 rounded-xl flex items-center gap-1.5 hover:bg-gray-50 shadow-2xs text-[#374151]">
-          <CloudSun size={14} className="text-[#4a8fcc]" /> Forecast
-        </button>
+        {onNavigateWeather && (
+          <button
+            onClick={onNavigateWeather}
+            className="text-xs font-semibold bg-white border border-[#e5e7eb] px-3 py-1.5 rounded-xl flex items-center gap-1.5 hover:bg-gray-50 shadow-2xs text-[#374151] transition shrink-0 cursor-pointer"
+            title="Open 7-day meteorological forecast"
+          >
+            <CloudSun size={14} className="text-[#4a8fcc]" />
+            <span>{t('dashboard.forecastBtn')}</span>
+          </button>
+        )}
       </header>
     </section>
   );
@@ -1024,6 +1157,7 @@ export function MapViewV2({
   onOpenAnalytics?: (fieldId: string) => void;
   floatingChrome?: boolean;
 }) {
+  const { t, formatHectares } = useI18n();
   const [map, setMap] = useState<L.Map | null>(null);
   const [cardOpen, setCardOpen] = useState(true);
   const [fieldCardTab, setFieldCardTab] = useState<'soil' | 'nasa' | 'details'>('soil');
@@ -1077,11 +1211,11 @@ export function MapViewV2({
   // Locate user position via browser geolocation
   const handleLocateMe = useCallback(() => {
     if (!navigator.geolocation) {
-      notify('Geolocation is not supported by your browser.');
+      notify(t('dashboard.geoNotSupported'));
       return;
     }
     setLocating(true);
-    notify('Requesting your GPS location...');
+    notify(t('dashboard.locatingGps'));
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const lat = pos.coords.latitude;
@@ -1092,15 +1226,15 @@ export function MapViewV2({
         if (map) {
           map.flyTo([lat, lon], 14.5, { duration: 1.2 });
         }
-        notify(`Located your position: ${lat.toFixed(4)}, ${lon.toFixed(4)}`);
+        notify(t('dashboard.locatedSuccess', { coords: `${lat.toFixed(4)}, ${lon.toFixed(4)}` }));
       },
       (err) => {
         setLocating(false);
-        notify(`Could not get location: ${err.message}`);
+        notify(t('dashboard.geoError', { error: err.message }));
       },
       { enableHighAccuracy: true, timeout: 8000 }
     );
-  }, [map, notify]);
+  }, [map, notify, t]);
 
   // Fit bounds to selected field or all fields
   useEffect(() => {
@@ -1240,15 +1374,15 @@ export function MapViewV2({
             <div className="w-12 h-12 rounded-2xl bg-[#1fa35b]/20 text-[#1fa35b] flex items-center justify-center mx-auto mb-3">
               <Sprout size={28} />
             </div>
-            <h3 className="text-base font-bold mb-1">No Saved Fields on Map</h3>
+            <h3 className="text-base font-bold mb-1">{t('dashboard.noFieldsOnMapTitle')}</h3>
             <p className="text-xs text-[#aaa] mb-4">
-              Explore official Brandenburg agricultural boundaries (DFBK) and save them to your farm to view them here.
+              {t('dashboard.noFieldsOnMapDesc')}
             </p>
             <button
               onClick={() => navigate('fields')}
-              className="px-5 py-2.5 rounded-xl bg-[#1fa35b] hover:bg-[#188a4c] font-semibold text-xs text-white shadow-lg flex items-center justify-center gap-1.5 mx-auto"
+              className="px-5 py-2.5 rounded-xl bg-[#1fa35b] hover:bg-[#188a4c] font-semibold text-xs text-white shadow-lg flex items-center justify-center gap-1.5 mx-auto cursor-pointer"
             >
-              <Plus size={16} /> Add Your First Field
+              <Plus size={16} /> {t('dashboard.addFirstField')}
             </button>
           </div>
         </div>
@@ -1261,7 +1395,7 @@ export function MapViewV2({
             <div>
               <h2>{selected.name}</h2>
               <p>
-                {selected.farm_name || 'Farm'} · {selected.current_crop || 'No crop assigned'}
+                {selected.farm_name || 'Farm'} · {selected.current_crop || t('dashboard.noCropAssigned')}
               </p>
             </div>
             <button onClick={() => setCardOpen(false)}>
@@ -1280,7 +1414,7 @@ export function MapViewV2({
                   : 'text-[#6b7280] hover:text-[#111]'
               }`}
             >
-              <FlaskConical size={13} /> SoilGrids
+              <FlaskConical size={13} /> {t('dashboard.soilGridsTab')}
             </button>
             <button
               type="button"
@@ -1291,7 +1425,7 @@ export function MapViewV2({
                   : 'text-[#6b7280] hover:text-[#111]'
               }`}
             >
-              <Satellite size={13} /> NASA Satellites
+              <Satellite size={13} /> {t('dashboard.nasaSatellitesTab')}
             </button>
             <button
               type="button"
@@ -1302,7 +1436,7 @@ export function MapViewV2({
                   : 'text-[#6b7280] hover:text-[#111]'
               }`}
             >
-              <Layers size={13} /> Field Info
+              <Layers size={13} /> {t('dashboard.fieldInfoTab')}
             </button>
           </div>
 
@@ -1328,29 +1462,29 @@ export function MapViewV2({
             <>
               <div className="dates">
                 <div>
-                  <span>Area</span>
-                  <b>{selected.area_hectares.toFixed(2)} ha</b>
+                  <span>{t('dashboard.fieldArea')}</span>
+                  <b>{formatHectares(selected.area_hectares)}</b>
                 </div>
                 <div>
-                  <span>Current Crop</span>
-                  <b>{selected.current_crop || 'Unassigned'}</b>
+                  <span>{t('dashboard.currentCrop')}</span>
+                  <b>{selected.current_crop || t('common.unassigned')}</b>
                 </div>
               </div>
 
               <div className="sensor-box mb-3">
                 <div>
-                  <span>Provenance</span>
+                  <span>{t('dashboard.provenance')}</span>
                   <b>{selected.boundary_source}</b>
                 </div>
                 <div>
-                  <span>Boundary ID</span>
+                  <span>{t('dashboard.boundaryId')}</span>
                   <b className="truncate max-w-[130px]">
                     {selected.source_boundary_id || 'User-drawn'}
                   </b>
                 </div>
                 {selected.land_use_category && (
                   <div>
-                    <span>Category</span>
+                    <span>{t('dashboard.category')}</span>
                     <b>{selected.land_use_category}</b>
                   </div>
                 )}
@@ -1363,14 +1497,14 @@ export function MapViewV2({
               onClick={() => (onOpenAnalytics ? onOpenAnalytics(selected.id) : navigate('rotation-studio'))}
               className="w-full py-2.5 rounded-xl bg-[#1fa35b] hover:bg-[#188a4c] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow"
             >
-              <Sparkles size={14} /> Field Analytics & Historical Report
+              <Sparkles size={14} /> {t('dashboard.fieldAnalyticsBtn')}
             </button>
 
             <button
               onClick={() => navigate('rotation-studio')}
               className="w-full py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs flex items-center justify-center gap-1.5"
             >
-              <Sprout size={13} /> Rotation Studio
+              <Sprout size={13} /> {t('dashboard.rotationStudioBtn')}
             </button>
 
             <div className="grid grid-cols-2 gap-2">
@@ -1378,19 +1512,19 @@ export function MapViewV2({
                 onClick={() => onEdit(selected)}
                 className="py-2 rounded-xl bg-[#f0f0f0] hover:bg-[#e4e4e4] text-[#1b1b1b] font-semibold text-xs flex items-center justify-center gap-1"
               >
-                <Pencil size={13} /> Edit Field
+                <Pencil size={13} /> {t('dashboard.editFieldBtn')}
               </button>
               <button
                 onClick={() => onDelete(selected)}
                 className="py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-xs flex items-center justify-center gap-1"
               >
-                <Trash2 size={13} /> Delete
+                <Trash2 size={13} /> {t('dashboard.deleteFieldBtn')}
               </button>
             </div>
           </div>
 
           <footer className="mt-3">
-            <span>Verified Record</span>
+            <span>{t('dashboard.verifiedRecordFooter')}</span>
             <p className="text-xs text-[#aaa]">
               {selected.attribution || '© MLEUV, dl-de/by-2-0'}
             </p>

@@ -131,8 +131,8 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
       ? `${fullReport.elevation.elevation_range_m.toFixed(1)} m relief`
       : 'Pending DEM sync';
   const soilBrightness =
-    fullReport?.soil_brightness?.mean_soil_brightness != null
-      ? `${fullReport.soil_brightness.mean_soil_brightness.toFixed(3)} index`
+    fullReport?.soil_brightness?.mean_brightness != null
+      ? `${fullReport.soil_brightness.mean_brightness.toFixed(3)} index`
       : fullReport?.soil_brightness?.is_available
       ? 'Calculated'
       : 'Bare soil unavailable';

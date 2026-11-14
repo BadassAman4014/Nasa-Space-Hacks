@@ -6,6 +6,7 @@ import {
   type SearchResultCategory,
 } from '../../services/geocodingService';
 import type { SavedField, UserFarm } from '../../services/boundariesApi';
+import { useI18n } from '../../i18n';
 
 interface MapSearchBarProps {
   mode: 'dashboard' | 'explorer';
@@ -26,6 +27,7 @@ export const MapSearchBar: React.FC<MapSearchBarProps> = ({
   className = '',
   darkSurface = false,
 }) => {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -38,8 +40,8 @@ export const MapSearchBar: React.FC<MapSearchBarProps> = ({
 
   const defaultPlaceholder =
     mode === 'dashboard'
-      ? 'Search saved fields, farms, or locations...'
-      : 'Search municipalities, regions, or coordinates...';
+      ? t('dashboard.searchPlaceholder')
+      : t('fieldExplorer.searchPlaceholder');
 
   // Perform search with 180ms debounce
   useEffect(() => {
@@ -172,11 +174,10 @@ export const MapSearchBar: React.FC<MapSearchBarProps> = ({
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <div
-        className={`flex items-center gap-2 rounded-xl border transition shadow-sm ${
-          darkSurface
-            ? 'bg-[#1a1a1a] border-[#3a3a3a] text-white focus-within:border-[#1fa35b]'
-            : 'bg-white border-[#e5e7eb] text-[#111] focus-within:border-[#1fa35b] focus-within:ring-2 focus-within:ring-[#1fa35b]/20'
-        } px-3 py-2`}
+        className={`flex items-center gap-2 rounded-xl border transition shadow-sm ${darkSurface
+          ? 'bg-[#1a1a1a] border-[#3a3a3a] text-white focus-within:border-[#1fa35b]'
+          : 'bg-white border-[#e5e7eb] text-[#111] focus-within:border-[#1fa35b] focus-within:ring-2 focus-within:ring-[#1fa35b]/20'
+          } px-3 py-2`}
       >
         <Search size={16} className={darkSurface ? 'text-[#888]' : 'text-[#9ca3af]'} />
         <input
@@ -189,9 +190,8 @@ export const MapSearchBar: React.FC<MapSearchBarProps> = ({
           }}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || defaultPlaceholder}
-          className={`w-full bg-transparent text-xs font-medium focus:outline-none placeholder:text-gray-400 ${
-            darkSurface ? 'text-white' : 'text-gray-900'
-          }`}
+          className={`w-full bg-transparent text-xs font-medium focus:outline-none placeholder:text-gray-400 ${darkSurface ? 'text-white' : 'text-gray-900'
+            }`}
         />
         {query && (
           <button
@@ -202,9 +202,8 @@ export const MapSearchBar: React.FC<MapSearchBarProps> = ({
               setIsOpen(false);
               inputRef.current?.focus();
             }}
-            className={`p-0.5 rounded-full hover:bg-gray-200/50 ${
-              darkSurface ? 'text-[#888] hover:text-white' : 'text-gray-400 hover:text-gray-600'
-            }`}
+            className={`p-0.5 rounded-full hover:bg-gray-200/50 ${darkSurface ? 'text-[#888] hover:text-white' : 'text-gray-400 hover:text-gray-600'
+              }`}
           >
             <X size={14} />
           </button>
@@ -214,11 +213,10 @@ export const MapSearchBar: React.FC<MapSearchBarProps> = ({
       {/* Results Dropdown Menu */}
       {isOpen && results.length > 0 && (
         <div
-          className={`absolute left-0 right-0 top-full mt-1.5 max-h-72 overflow-y-auto rounded-xl border shadow-xl z-[600] ${
-            darkSurface
-              ? 'bg-[#1f1f1f] border-[#333] text-white'
-              : 'bg-white border-[#e5e7eb] text-gray-900'
-          }`}
+          className={`absolute left-0 right-0 top-full mt-1.5 max-h-72 overflow-y-auto rounded-xl border shadow-xl z-[600] ${darkSurface
+            ? 'bg-[#1f1f1f] border-[#333] text-white'
+            : 'bg-white border-[#e5e7eb] text-gray-900'
+            }`}
         >
           <div className="py-1">
             {results.map((item, idx) => {
@@ -228,13 +226,12 @@ export const MapSearchBar: React.FC<MapSearchBarProps> = ({
                   key={item.id}
                   onClick={() => handleSelect(item)}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`px-3 py-2.5 cursor-pointer flex items-center justify-between gap-2.5 transition ${
-                    isHighlighted
-                      ? darkSurface
-                        ? 'bg-[#2a2a2a]'
-                        : 'bg-[#f3f4f6]'
-                      : 'hover:bg-opacity-50'
-                  }`}
+                  className={`px-3 py-2.5 cursor-pointer flex items-center justify-between gap-2.5 transition ${isHighlighted
+                    ? darkSurface
+                      ? 'bg-[#2a2a2a]'
+                      : 'bg-[#f3f4f6]'
+                    : 'hover:bg-opacity-50'
+                    }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="shrink-0">{getCategoryIcon(item.category)}</div>
@@ -243,9 +240,8 @@ export const MapSearchBar: React.FC<MapSearchBarProps> = ({
                         {highlightMatch(item.title, query)}
                       </div>
                       <div
-                        className={`text-[11px] truncate ${
-                          darkSurface ? 'text-[#888]' : 'text-gray-500'
-                        }`}
+                        className={`text-[11px] truncate ${darkSurface ? 'text-[#888]' : 'text-gray-500'
+                          }`}
                       >
                         {item.subtitle}
                       </div>

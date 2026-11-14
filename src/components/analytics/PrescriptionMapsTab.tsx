@@ -13,6 +13,7 @@ import {
   DollarSign
 } from 'lucide-react';
 import { FieldStatusSummary, FullFieldReportResponse } from '../../services/fieldAnalyticsApi';
+import { useI18n } from '../../i18n';
 
 interface PrescriptionMapsTabProps {
   summary: FieldStatusSummary;
@@ -27,6 +28,7 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
   fullReport,
   notify,
 }) => {
+  const { t } = useI18n();
   const [selectedType, setSelectedType] = useState<FertilizerType>('urea');
   const [strategy, setStrategy] = useState<'standard' | 'aggressive' | 'conservative'>('standard');
   const [highZoneRate, setHighZoneRate] = useState<number>(240);
@@ -99,13 +101,13 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-400/30">
-              Variable-Rate Application (VRA)
+              {t('analyticsTabs.vraTitle')}
             </span>
             <span className="text-xs text-emerald-200">
-              {summary.current_crop || 'No crop assigned'} · {areaHa.toFixed(2)} ha
+              {summary.current_crop || t('analytics.noCropAssigned')} · {areaHa.toFixed(2)} ha
             </span>
           </div>
-          <h2 className="text-2xl font-bold">Prescription Map Generator — {summary.name}</h2>
+          <h2 className="text-2xl font-bold">{t('analyticsTabs.prescriptionGeneratorTitle', { name: summary.name })}</h2>
           <p className="text-xs text-emerald-100/80 mt-1 max-w-2xl leading-relaxed">
             Tailored to {summary.name}'s multi-season productivity zones ({fullReport?.productivity?.total_seasons_analyzed || 4} seasons analyzed with {fullReport?.productivity?.stability_rating || 'High'} temporal stability).
           </p>
@@ -119,7 +121,7 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
             className="px-4 py-2.5 rounded-xl bg-white text-gray-900 hover:bg-gray-100 font-bold text-xs flex items-center gap-2 shadow transition disabled:opacity-50"
           >
             <FileCode2 size={16} className="text-emerald-600" />
-            <span>{exporting === 'isoxml' ? 'Exporting...' : 'Export ISO-XML'}</span>
+            <span>{exporting === 'isoxml' ? 'Exporting...' : t('analyticsTabs.exportIsoXml')}</span>
           </button>
           <button
             onClick={() => handleExport('shapefile')}
@@ -127,7 +129,7 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
             className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 font-bold text-xs flex items-center gap-2 shadow transition disabled:opacity-50"
           >
             <Download size={16} />
-            <span>{exporting === 'shapefile' ? 'Exporting...' : 'Export Shapefile'}</span>
+            <span>{exporting === 'shapefile' ? 'Exporting...' : t('analyticsTabs.exportShapefile')}</span>
           </button>
         </div>
       </div>
@@ -145,11 +147,10 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
               <button
                 type="button"
                 onClick={() => handleApplyPreset('urea')}
-                className={`p-3 rounded-xl border text-left transition ${
-                  selectedType === 'urea'
-                    ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 font-bold ring-2 ring-emerald-500/20'
-                    : 'border-gray-200 hover:bg-gray-50 text-gray-700 font-medium'
-                }`}
+                className={`p-3 rounded-xl border text-left transition ${selectedType === 'urea'
+                  ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 font-bold ring-2 ring-emerald-500/20'
+                  : 'border-gray-200 hover:bg-gray-50 text-gray-700 font-medium'
+                  }`}
               >
                 <div className="text-xs">Urea (46-0-0)</div>
                 <div className="text-[11px] text-gray-500 mt-0.5">Top-dressing Nitrogen</div>
@@ -157,11 +158,10 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
               <button
                 type="button"
                 onClick={() => handleApplyPreset('dap')}
-                className={`p-3 rounded-xl border text-left transition ${
-                  selectedType === 'dap'
-                    ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 font-bold ring-2 ring-emerald-500/20'
-                    : 'border-gray-200 hover:bg-gray-50 text-gray-700 font-medium'
-                }`}
+                className={`p-3 rounded-xl border text-left transition ${selectedType === 'dap'
+                  ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 font-bold ring-2 ring-emerald-500/20'
+                  : 'border-gray-200 hover:bg-gray-50 text-gray-700 font-medium'
+                  }`}
               >
                 <div className="text-xs">DAP (18-46-0)</div>
                 <div className="text-[11px] text-gray-500 mt-0.5">Starter Phosphorus</div>
@@ -169,11 +169,10 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
               <button
                 type="button"
                 onClick={() => handleApplyPreset('npk')}
-                className={`p-3 rounded-xl border text-left transition ${
-                  selectedType === 'npk'
-                    ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 font-bold ring-2 ring-emerald-500/20'
-                    : 'border-gray-200 hover:bg-gray-50 text-gray-700 font-medium'
-                }`}
+                className={`p-3 rounded-xl border text-left transition ${selectedType === 'npk'
+                  ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 font-bold ring-2 ring-emerald-500/20'
+                  : 'border-gray-200 hover:bg-gray-50 text-gray-700 font-medium'
+                  }`}
               >
                 <div className="text-xs">NPK 15-15-15</div>
                 <div className="text-[11px] text-gray-500 mt-0.5">Balanced Basal</div>
@@ -181,11 +180,10 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
               <button
                 type="button"
                 onClick={() => handleApplyPreset('seed')}
-                className={`p-3 rounded-xl border text-left transition ${
-                  selectedType === 'seed'
-                    ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 font-bold ring-2 ring-emerald-500/20'
-                    : 'border-gray-200 hover:bg-gray-50 text-gray-700 font-medium'
-                }`}
+                className={`p-3 rounded-xl border text-left transition ${selectedType === 'seed'
+                  ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 font-bold ring-2 ring-emerald-500/20'
+                  : 'border-gray-200 hover:bg-gray-50 text-gray-700 font-medium'
+                  }`}
               >
                 <div className="text-xs">Seeding Density</div>
                 <div className="text-[11px] text-gray-500 mt-0.5">Seeds / m² or kg/ha</div>
@@ -202,33 +200,30 @@ export const PrescriptionMapsTab: React.FC<PrescriptionMapsTabProps> = ({
               <button
                 type="button"
                 onClick={() => setStrategy('standard')}
-                className={`py-2 px-3 rounded-lg border text-center font-semibold transition ${
-                  strategy === 'standard'
-                    ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`py-2 px-3 rounded-lg border text-center font-semibold transition ${strategy === 'standard'
+                  ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 Balanced
               </button>
               <button
                 type="button"
                 onClick={() => setStrategy('aggressive')}
-                className={`py-2 px-3 rounded-lg border text-center font-semibold transition ${
-                  strategy === 'aggressive'
-                    ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`py-2 px-3 rounded-lg border text-center font-semibold transition ${strategy === 'aggressive'
+                  ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 High Potential
               </button>
               <button
                 type="button"
                 onClick={() => setStrategy('conservative')}
-                className={`py-2 px-3 rounded-lg border text-center font-semibold transition ${
-                  strategy === 'conservative'
-                    ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`py-2 px-3 rounded-lg border text-center font-semibold transition ${strategy === 'conservative'
+                  ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 Eco / Low Input
               </button>

@@ -60,6 +60,8 @@ import {
 import { MapSearchBar } from '../common/MapSearchBar';
 import { MapLegend } from '../common/MapLegend';
 import { isWithinBrandenburg, type SearchResult } from '../../services/geocodingService';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 
 // Initial focus: Potsdam, Brandenburg
 const POTSDAM_CENTER: [number, number] = [52.415, 13.045];
@@ -138,6 +140,7 @@ function MapResizer() {
 }
 
 export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplorerViewProps) {
+  const { t } = useI18n();
   // Discovery mode: 'discover' (real DFBK fields) or 'draw' (custom farmer geometry)
   const [mode, setMode] = useState<'discover' | 'draw'>('discover');
 
@@ -817,7 +820,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                 mode === 'discover' ? 'bg-[#1fa35b] text-white shadow-sm' : 'text-[#888] hover:text-white'
               }`}
             >
-              <Globe2 size={13} /> Official DFBK Discovery
+              <Globe2 size={13} /> {t('fieldExplorer.title')}
             </button>
             <button
               onClick={() => {
@@ -828,7 +831,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                 mode === 'draw' ? 'bg-[#ff7a1a] text-white shadow-sm' : 'text-[#888] hover:text-white'
               }`}
             >
-              <Pencil size={13} /> Draw Custom Field
+              <Pencil size={13} /> {t('fieldExplorer.drawPolygon')}
             </button>
           </div>
 
@@ -839,7 +842,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
               savedFarms={userFarms}
               onSelectResult={handleSearchResult}
               darkSurface={true}
-              placeholder="Search Brandenburg municipalities, regions, or coordinates..."
+              placeholder={t('fieldExplorer.searchPlaceholder')}
               className="w-72"
             />
           )}
@@ -856,13 +859,13 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                     ? 'bg-[#1fa35b]/20 border-[#1fa35b] text-[#1fa35b] hover:bg-[#1fa35b]/30'
                     : 'bg-[#141414] hover:bg-[#222] border-[#333] text-white hover:border-[#444]'
                 }`}
-                title="Fetch your exact location to find agricultural fields near you"
+                title={t('fieldExplorerView.nearMeTooltip')}
               >
                 <LocateFixed
                   size={14}
                   className={locating ? 'animate-spin text-[#1fa35b]' : userLocation ? 'text-[#1fa35b]' : 'text-[#3b82f6]'}
                 />
-                <span>{locating ? 'Locating...' : userLocation ? 'Near Me (Active)' : 'Near Me'}</span>
+                <span>{locating ? t('fieldExplorerView.locating') : userLocation ? t('fieldExplorerView.nearMeActive') : t('fieldExplorerView.nearMe')}</span>
               </button>
 
               {userLocation && (
@@ -873,21 +876,21 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                     className="bg-[#141414] border border-[#333] rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-[#1fa35b]"
                     title="Search radius around your exact location"
                   >
-                    <option value={1000}>1 km radius</option>
-                    <option value={2000}>2 km radius</option>
-                    <option value={3000}>3 km radius</option>
-                    <option value={5000}>5 km radius</option>
-                    <option value={10000}>10 km radius</option>
-                    <option value={20000}>20 km radius</option>
+                    <option value={1000}>{t('fieldExplorerView.radiusKm', { km: 1 })}</option>
+                    <option value={2000}>{t('fieldExplorerView.radiusKm', { km: 2 })}</option>
+                    <option value={3000}>{t('fieldExplorerView.radiusKm', { km: 3 })}</option>
+                    <option value={5000}>{t('fieldExplorerView.radiusKm', { km: 5 })}</option>
+                    <option value={10000}>{t('fieldExplorerView.radiusKm', { km: 10 })}</option>
+                    <option value={20000}>{t('fieldExplorerView.radiusKm', { km: 20 })}</option>
                   </select>
                   <button
                     type="button"
                     onClick={() => {
                       setUserLocation(null);
-                      onNotify('Cleared location filter.');
+                      onNotify(t('fieldExplorerView.clearLocationFilter'));
                     }}
                     className="p-1.5 rounded-lg bg-[#222] hover:bg-[#333] text-[#888] hover:text-white transition"
-                    title="Clear location filter"
+                    title={t('fieldExplorerView.clearLocationFilter')}
                   >
                     <X size={13} />
                   </button>
@@ -899,7 +902,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
           {/* Quick jump pills */}
           {mode === 'discover' && (
             <div className="hidden xl:flex items-center gap-1.5 text-xs text-[#888]">
-              <span>Jump:</span>
+              <span>{t('fieldExplorerView.jump')}</span>
               {BRANDENBURG_REGIONS.map((r) => (
                 <button
                   key={r.name}
@@ -913,7 +916,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
           )}
         </div>
 
-        {/* Right: Category filter & Dashboard link */}
+        {/* Right: Category filter, Dashboard link & LanguageSwitcher */}
         <div className="flex items-center gap-2.5 shrink-0">
           {mode === 'discover' && (
             <div className="flex items-center gap-1.5">
@@ -923,12 +926,12 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="bg-[#141414] border border-[#333] rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#1fa35b] cursor-pointer"
               >
-                <option value="ALL">All Categories</option>
-                <option value="AL">Arable Land (AL)</option>
-                <option value="GL">Grassland (GL)</option>
-                <option value="DK">Permanent Crops (DK)</option>
-                <option value="AL-AF">Agroforestry (AL-AF)</option>
-                <option value="AL-APV">Agri-PV (AL-APV)</option>
+                <option value="ALL">{t('fieldExplorerView.allCategories')}</option>
+                <option value="AL">{t('fieldExplorerView.arableLandCat')}</option>
+                <option value="GL">{t('fieldExplorerView.grasslandCat')}</option>
+                <option value="DK">{t('fieldExplorerView.permanentCropsCat')}</option>
+                <option value="AL-AF">{t('fieldExplorerView.agroforestryCat')}</option>
+                <option value="AL-APV">{t('fieldExplorerView.agriPvCat')}</option>
               </select>
             </div>
           )}
@@ -937,7 +940,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
           {(isOutsideCoverage || hasScanned || predictions.length > 0) && (
             <div className="flex items-center gap-2 bg-[#141414] border border-[#a855f7]/40 rounded-lg px-2.5 py-1 text-xs">
               <Sliders size={12} className="text-[#c084fc]" />
-              <span className="text-[11px] text-[#aaa]">AI Threshold:</span>
+              <span className="text-[11px] text-[#aaa]">{t('fieldExplorerView.aiThreshold')}</span>
               <input
                 type="range"
                 min="0.10"
@@ -961,9 +964,11 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
               title="Return to Dashboard"
             >
               <LayoutDashboard size={13} className="text-[#1fa35b]" />
-              <span>Dashboard ({savedFields.length})</span>
+              <span>{t('fieldExplorerView.dashboardBtn', { count: savedFields.length })}</span>
             </button>
           )}
+
+          <LanguageSwitcher dark />
         </div>
       </div>
 
@@ -1521,7 +1526,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                       onClick={selectAllPredictions}
                       className="hover:text-white underline text-[11px]"
                     >
-                      Select all
+                      {t('fieldExplorerView.selectAll')}
                     </button>
                     <span>·</span>
                     <button
@@ -1529,11 +1534,11 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                       onClick={deselectAllPredictions}
                       className="hover:text-white underline text-[11px]"
                     >
-                      Deselect all
+                      {t('fieldExplorerView.deselectAll')}
                     </button>
                   </div>
                   <span className="text-[#888]">
-                    {selectedPredictionsArea.toFixed(1)} ha chosen
+                    {t('fieldExplorerView.chosenArea', { area: selectedPredictionsArea.toFixed(1) })}
                   </span>
                 </div>
 
@@ -1545,7 +1550,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                     className="w-full py-2.5 rounded-xl text-xs font-semibold bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center justify-center gap-2 shadow-[0_2px_12px_rgba(168,85,247,0.35)] transition disabled:opacity-40"
                   >
                     <Save size={14} />
-                    <span>Save Confirmed Fields ({selectedPredictionIds.size})</span>
+                    <span>{t('fieldExplorerView.saveConfirmedFields', { count: selectedPredictionIds.size })}</span>
                   </button>
 
                   <button
@@ -1555,7 +1560,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                     className="w-full py-2 rounded-xl text-xs font-medium bg-[#222] hover:bg-[#2c2c2c] text-[#ccc] hover:text-white flex items-center justify-center gap-1.5 transition"
                   >
                     <RefreshCw size={12} className={isScanning ? 'animate-spin' : ''} />
-                    <span>Re-scan Area</span>
+                    <span>{t('fieldExplorerView.reScanArea')}</span>
                   </button>
                 </div>
               </>
@@ -1567,7 +1572,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                   className="w-full py-2 rounded-xl text-xs font-semibold bg-[#a855f7]/20 hover:bg-[#a855f7]/30 text-[#c084fc] border border-[#a855f7]/40 flex items-center justify-center gap-1.5 transition"
                 >
                   <Sliders size={13} />
-                  <span>Lower Threshold to 20%</span>
+                  <span>{t('fieldExplorerView.lowerThreshold')}</span>
                 </button>
 
                 <button
@@ -1577,7 +1582,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                   className="w-full py-2 rounded-xl text-xs font-medium bg-[#222] hover:bg-[#2c2c2c] text-[#ccc] hover:text-white flex items-center justify-center gap-1.5 transition"
                 >
                   <RefreshCw size={12} className={isScanning ? 'animate-spin' : ''} />
-                  <span>Re-scan Area</span>
+                  <span>{t('fieldExplorerView.reScanArea')}</span>
                 </button>
               </div>
             )}
@@ -1594,8 +1599,8 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
             <Sparkles size={14} />
             <span>
               {filteredPredictions.length > 0
-                ? `Show AI Detections (${filteredPredictions.length})`
-                : `AI Threshold (${(confidenceFilter * 100).toFixed(0)}%)`}
+                ? t('fieldExplorerView.showAiDetections', { count: filteredPredictions.length })
+                : `${t('fieldExplorerView.aiThreshold')} ${(confidenceFilter * 100).toFixed(0)}%`}
             </span>
           </button>
         )}
@@ -1606,7 +1611,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
             <div className="flex items-start justify-between border-b border-[#2e2638] pb-3 mb-3">
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#c084fc] tracking-wider flex items-center gap-1">
-                  <Sparkles size={12} /> AI Detected Boundary
+                  <Sparkles size={12} /> {t('fieldExplorerView.aiDetectedBoundary')}
                 </span>
                 <h3 className="text-sm font-bold text-white mt-0.5">
                   {activePrediction.properties.name}
@@ -1624,13 +1629,13 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
             <div className="space-y-2.5 mb-4">
               <div className="grid grid-cols-2 gap-2 text-center">
                 <div className="bg-[#241e2c] p-2 rounded-lg border border-[#3b2e47]">
-                  <div className="text-[10px] text-[#aaa]">Predicted Area</div>
+                  <div className="text-[10px] text-[#aaa]">{t('fieldExplorerView.predictedArea')}</div>
                   <div className="text-sm font-bold text-white">
                     {activePrediction.properties.area_hectares.toFixed(2)} ha
                   </div>
                 </div>
                 <div className="bg-[#241e2c] p-2 rounded-lg border border-[#3b2e47]">
-                  <div className="text-[10px] text-[#aaa]">Confidence</div>
+                  <div className="text-[10px] text-[#aaa]">{t('fieldExplorerView.confidence')}</div>
                   <div className="text-sm font-bold text-[#10b981]">
                     {(activePrediction.properties.confidence * 100).toFixed(1)}%
                   </div>
@@ -1639,19 +1644,19 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
 
               <div className="text-[11px] text-[#aaa] space-y-1 bg-[#241e2c] p-2.5 rounded-lg border border-[#3b2e47]">
                 <div className="flex justify-between">
-                  <span>Sensor:</span>
+                  <span>{t('fieldExplorerView.sensor')}</span>
                   <span className="text-white">{activePrediction.properties.sensor}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Imagery Date:</span>
+                  <span>{t('fieldExplorerView.imageryDate')}</span>
                   <span className="text-white">{activePrediction.properties.imagery_date}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Model:</span>
+                  <span>{t('fieldExplorerView.model')}</span>
                   <span className="text-white">{activePrediction.properties.model_version}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Region:</span>
+                  <span>{t('fieldExplorerView.region')}</span>
                   <span className="text-[#c084fc] font-semibold">{activePrediction.properties.geographic_region}</span>
                 </div>
               </div>
@@ -1663,7 +1668,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                 onClick={() => openSaveSinglePrediction(activePrediction)}
                 className="w-full py-2.5 rounded-xl text-xs font-semibold bg-[#1fa35b] text-white hover:bg-[#188a4c] flex items-center justify-center gap-1.5 shadow-md transition"
               >
-                <Save size={14} /> Save to My Farm
+                <Save size={14} /> {t('fieldExplorerView.saveToMyFarm')}
               </button>
 
               <button
@@ -1677,11 +1682,11 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
               >
                 {selectedPredictionIds.has(activePrediction.properties.id) ? (
                   <>
-                    <X size={13} /> Remove from Multi-Select
+                    <X size={13} /> {t('fieldExplorerView.removeFromMultiSelect')}
                   </>
                 ) : (
                   <>
-                    <Check size={13} /> Select for Batch Save
+                    <Check size={13} /> {t('fieldExplorerView.selectForBatchSave')}
                   </>
                 )}
               </button>
@@ -1691,7 +1696,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
 
         {/* Data Source & Legal Attribution pill */}
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-[400] text-[10px] text-[#888] bg-black/60 px-3 py-1 rounded-full pointer-events-none">
-          Data: © MLEUV, dl-de/by-2-0 · Digitales Feldblockkataster Brandenburg · EPSG:25833
+          {t('fieldExplorerView.dataSourceAttribution')}
         </div>
       </div>
 
@@ -1703,17 +1708,17 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
               <div>
                 <h3 className="text-base font-bold text-white">
                   {modalMode === 'single'
-                    ? 'Save Field to My Farm'
+                    ? t('fieldExplorerView.saveFieldModalTitleSingle')
                     : modalMode === 'multi'
-                      ? `Import ${selectedIds.size} Fields to Farm`
+                      ? t('fieldExplorerView.saveFieldModalTitleMulti', { count: selectedIds.size })
                       : modalMode === 'ai_single'
-                        ? 'Save AI-Detected Field'
+                        ? t('fieldExplorerView.saveFieldModalTitleAiSingle')
                         : modalMode === 'ai_multi'
-                          ? `Save ${selectedPredictionIds.size} AI-Detected Fields`
-                          : 'Save Custom Field'}
+                          ? t('fieldExplorerView.saveFieldModalTitleAiMulti', { count: selectedPredictionIds.size })
+                          : t('fieldExplorerView.saveFieldModalTitleCustom')}
                 </h3>
                 <p className="text-xs text-[#aaa] mt-0.5">
-                  Records this boundary in your persistent farm database.
+                  {t('fieldExplorerView.saveFieldModalSubtitle')}
                 </p>
               </div>
               <button
@@ -1728,13 +1733,13 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
               {/* Field Name (required) */}
               <div>
                 <label className="block text-xs font-semibold text-[#ddd] mb-1.5">
-                  Field Name <span className="text-red-400">*</span>
+                  {t('fieldExplorerView.fieldNameLabel')} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={saveFieldName}
                   onChange={(e) => setSaveFieldName(e.target.value)}
-                  placeholder="e.g. Field 1, North Pasture"
+                  placeholder={t('fieldExplorerView.fieldNamePlaceholder')}
                   className="w-full bg-[#1a1a1a] border border-[#3a3a3a] rounded-lg px-3 py-2 text-xs text-white placeholder-[#666] focus:outline-none focus:border-[#1fa35b]"
                   autoFocus
                 />
@@ -1744,7 +1749,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-semibold text-[#ddd]">
-                    Farm Assignment <span className="text-red-400">*</span>
+                    {t('fieldExplorerView.farmAssignmentLabel')} <span className="text-red-400">*</span>
                   </label>
                   {userFarms.length > 0 && (
                     <button
@@ -1752,7 +1757,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                       onClick={() => setIsCreatingNewFarm(!isCreatingNewFarm)}
                       className="text-[11px] text-[#1fa35b] font-medium hover:underline"
                     >
-                      {isCreatingNewFarm ? 'Use Existing Farm' : '+ Create New Farm'}
+                      {isCreatingNewFarm ? t('fieldExplorerView.useExistingFarm') : t('fieldExplorerView.createNewFarm')}
                     </button>
                   )}
                 </div>
@@ -1775,31 +1780,31 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                         {farm.name} ({farm.location})
                       </option>
                     ))}
-                    <option value="__NEW__">+ Create New Farm...</option>
+                    <option value="__NEW__">{t('fieldExplorerView.createNewFarmOption')}</option>
                   </select>
                 ) : (
                   <div className="space-y-2 p-3 bg-[#1c1c1c] rounded-xl border border-[#333]">
                     <div>
                       <span className="text-[11px] font-medium text-[#bbb] block mb-1">
-                        New Farm Name <span className="text-red-400">*</span>
+                        {t('fieldExplorerView.newFarmNameLabel')} <span className="text-red-400">*</span>
                       </span>
                       <input
                         type="text"
                         value={newFarmName}
                         onChange={(e) => setNewFarmName(e.target.value)}
-                        placeholder="e.g. Test Farm"
+                        placeholder={t('fieldExplorerView.newFarmPlaceholder')}
                         className="w-full bg-[#121212] border border-[#3a3a3a] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#1fa35b]"
                       />
                     </div>
                     <div>
                       <span className="text-[11px] font-medium text-[#bbb] block mb-1">
-                        Location
+                        {t('fieldExplorerView.locationLabel')}
                       </span>
                       <input
                         type="text"
                         value={newFarmLocation}
                         onChange={(e) => setNewFarmLocation(e.target.value)}
-                        placeholder="e.g. Potsdam, Brandenburg"
+                        placeholder={t('fieldExplorerView.locationPlaceholder')}
                         className="w-full bg-[#121212] border border-[#3a3a3a] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#1fa35b]"
                       />
                     </div>
@@ -1864,7 +1869,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                 onClick={() => setShowSaveModal(false)}
                 className="px-4 py-2 rounded-lg bg-[#333] hover:bg-[#444] text-xs font-medium text-[#ccc]"
               >
-                Cancel
+                {t('fieldExplorerView.cancelBtn')}
               </button>
               <button
                 type="button"
@@ -1873,7 +1878,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
                 className="px-5 py-2 rounded-lg bg-[#1fa35b] hover:bg-[#188a4c] font-semibold text-xs text-white flex items-center gap-1.5 disabled:opacity-50 shadow-md"
               >
                 {saving && <RefreshCw size={13} className="animate-spin" />}
-                {saving ? 'Saving...' : 'Confirm & Save to Farm'}
+                {saving ? t('fieldExplorerView.savingBtn') : t('fieldExplorerView.saveBtn')}
               </button>
             </div>
           </div>

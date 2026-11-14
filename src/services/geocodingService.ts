@@ -310,3 +310,54 @@ export async function executeUnifiedSearch(
   }
 }
 
+/**
+ * Reverse-geocodes latitude & longitude into a human-readable city/region name.
+ * Uses Nominatim with fallback to the local Brandenburg catalog.
+ */
+export async function reverseGeocodeLocation(lat: number, lon: number): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=12&addressdetails=1`,
+      { headers: { 'Accept-Language': 'en,de' } }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const addr = data.address || {};
+      const locality =
+        addr.city ||
+        addr.town ||
+        addr.village ||
+        addr.municipality ||
+        addr.suburb ||
+        addr.county ||
+        addr.hamlet;
+      const stateOrCountry = addr.state || addr.country;
+      if (locality && stateOrCountry) {
+        return `${locality}, ${stateOrCountry}`;
+      }
+      if (locality) return locality;
+      if (data.display_name) {
+        return data.display_name.split(',').slice(0, 2).join(',').trim();
+      }
+    }
+  } catch {
+    // Ignore and fallback
+  }
+
+  // Fallback: Find closest known region in catalog
+  let closestName = '';
+  let minDistance = Infinity;
+  for (const loc of BRANDENBURG_LOCATIONS) {
+    const d = Math.hypot(loc.lat - lat, loc.lon - lon);
+    if (d < minDistance) {
+      minDistance = d;
+      closestName = `${loc.name}, Brandenburg`;
+    }
+  }
+  if (minDistance < 0.8) {
+    return closestName;
+  }
+
+  return `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`;
+}
+

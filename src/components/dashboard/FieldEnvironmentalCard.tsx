@@ -19,6 +19,7 @@ import {
   type FieldEnvironmentalResponse,
   type DatasetType,
 } from '../../services/environmentApi';
+import { useI18n } from '../../i18n';
 
 interface FieldEnvironmentalCardProps {
   fieldId: string;
@@ -33,6 +34,7 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
   fieldAreaHa,
   notify,
 }) => {
+  const { t } = useI18n();
   const [data, setData] = useState<FieldEnvironmentalResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [extracting, setExtracting] = useState<boolean>(false);
@@ -80,7 +82,7 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
     setError(null);
     try {
       if (notify) {
-        notify(refresh ? 'Refreshing NASA Earth observations...' : 'Fetching NASA satellite data (SMAP, GPM, MODIS)...');
+        notify(refresh ? t('environmentalCard.refreshNotify') : t('environmentalCard.fetchNotify'));
       }
       const dates = getDateWindow();
       const res = await environmentApi.extractEnvironmental(fieldId, {
@@ -91,13 +93,13 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
       });
       setData(res);
       if (notify) {
-        notify('NASA Earth observation data successfully updated.');
+        notify(t('environmentalCard.successNotify'));
       }
     } catch (err: any) {
       console.error('NASA extraction failed:', err);
       setError(err?.message || 'Failed to extract NASA data');
       if (notify) {
-        notify('NASA data extraction failed. Please try again.');
+        notify(t('environmentalCard.errorNotify'));
       }
     } finally {
       setExtracting(false);
@@ -108,7 +110,7 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
     return (
       <div className="bg-[#fcfcfc] border border-[#e8e8e8] rounded-xl p-4 text-center my-3">
         <div className="w-5 h-5 border-2 border-[#1fa35b] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-        <p className="text-xs text-[#888]">Loading NASA environmental observations...</p>
+        <p className="text-xs text-[#888]">{t('environmentalCard.loading')}</p>
       </div>
     );
   }
@@ -126,10 +128,9 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
         <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-2.5">
           <Satellite size={20} />
         </div>
-        <h4 className="text-xs font-bold text-[#1f2937] mb-1">NASA Environmental Data</h4>
+        <h4 className="text-xs font-bold text-[#1f2937] mb-1">{t('environmentalCard.emptyTitle')}</h4>
         <p className="text-[11px] text-[#6b7280] leading-relaxed mb-3">
-          Retrieve real satellite Earth observations for this field:
-          NASA SMAP (soil moisture), NASA GPM IMERG (precipitation), and NASA MODIS (NDVI/EVI vegetation).
+          {t('environmentalCard.emptyDesc')}
         </p>
         <button
           onClick={() => handleExtract(false)}
@@ -139,12 +140,12 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
           {extracting ? (
             <>
               <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Fetching NASA Satellites...</span>
+              <span>{t('environmentalCard.fetchingBtn')}</span>
             </>
           ) : (
             <>
               <Satellite size={14} />
-              <span>Fetch NASA Environmental Data</span>
+              <span>{t('environmentalCard.fetchBtn')}</span>
             </>
           )}
         </button>
@@ -162,7 +163,7 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
       <div className="flex items-center justify-between border-b border-[#f0f0f0] pb-2.5">
         <div className="flex items-center gap-1.5">
           <Satellite size={16} className="text-[#3b82f6]" />
-          <h4 className="text-xs font-bold text-[#1f2937]">NASA Earth Observations</h4>
+          <h4 className="text-xs font-bold text-[#1f2937]">{t('environmentalCard.title')}</h4>
         </div>
         <div className="flex items-center gap-1.5">
           {/* Date range picker */}
@@ -171,15 +172,15 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
             onChange={(e) => setDateRange(e.target.value as any)}
             className="text-[10px] bg-[#f3f4f6] border border-[#e5e7eb] text-[#4b5563] px-1.5 py-0.5 rounded font-medium focus:outline-none"
           >
-            <option value="30">30 Days</option>
-            <option value="90">90 Days</option>
-            <option value="180">6 Months</option>
+            <option value="30">{t('environmentalCard.days30')}</option>
+            <option value="90">{t('environmentalCard.days90')}</option>
+            <option value="180">{t('environmentalCard.months6')}</option>
           </select>
           <button
             onClick={() => handleExtract(true)}
             disabled={extracting}
             className="p-1 rounded-md hover:bg-[#f3f4f6] text-[#6b7280] hover:text-[#111] transition"
-            title="Refresh satellite data"
+            title={t('environmentalCard.refreshTooltip')}
           >
             <RefreshCw size={13} className={extracting ? 'animate-spin text-[#1fa35b]' : ''} />
           </button>
@@ -190,33 +191,30 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
       <div className="grid grid-cols-3 gap-1 bg-[#f3f4f6] p-1 rounded-lg text-xs font-semibold">
         <button
           onClick={() => setSelectedDataset('smap')}
-          className={`py-1.5 px-2 rounded-md flex items-center justify-center gap-1 transition ${
-            selectedDataset === 'smap'
-              ? 'bg-white text-[#1f2937] shadow-xs'
-              : 'text-[#6b7280] hover:text-[#111]'
-          }`}
+          className={`py-1.5 px-2 rounded-md flex items-center justify-center gap-1 transition ${selectedDataset === 'smap'
+            ? 'bg-white text-[#1f2937] shadow-xs'
+            : 'text-[#6b7280] hover:text-[#111]'
+            }`}
         >
           <Droplets size={13} className="text-[#0284c7]" />
           <span>SMAP</span>
         </button>
         <button
           onClick={() => setSelectedDataset('gpm')}
-          className={`py-1.5 px-2 rounded-md flex items-center justify-center gap-1 transition ${
-            selectedDataset === 'gpm'
-              ? 'bg-white text-[#1f2937] shadow-xs'
-              : 'text-[#6b7280] hover:text-[#111]'
-          }`}
+          className={`py-1.5 px-2 rounded-md flex items-center justify-center gap-1 transition ${selectedDataset === 'gpm'
+            ? 'bg-white text-[#1f2937] shadow-xs'
+            : 'text-[#6b7280] hover:text-[#111]'
+            }`}
         >
           <CloudRain size={13} className="text-[#2563eb]" />
           <span>GPM</span>
         </button>
         <button
           onClick={() => setSelectedDataset('modis')}
-          className={`py-1.5 px-2 rounded-md flex items-center justify-center gap-1 transition ${
-            selectedDataset === 'modis'
-              ? 'bg-white text-[#1f2937] shadow-xs'
-              : 'text-[#6b7280] hover:text-[#111]'
-          }`}
+          className={`py-1.5 px-2 rounded-md flex items-center justify-center gap-1 transition ${selectedDataset === 'modis'
+            ? 'bg-white text-[#1f2937] shadow-xs'
+            : 'text-[#6b7280] hover:text-[#111]'
+            }`}
         >
           <Sprout size={13} className="text-[#1fa35b]" />
           <span>MODIS</span>
@@ -365,9 +363,8 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
                   return (
                     <div
                       key={idx}
-                      className={`flex-1 rounded-xs transition ${
-                        isHeavy ? 'bg-[#f59e0b]' : o.mean_value > 0 ? 'bg-[#2563eb]' : 'bg-[#e5e7eb]'
-                      }`}
+                      className={`flex-1 rounded-xs transition ${isHeavy ? 'bg-[#f59e0b]' : o.mean_value > 0 ? 'bg-[#2563eb]' : 'bg-[#e5e7eb]'
+                        }`}
                       style={{ height: `${heightPct}%` }}
                       title={`${o.observation_date}: ${o.mean_value} mm`}
                     />
@@ -431,8 +428,8 @@ export const FieldEnvironmentalCard: React.FC<FieldEnvironmentalCardProps> = ({
                 {modis.latest_ndvi && modis.latest_ndvi > 0.6
                   ? 'Dense active canopy'
                   : modis.latest_ndvi && modis.latest_ndvi > 0.35
-                  ? 'Moderate vegetative cover'
-                  : 'Low vegetative cover / bare'}
+                    ? 'Moderate vegetative cover'
+                    : 'Low vegetative cover / bare'}
               </span>
             </div>
 

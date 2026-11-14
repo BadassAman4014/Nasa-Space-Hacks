@@ -18,6 +18,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from shapely.geometry import shape
 
 from app.services.field_segmentation.inference import FieldInferenceEngine
 from app.services.field_segmentation.satellite_service import Sentinel2AcquisitionService
@@ -41,7 +42,6 @@ def main():
 
     print("[3/4] Running inference & extracting field polygons...")
     proba = engine.run_inference_on_raster(s2_data, tile_size=256, overlap=32)
-    # proba: (3, 256, 256) -> [background, interior, boundary]
     detected_features = engine.detect_fields(
         image_4band=s2_data,
         bbox=BBOX,
@@ -51,7 +51,9 @@ def main():
     print(f"      Detected {len(detected_features)} agricultural field polygons.")
 
     print("[4/4] Rasterizing official DFBK cadastral ground truth...")
-    dfbk_geoms = boundary_provider.get_raw_parcels_in_bbox(BBOX)
+    w, s, e, n = BBOX
+    dfbk_resp = boundary_provider.dfbk.get_boundaries_in_viewport(w, s, e, n)
+    dfbk_geoms = [shape(f["geometry"]) for f in dfbk_resp["features"] if f.get("geometry")]
     print(f"      Retrieved {len(dfbk_geoms)} official DFBK cadastral ground truth parcels.")
     ground_truth_mask = rasterize_dfbk_polygons(dfbk_geoms, BBOX, (256, 256))
 
@@ -110,12 +112,12 @@ def main():
     # Overlay ground truth boundaries in white dashed line
     axes[1, 2].contour(ground_truth_mask == 2, levels=[0.5], colors="cyan", linewidths=1.2, linestyles="dashed")
     # Overlay detected interior
-    axes[1, 2].contour(interior_prob > 0.45, levels=[0.5], colors="lime", linewidths=1.6)
+    axes[1, 2].contour(interior_prob > 0.35, levels=[0.5], colors="lime", linewidths=1.6)
     axes[1, 2].set_title(f"(6) Detected AI Polygons ({len(detected_features)}) vs Ground Truth", fontsize=12, fontweight="bold")
     axes[1, 2].axis("off")
 
     # Add legend
-    cyan_line = mpatches.Patch(color="cyan", label="Official DFBK Cadastre (Ground Truth)")
+    cyan_line = mpatches.Patch(color="cyan", label=f"Official DFBK Cadastre ({len(dfbk_geoms)} parcels)")
     lime_line = mpatches.Patch(color="lime", label=f"FTW-PRUE+ AI Detections ({len(detected_features)} fields)")
     axes[1, 2].legend(handles=[cyan_line, lime_line], loc="lower right", fontsize=9, framealpha=0.9)
 

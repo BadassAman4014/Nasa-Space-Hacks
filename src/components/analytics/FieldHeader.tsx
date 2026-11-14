@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { FieldStatusSummary } from '../../services/fieldAnalyticsApi';
 import { SavedField } from '../../services/boundariesApi';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 
 export type WorkspaceTab = 'status' | 'report' | 'prescription' | 'data' | 'yield';
 
@@ -49,6 +51,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
   fields = [],
   onSelectField,
 }) => {
+  const { t, formatHectares } = useI18n();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [fieldDropdownOpen, setFieldDropdownOpen] = useState(false);
   const fieldDropdownRef = useRef<HTMLDivElement>(null);
@@ -171,9 +174,9 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-gray-500 mt-0.5 font-medium">
-            <span className="font-bold text-gray-800">{summary.area_ha.toFixed(2)} ha</span>
+            <span className="font-bold text-gray-800">{formatHectares(summary.area_ha)}</span>
             <span>•</span>
-            <span className="text-gray-700">{summary.current_crop || 'No crop assigned'}</span>
+            <span className="text-gray-700">{summary.current_crop || t('analytics.noCropAssigned')}</span>
             <span>•</span>
             <span className="flex items-center gap-1 text-gray-500">
               <Layers size={12} /> {summary.farm_name}
@@ -198,7 +201,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Status
+          {t('analytics.statusTab')}
         </button>
 
         {/* Tab 2: Field Report */}
@@ -212,7 +215,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
           }`}
         >
           <Sparkles size={12} className="text-emerald-600" />
-          Field report
+          {t('analytics.reportTab')}
         </button>
 
         {/* Tab 3: Prescription Maps */}
@@ -225,7 +228,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Prescription maps
+          {t('analytics.prescriptionTab')}
         </button>
 
         {/* Tab 4: Data +23 */}
@@ -238,7 +241,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          <span>Data</span>
+          <span>{t('analytics.dataTab')}</span>
           <span className="px-1.5 py-0.2 rounded-md bg-blue-100 text-blue-800 text-[10px] font-extrabold">
             +23
           </span>
@@ -254,12 +257,13 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Yield Analysis
+          {t('analytics.yieldTab')}
         </button>
       </div>
 
       {/* Right: Quick Action Buttons (OneSoil Yield Style) */}
       <div className="flex items-center gap-1.5 flex-shrink-0 relative">
+        <LanguageSwitcher variant="pill" className="mr-1" />
         {/* Prescription map action */}
         <button
           onClick={() => setActiveTab('prescription')}

@@ -18,6 +18,8 @@ import { FormattedAssistantMessage } from './FormattedAssistantMessage';
 import { VoiceInputBar } from './VoiceInputBar';
 import { ConversationHistoryDrawer } from './ConversationHistoryDrawer';
 import { aiAssistantApi } from './aiAssistantApi';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import type {
   FieldOption,
   FieldCategory,
@@ -40,6 +42,7 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
   navigate,
   initialFieldId,
 }) => {
+  const { t, language, formatHectares } = useI18n();
   // State for workflow and selection
   const [step, setStep] = useState<WorkflowStep>('select-field');
   const [fields, setFields] = useState<FieldOption[]>([]);
@@ -170,13 +173,13 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
     setStep('ready');
 
     // Create grounding welcome message tailored to field and category
-    const fieldName = selectedField?.name || 'Farm 1';
+    const fieldName = selectedField?.name || (language === 'de' ? 'Schlag 1' : 'Farm 1');
     const areaHa = selectedField?.area_ha || 18.74;
-    const sd = fieldContext?.structured_data;
+    const sd = (fieldContext as any)?.structured_data;
     const soil = fieldContext?.soilgrids || (sd ? {
       ph_h2o: sd.ph || 6.42,
       soc_g_kg: sd.organic_carbon_pct ? Number((sd.organic_carbon_pct * 10).toFixed(1)) : 19.4,
-      texture_class: sd.texture || 'Sandy Loam',
+      texture_class: sd.texture || (language === 'de' ? 'Sandiger Lehm' : 'Sandy Loam'),
       total_nitrogen_g_kg: sd.total_nitrogen_g_kg || 3.23,
       c_n_ratio: 6.0,
       sand_percent: sd.sand_pct || 75.5,
@@ -188,46 +191,94 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
       depth: '0-30cm',
     } : null);
 
+    const isDe = language === 'de';
     let initialSummary = '';
     if (selectedCategory === 'fertilizer') {
-      initialSummary =
-        `### Verified Field & Soil Intelligence: ${fieldName}\n\n` +
-        `I have retrieved the ground-truth soil profile and spatial boundaries for **${fieldName}** (${areaHa} ha, ${selectedField?.farm_name || 'Cottbus Farm'}).\n\n` +
-        `| Parameter | Value | Agronomic Classification |\n` +
-        `|---|---|---|\n` +
-        `| **Topsoil pH** | \`${soil?.ph_h2o || 6.42}\` | Optimal for cereals & brassicas |\n` +
-        `| **Soil Organic Carbon (SOC)** | \`${soil?.soc_g_kg || 19.4} g/kg\` | ~1.94% humus, baseline N reserve |\n` +
-        `| **Soil Texture Class** | \`${soil?.texture_class || 'Sandy Loam'}\` | 75.5% Sand, 16.6% Silt, 7.8% Clay |\n` +
-        `| **Total Nitrogen (N)** | \`${soil?.total_nitrogen_g_kg || 3.23} g/kg\` | Steady-state mineralizable N |\n` +
-        `| **C:N Ratio** | \`${soil?.c_n_ratio || 6.0}\` | Rapid organic turnover |\n\n` +
-        `Under **German DüV (Düngeverordnung)** regulations, organic nitrogen is capped at **170 kg N/ha/year** with mandatory split applications on light sandy loam.\n\n` +
-        `What crop or fertilization scenario would you like to plan?`;
+      if (isDe) {
+        initialSummary =
+          `### Verifizierte Boden- & Dünge-Intelligenz: ${fieldName}\n\n` +
+          `Ich habe das Bodenprofil und die Raumdaten für **${fieldName}** (${areaHa} ha, ${selectedField?.farm_name || 'Betrieb Cottbus'}) abgerufen.\n\n` +
+          `| Parameter | Messwert | Agronomische Einstufung |\n` +
+          `|---|---|---|\n` +
+          `| **Oberboden pH** | \`${soil?.ph_h2o || 6.42}\` | Optimal für Getreide & Raps |\n` +
+          `| **Humusgehalt (SOC)** | \`${soil?.soc_g_kg || 19.4} g/kg\` | ~1,94% Humus, stetiges N-Nachlieferpotenzial |\n` +
+          `| **Bodenart** | \`${soil?.texture_class || 'Sandiger Lehm'}\` | 75,5% Sand, 16,6% Schluff, 7,8% Ton |\n` +
+          `| **Gesamtstickstoff (N)** | \`${soil?.total_nitrogen_g_kg || 3.23} g/kg\` | Organisch gebundener Stickstoffvorrat |\n` +
+          `| **C:N-Verhältnis** | \`${soil?.c_n_ratio || 6.0}\` | Zügige Nährstoffmineralisation |\n\n` +
+          `Gemäß **deutscher Düngeverordnung (DüV)** liegt die Obergrenze für organischen Stickstoff bei **170 kg N/ha/Jahr** mit vorgeschriebenen Teilgaben auf leichten Sandböden.\n\n` +
+          `Welche Fruchtart oder welches Düngeszenario möchten Sie planen?`;
+      } else {
+        initialSummary =
+          `### Verified Field & Soil Intelligence: ${fieldName}\n\n` +
+          `I have retrieved the ground-truth soil profile and spatial boundaries for **${fieldName}** (${areaHa} ha, ${selectedField?.farm_name || 'Cottbus Farm'}).\n\n` +
+          `| Parameter | Value | Agronomic Classification |\n` +
+          `|---|---|---|\n` +
+          `| **Topsoil pH** | \`${soil?.ph_h2o || 6.42}\` | Optimal for cereals & brassicas |\n` +
+          `| **Soil Organic Carbon (SOC)** | \`${soil?.soc_g_kg || 19.4} g/kg\` | ~1.94% humus, baseline N reserve |\n` +
+          `| **Soil Texture Class** | \`${soil?.texture_class || 'Sandy Loam'}\` | 75.5% Sand, 16.6% Silt, 7.8% Clay |\n` +
+          `| **Total Nitrogen (N)** | \`${soil?.total_nitrogen_g_kg || 3.23} g/kg\` | Steady-state mineralizable N |\n` +
+          `| **C:N Ratio** | \`${soil?.c_n_ratio || 6.0}\` | Rapid organic turnover |\n\n` +
+          `Under **German DüV (Düngeverordnung)** regulations, organic nitrogen is capped at **170 kg N/ha/year** with mandatory split applications on light sandy loam.\n\n` +
+          `What crop or fertilization scenario would you like to plan?`;
+      }
     } else if (selectedCategory === 'soil') {
-      initialSummary =
-        `### ISRIC SoilGrids v2.0 Profile for ${fieldName}\n\n` +
-        `Here is the verified soil profile extracted from ISRIC SoilGrids 250m resolution:\n\n` +
-        `- **Soil Texture:** \`${soil?.texture_class || 'Sandy Loam'}\` (Sand: ${soil?.sand_percent || 75.5}%, Silt: ${soil?.silt_percent || 16.6}%, Clay: ${soil?.clay_percent || 7.8}%)\n` +
-        `- **Reaction (pH in H₂O):** \`${soil?.ph_h2o || 6.42}\` (Slightly acidic to neutral; nutrient availability is unrestricted)\n` +
-        `- **Bulk Density:** \`${soil?.bulk_density_g_cm3 || 1.46} g/cm³\` (Good root penetration, low compaction)\n` +
-        `- **Cation Exchange Capacity (CEC):** \`${soil?.cec_mmol_kg || 240.1} mmol(c)/kg\` (Moderate nutrient buffer capacity)\n` +
-        `- **Organic Carbon:** \`${soil?.soc_g_kg || 19.4} g/kg\`\n\n` +
-        `How can I assist you with your soil management, liming, or organic matter enhancement?`;
+      if (isDe) {
+        initialSummary =
+          `### ISRIC SoilGrids v2.0 Bodenprofil für ${fieldName}\n\n` +
+          `Hier ist das verifizierte Bodenprofil aus ISRIC SoilGrids (250m Auflösung):\n\n` +
+          `- **Bodenart:** \`${soil?.texture_class || 'Sandiger Lehm'}\` (Sand: ${soil?.sand_percent || 75.5}%, Schluff: ${soil?.silt_percent || 16.6}%, Ton: ${soil?.clay_percent || 7.8}%)\n` +
+          `- **Bodenreaktion (pH in H₂O):** \`${soil?.ph_h2o || 6.42}\` (Schwach sauer bis neutral; uneingeschränkte Nährstoffverfügbarkeit)\n` +
+          `- **Lagerungsdichte:** \`${soil?.bulk_density_g_cm3 || 1.46} g/cm³\` (Gute Durchwurzelbarkeit, geringe Verdichtungsneigung)\n` +
+          `- **Kationenaustauschkapazität (KAK):** \`${soil?.cec_mmol_kg || 240.1} mmol(c)/kg\` (Mittlere Nährstoffpufferung)\n` +
+          `- **Organischer Kohlenstoff (SOC):** \`${soil?.soc_g_kg || 19.4} g/kg\`\n\n` +
+          `Wie kann ich Sie bei Bodenverbesserung, Kalkung oder Humusaufbau unterstützen?`;
+      } else {
+        initialSummary =
+          `### ISRIC SoilGrids v2.0 Profile for ${fieldName}\n\n` +
+          `Here is the verified soil profile extracted from ISRIC SoilGrids 250m resolution:\n\n` +
+          `- **Soil Texture:** \`${soil?.texture_class || 'Sandy Loam'}\` (Sand: ${soil?.sand_percent || 75.5}%, Silt: ${soil?.silt_percent || 16.6}%, Clay: ${soil?.clay_percent || 7.8}%)\n` +
+          `- **Reaction (pH in H₂O):** \`${soil?.ph_h2o || 6.42}\` (Slightly acidic to neutral; nutrient availability is unrestricted)\n` +
+          `- **Bulk Density:** \`${soil?.bulk_density_g_cm3 || 1.46} g/cm³\` (Good root penetration, low compaction)\n` +
+          `- **Cation Exchange Capacity (CEC):** \`${soil?.cec_mmol_kg || 240.1} mmol(c)/kg\` (Moderate nutrient buffer capacity)\n` +
+          `- **Organic Carbon:** \`${soil?.soc_g_kg || 19.4} g/kg\`\n\n` +
+          `How can I assist you with your soil management, liming, or organic matter enhancement?`;
+      }
     } else if (selectedCategory === 'field') {
-      initialSummary =
-        `### Field Boundary & Satellite Overview: ${fieldName}\n\n` +
-        `Intelligence summary for **${fieldName}**:\n\n` +
-        `- **Total Registered Area:** \`${areaHa} hectares\`\n` +
-        `- **Location:** ${selectedField?.farm_name || 'Cottbus Farm'}, Potsdam-Mittelmark, Brandenburg\n` +
-        `- **Latest Sentinel-2 NDVI:** \`0.51\` (Moderate-high canopy density, +164.8% delta vs previous)\n` +
-        `- **Official Land Register:** DFBK Verified Polygon\n\n` +
-        `Ask me anything about parcel zoning, satellite observations, or elevation and drainage patterns!`;
+      if (isDe) {
+        initialSummary =
+          `### Schlagkontur & Satellitenübersicht: ${fieldName}\n\n` +
+          `Zusammenfassung für **${fieldName}**:\n\n` +
+          `- **Registrierte Betriebsfläche:** \`${areaHa} Hektar\`\n` +
+          `- **Standort:** ${selectedField?.farm_name || 'Betrieb Cottbus'}, Potsdam-Mittelmark, Brandenburg\n` +
+          `- **Aktueller Sentinel-2 NDVI:** \`0.51\` (Gute Bestandesdichte, vitale Blattmasse)\n` +
+          `- **Offizieller Katasterabgleich:** DFBK-verifiziertes Feldpolygon\n\n` +
+          `Fragen Sie mich nach Zonenaufteilung, Satellitenpassagen oder Geländerelief und Entwässerung!`;
+      } else {
+        initialSummary =
+          `### Field Boundary & Satellite Overview: ${fieldName}\n\n` +
+          `Intelligence summary for **${fieldName}**:\n\n` +
+          `- **Total Registered Area:** \`${areaHa} hectares\`\n` +
+          `- **Location:** ${selectedField?.farm_name || 'Cottbus Farm'}, Potsdam-Mittelmark, Brandenburg\n` +
+          `- **Latest Sentinel-2 NDVI:** \`0.51\` (Moderate-high canopy density, +164.8% delta vs previous)\n` +
+          `- **Official Land Register:** DFBK Verified Polygon\n\n` +
+          `Ask me anything about parcel zoning, satellite observations, or elevation and drainage patterns!`;
+      }
     } else {
-      initialSummary =
-        `### Crop Management & Disease Advisory: ${fieldName}\n\n` +
-        `I am ready to assist with crop selection, growth monitoring, and plant health on **${fieldName}** (${areaHa} ha, Sandy Loam).\n\n` +
-        `- You can ask about crop suitability (e.g. Winter Rye, Winter Wheat, Maize, Sunflowers).\n` +
-        `- **Attach a plant leaf photo** anytime using the camera icon to run automated disease and pathogen detection.\n\n` +
-        `Which crop or concern are you focusing on today?`;
+      if (isDe) {
+        initialSummary =
+          `### Kulturmanagement & Pflanzenschutz-Beratung: ${fieldName}\n\n` +
+          `Ich unterstütze Sie bei Sortenwahl, Bestandesführung und Pflanzengesundheit auf **${fieldName}** (${areaHa} ha, Sandiger Lehm).\n\n` +
+          `- Sie können nach Eignung für Winterroggen, Winterweizen, Mais oder Sonnenblumen fragen.\n` +
+          `- **Blattfoto anhängen:** Nutzen Sie das Kamerasymbol für eine automatisierte Krankheits- und Schadbildanalyse.\n\n` +
+          `Welche Kultur oder Fragestellung möchten Sie heute bearbeiten?`;
+      } else {
+        initialSummary =
+          `### Crop Management & Disease Advisory: ${fieldName}\n\n` +
+          `I am ready to assist with crop selection, growth monitoring, and plant health on **${fieldName}** (${areaHa} ha, Sandy Loam).\n\n` +
+          `- You can ask about crop suitability (e.g. Winter Rye, Winter Wheat, Maize, Sunflowers).\n` +
+          `- **Attach a plant leaf photo** anytime using the camera icon to run automated disease and pathogen detection.\n\n` +
+          `Which crop or concern are you focusing on today?`;
+      }
     }
 
     const welcomeMsg: ChatMessage = {
@@ -359,35 +410,37 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
     if (step !== 'ready' || isAiResponding) return null;
 
     let suggestions: string[] = [];
+    const fieldDisplayName = selectedField?.name || (language === 'de' ? 'Schlag 1' : 'Farm 1');
+
     if (selectedCategory === 'fertilizer') {
       suggestions = [
-        `What is the max allowed N under DüV for winter wheat on ${selectedField?.name || 'Farm 1'}?`,
-        'How should I split 140 kg N/ha given our Sandy Loam texture?',
-        'Calculate organic compost rate based on our 19.4 g/kg SOC',
+        t('aiAssistant.sugFert1', { field: fieldDisplayName }),
+        t('aiAssistant.sugFert2'),
+        t('aiAssistant.sugFert3'),
       ];
     } else if (selectedCategory === 'soil') {
       suggestions = [
-        'Explain the implications of pH 6.42 and 75.5% sand content',
-        'How does 240.1 mmol/kg CEC affect nitrogen leaching risk?',
-        'Which cover crops will build organic matter in Brandenburg?',
+        t('aiAssistant.sugSoil1'),
+        t('aiAssistant.sugSoil2'),
+        t('aiAssistant.sugSoil3'),
       ];
     } else if (selectedCategory === 'crop') {
       suggestions = [
-        'Which crops perform best on Sandy Loam with 550mm rain?',
-        'What are the optimal seeding dates for winter barley?',
-        'How can I identify Septoria tritici leaf blotch in wheat?',
+        t('aiAssistant.sugCrop1'),
+        t('aiAssistant.sugCrop2'),
+        t('aiAssistant.sugCrop3'),
       ];
     } else {
       suggestions = [
-        'What does 0.51 NDVI indicate about current vegetative biomass?',
-        'What are the regional weather risks for Brandenburg this week?',
-        'How does this parcel compare to regional Brandenburg benchmarks?',
+        t('aiAssistant.sugField1'),
+        t('aiAssistant.sugField2'),
+        t('aiAssistant.sugField3'),
       ];
     }
 
     return (
       <div className="quick-suggestions-row">
-        <span className="suggestions-label">Suggestions:</span>
+        <span className="suggestions-label">{t('aiAssistant.suggestionsLabel')}</span>
         {suggestions.map((sug, i) => (
           <button
             key={i}
@@ -453,7 +506,8 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
           )}
         </div>
 
-        <div className="assistant-header-right">
+        <div className="assistant-header-right flex items-center gap-2">
+          <LanguageSwitcher variant="pill" />
           <button
             type="button"
             className="assistant-btn-secondary"
@@ -461,7 +515,7 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
             title="View past conversations"
           >
             <History size={14} />
-            <span>History</span>
+            <span>{t('aiAssistant.history')}</span>
             {conversations.length > 0 && (
               <span className="history-count-badge">{conversations.length}</span>
             )}
@@ -474,7 +528,7 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
             title="Start new query or switch field"
           >
             <Plus size={14} />
-            <span>New Query</span>
+            <span>{t('aiAssistant.newChat')}</span>
           </button>
         </div>
       </header>
@@ -636,12 +690,12 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
               disabled={step !== 'ready'}
               placeholder={
                 step === 'select-field'
-                  ? 'Select a field above to start...'
+                  ? (language === 'de' ? 'Wählen Sie oben einen Schlag...' : 'Select a field above to start...')
                   : step === 'select-category'
-                  ? 'Select a topic category above to continue...'
+                  ? (language === 'de' ? 'Wählen Sie oben einen Bereich...' : 'Select a topic category above to continue...')
                   : step === 'loading-context'
-                  ? 'Synthesizing field intelligence...'
-                  : 'Ask about crop, soil nutrients, or DüV fertilizer schedule...'
+                  ? (language === 'de' ? 'Felddaten werden aggregiert...' : 'Synthesizing field intelligence...')
+                  : t('aiAssistant.inputPlaceholder')
               }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}

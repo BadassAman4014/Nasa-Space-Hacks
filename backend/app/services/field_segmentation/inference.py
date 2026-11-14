@@ -71,14 +71,14 @@ class FieldInferenceEngine:
         """
         assert image_4band.ndim == 3 and image_4band.shape[0] >= 4, f"Expected (4, H, W) array, got {image_4band.shape}"
         
-        # Scaling factor: FTW expects Sentinel-2 DN / 3000.0 (reflectance * 10000 / 3000 = 3.333)
-        scale = 10000.0 / 3000.0
+        # Scaling factor: FTW-PRUE expects reflectance in [0, 1000] range
+        scale = 1000.0 if np.nanmax(image_4band) <= 2.0 else 0.1
         b02 = np.clip(image_4band[0], 0.0, 1.0) * scale
         b03 = np.clip(image_4band[1], 0.0, 1.0) * scale
         b04 = np.clip(image_4band[2], 0.0, 1.0) * scale
         b08 = np.clip(image_4band[3], 0.0, 1.0) * scale
 
-        # Stack into [B04, B03, B02, B08, B04, B03, B02, B08]
+        # Stack into [B04, B03, B02, B08, B04, B03, B02, B08] (Red, Green, Blue, NIR)
         return np.stack([b04, b03, b02, b08, b04, b03, b02, b08], axis=0).astype(np.float32)
 
     @torch.inference_mode()

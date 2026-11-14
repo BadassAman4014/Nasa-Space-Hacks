@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import type { FieldOption, FieldCategory } from './types';
+import { useI18n } from '../../i18n';
 
 interface DeterministicWorkflowProps {
   step: 'select-field' | 'select-category';
@@ -34,6 +35,8 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
   onSelectCategory,
   onReset,
 }) => {
+  const { t, formatHectares } = useI18n();
+
   return (
     <div className="deterministic-workflow-container">
       {/* STEP 1: Select Field */}
@@ -44,10 +47,10 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
           </div>
           <div className="ai-bubble-content">
             <p className="ai-greeting-text">
-              <strong>Hello. Welcome to your AI Farming Assistant.</strong> Which field would you like to explore today?
+              <strong>{t('aiAssistant.welcomeGreeting')}</strong> {t('aiAssistant.welcomeQuestion')}
             </p>
             <p className="ai-greeting-sub">
-              Select one of your registered fields or choose a comparative inquiry:
+              {t('aiAssistant.welcomeSub')}
             </p>
           </div>
         </div>
@@ -57,7 +60,7 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
             {isLoadingFields ? (
               <div className="fields-loading-state">
                 <div className="loading-spinner" />
-                <span>Loading registered fields...</span>
+                <span>{t('aiAssistant.loadingFields')}</span>
               </div>
             ) : (
               fields.map((field) => {
@@ -86,7 +89,7 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
                       <div className="field-card-header">
                         <span className="field-card-title">{field.name}</span>
                         {!isSpecial && field.area_ha > 0 && (
-                          <span className="field-card-area">{field.area_ha} ha</span>
+                          <span className="field-card-area">{formatHectares(field.area_ha)}</span>
                         )}
                       </div>
                       <p className="field-card-farm">
@@ -95,11 +98,11 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
                       </p>
                       <div className="field-card-footer">
                         {isSpecial ? (
-                          <span className="field-card-badge">System inquiry</span>
+                          <span className="field-card-badge">{t('aiAssistant.systemInquiry')}</span>
                         ) : (
                           <span className="field-card-badge status-verified">
                             <ShieldCheck size={12} className="inline mr-1 text-muted-sage" />
-                            ISRIC & DFBK Verified
+                            {t('aiAssistant.verifiedBadge')}
                           </span>
                         )}
                         <ArrowRight size={13} className="card-arrow" />
@@ -115,9 +118,9 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
         {/* Selected Field Chip in review state */}
         {selectedField && step !== 'select-field' && (
           <div className="selected-entity-chip">
-            <span className="chip-label">Selected:</span>
+            <span className="chip-label">{t('aiAssistant.selectedLabel')}</span>
             <span className="chip-value">
-              {selectedField.name} {selectedField.area_ha > 0 ? `(${selectedField.area_ha} ha)` : ''}
+              {selectedField.name} {selectedField.area_ha > 0 ? `(${formatHectares(selectedField.area_ha)})` : ''}
             </span>
             <button
               type="button"
@@ -125,7 +128,7 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
               onClick={onReset}
               title="Change field selection"
             >
-              Change
+              {t('aiAssistant.changeFieldBtn')}
             </button>
           </div>
         )}
@@ -140,10 +143,10 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
             </div>
             <div className="ai-bubble-content">
               <p className="ai-greeting-text">
-                What would you like to explore regarding <strong>{selectedField.name}</strong>?
+                {t('aiAssistant.whatToExplore', { name: selectedField.name })}
               </p>
               <p className="ai-greeting-sub">
-                Select an agronomic domain to calibrate ground-truth intelligence:
+                {t('aiAssistant.selectDomainSub')}
               </p>
             </div>
           </div>
@@ -159,9 +162,9 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
                 <Sprout size={18} />
               </div>
               <div className="category-card-content">
-                <h4 className="category-title">Crop</h4>
+                <h4 className="category-title">{t('aiAssistant.catCropTitle')}</h4>
                 <p className="category-description">
-                  Growth stages, planting calendar & disease diagnostics
+                  {t('aiAssistant.catCropDesc')}
                 </p>
               </div>
             </button>
@@ -176,9 +179,9 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
                 <MapIcon size={18} />
               </div>
               <div className="category-card-content">
-                <h4 className="category-title">Field</h4>
+                <h4 className="category-title">{t('aiAssistant.catFieldTitle')}</h4>
                 <p className="category-description">
-                  Boundary coordinates, Sentinel-2 NDVI & elevation
+                  {t('aiAssistant.catFieldDesc')}
                 </p>
               </div>
             </button>
@@ -193,9 +196,9 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
                 <FlaskConical size={18} />
               </div>
               <div className="category-card-content">
-                <h4 className="category-title">Soil</h4>
+                <h4 className="category-title">{t('aiAssistant.catSoilTitle')}</h4>
                 <p className="category-description">
-                  ISRIC SoilGrids parameters: pH, SOC, texture & CEC
+                  {t('aiAssistant.catSoilDesc')}
                 </p>
               </div>
             </button>
@@ -210,9 +213,9 @@ export const DeterministicWorkflow: React.FC<DeterministicWorkflowProps> = ({
                 <Wheat size={18} />
               </div>
               <div className="category-card-content">
-                <h4 className="category-title">Fertilizers</h4>
+                <h4 className="category-title">{t('aiAssistant.catFertilizerTitle')}</h4>
                 <p className="category-description">
-                  DüV nutrient balances, split nitrogen & organic limits
+                  {t('aiAssistant.catFertilizerDesc')}
                 </p>
               </div>
             </button>

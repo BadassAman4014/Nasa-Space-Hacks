@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { useI18n } from '../../i18n';
 
 interface MapLegendProps {
   mode: 'dashboard' | 'explorer';
@@ -20,6 +21,7 @@ export const MapLegend: React.FC<MapLegendProps> = ({
   hasPredictions = false,
   className = '',
 }) => {
+  const { t } = useI18n();
   const [collapsed, setCollapsed] = useState(false);
 
   // Determine which sections to display
@@ -52,12 +54,12 @@ export const MapLegend: React.FC<MapLegendProps> = ({
         >
           <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#aaa]">
             <Layers size={14} className="text-[#1fa35b]" />
-            <span>Map Legend</span>
+            <span>{t('mapLegend.title')}</span>
           </div>
           <button
             type="button"
             className="text-[#888] hover:text-white transition p-1 rounded-md hover:bg-[#222]"
-            title={collapsed ? 'Expand Legend' : 'Collapse Legend'}
+            title={collapsed ? t('mapLegend.expandTooltip') : t('mapLegend.collapseTooltip')}
           >
             {collapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
@@ -69,7 +71,7 @@ export const MapLegend: React.FC<MapLegendProps> = ({
             {/* Section 1: User Selection & Saved Farms */}
             <div className="space-y-2">
               <div className="text-[10px] font-semibold uppercase tracking-wider text-[#777]">
-                Your Fields & Status
+                {t('mapLegend.yourFieldsSection')}
               </div>
 
               {/* Saved Field — Exclusively Emerald Green */}
@@ -78,11 +80,11 @@ export const MapLegend: React.FC<MapLegendProps> = ({
                   <div className="flex items-center gap-2.5">
                     <span className="w-3.5 h-3.5 rounded border-2 border-[#1fa35b] bg-[#1fa35b]/35 shadow-[0_0_6px_rgba(31,163,91,0.3)] shrink-0" />
                     <span className="text-[#f3f4f6] text-xs font-medium">
-                      Saved Field
+                      {t('mapLegend.savedField')}
                     </span>
                   </div>
                   <span className="text-[10px] font-semibold text-[#1fa35b] bg-[#1fa35b]/15 px-1.5 py-0.5 rounded border border-[#1fa35b]/30">
-                    My Farm
+                    {t('mapLegend.myFarmTag')}
                   </span>
                 </div>
               )}
@@ -93,11 +95,11 @@ export const MapLegend: React.FC<MapLegendProps> = ({
                   <div className="flex items-center gap-2.5">
                     <span className="w-3.5 h-3.5 rounded border-2 border-[#ff7a1a] bg-[#ff7a1a]/40 shadow-[0_0_6px_rgba(255,122,26,0.3)] shrink-0" />
                     <span className="text-[#f3f4f6] text-xs font-medium">
-                      Selected Field
+                      {t('mapLegend.selectedField')}
                     </span>
                   </div>
                   <span className="text-[10px] font-semibold text-[#ff7a1a] bg-[#ff7a1a]/15 px-1.5 py-0.5 rounded border border-[#ff7a1a]/30">
-                    Active
+                    {t('mapLegend.activeTag')}
                   </span>
                 </div>
               )}
@@ -108,11 +110,11 @@ export const MapLegend: React.FC<MapLegendProps> = ({
                   <div className="flex items-center gap-2.5">
                     <span className="w-3 h-3 rounded-full border-2 border-white bg-[#2563eb] shadow-[0_0_8px_#3b82f6] shrink-0" />
                     <span className="text-[#f3f4f6] text-xs font-medium">
-                      Your Location
+                      {t('mapLegend.yourLocation')}
                     </span>
                   </div>
                   <span className="text-[10px] font-semibold text-[#60a5fa] bg-[#2563eb]/20 px-1.5 py-0.5 rounded border border-[#3b82f6]/30">
-                    GPS
+                    {t('mapLegend.gpsTag')}
                   </span>
                 </div>
               )}
@@ -130,11 +132,11 @@ export const MapLegend: React.FC<MapLegendProps> = ({
                       }}
                     />
                     <span className="text-[#f3f4f6] text-xs font-medium">
-                      AI-predicted field
+                      {t('mapLegend.aiPredictedField')}
                     </span>
                   </div>
                   <span className="text-[10px] font-semibold text-[#c084fc] bg-[#a855f7]/15 px-1.5 py-0.5 rounded border border-[#a855f7]/30">
-                    AI CNN
+                    {t('mapLegend.aiCnnTag')}
                   </span>
                 </div>
               )}
@@ -144,7 +146,7 @@ export const MapLegend: React.FC<MapLegendProps> = ({
             {showDfbk && (
               <div className="space-y-2 pt-2 border-t border-[#262626]">
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-[#777]">
-                  Official DFBK Boundaries
+                  {t('mapLegend.dfbkSection')}
                 </div>
 
                 {/* Arable Land (AL) — Golden Wheat / Amber */}
@@ -152,7 +154,7 @@ export const MapLegend: React.FC<MapLegendProps> = ({
                   <div className="flex items-center gap-2.5">
                     <span className="w-3.5 h-3.5 rounded border-2 border-[#eab308] bg-[#eab308]/30 shrink-0" />
                     <span className="text-[#f3f4f6] text-xs font-medium">
-                      Arable Cropland
+                      {t('mapLegend.arableCropland')}
                     </span>
                   </div>
                   <span className="text-[10px] font-mono font-semibold text-[#eab308] bg-[#eab308]/15 px-1.5 py-0.5 rounded border border-[#eab308]/30">
@@ -165,7 +167,7 @@ export const MapLegend: React.FC<MapLegendProps> = ({
                   <div className="flex items-center gap-2.5">
                     <span className="w-3.5 h-3.5 rounded border-2 border-[#38bdf8] bg-[#38bdf8]/30 shrink-0" />
                     <span className="text-[#f3f4f6] text-xs font-medium">
-                      Grassland / Pasture
+                      {t('mapLegend.grasslandPasture')}
                     </span>
                   </div>
                   <span className="text-[10px] font-mono font-semibold text-[#38bdf8] bg-[#38bdf8]/15 px-1.5 py-0.5 rounded border border-[#38bdf8]/30">
@@ -178,7 +180,7 @@ export const MapLegend: React.FC<MapLegendProps> = ({
                   <div className="flex items-center gap-2.5">
                     <span className="w-3.5 h-3.5 rounded border-2 border-[#c084fc] bg-[#c084fc]/30 shrink-0" />
                     <span className="text-[#f3f4f6] text-xs font-medium">
-                      Permanent Crops
+                      {t('mapLegend.permanentCrops')}
                     </span>
                   </div>
                   <span className="text-[10px] font-mono font-semibold text-[#c084fc] bg-[#c084fc]/15 px-1.5 py-0.5 rounded border border-[#c084fc]/30">

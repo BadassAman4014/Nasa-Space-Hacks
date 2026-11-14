@@ -597,6 +597,55 @@ class WeatherStationService:
         elev = max(0.0, max_elev - (diff * 7.5))
         return round(elev, 1)
 
+    def get_point_weather(self, lat: float, lon: float) -> Dict[str, Any]:
+        """
+        Retrieves real-time atmospheric observation for specific geographical coordinates (e.g. device GPS).
+        """
+        params = {
+            "latitude": lat,
+            "longitude": lon,
+            "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m",
+            "timezone": "auto"
+        }
+        try:
+            resp = requests.get(self.OPEN_METEO_URL, params=params, timeout=5)
+            resp.raise_for_status()
+            api_data = resp.json()
+        except Exception:
+            api_data = self._generate_fallback_weather(lat, lon)
+
+        current_raw = api_data.get("current", {})
+        temp_c = round(float(current_raw.get("temperature_2m", 16.5)), 1)
+        feels_like_c = round(float(current_raw.get("apparent_temperature", 16.0)), 1)
+        humidity = round(float(current_raw.get("relative_humidity_2m", 65.0)), 1)
+        cloud_pct = round(float(current_raw.get("cloud_cover", 30.0)), 1)
+        wind_kmh = float(current_raw.get("wind_speed_10m", 14.0))
+        wind_ms = round(wind_kmh / 3.6, 1)
+        wind_deg = int(current_raw.get("wind_direction_10m", 240))
+        precip_mm = round(float(current_raw.get("precipitation", 0.0)), 1)
+        w_code = int(current_raw.get("weather_code", 1))
+
+        condition_desc, icon_type = self._parse_weather_code(w_code, cloud_pct)
+        wind_compass, wind_arrow = self._deg_to_compass_and_arrow(wind_deg)
+
+        return {
+            "lat": lat,
+            "lon": lon,
+            "temperature_c": temp_c,
+            "feels_like_c": feels_like_c,
+            "humidity_percent": humidity,
+            "cloud_cover_percent": int(round(cloud_pct)),
+            "wind_speed_kmh": round(wind_kmh, 1),
+            "wind_speed_ms": wind_ms,
+            "wind_direction_deg": wind_deg,
+            "wind_compass": wind_compass,
+            "wind_arrow": wind_arrow,
+            "precipitation_mm": precip_mm,
+            "weather_code": w_code,
+            "condition": condition_desc,
+            "icon": icon_type,
+        }
+
     def _generate_fallback_weather(self, lat: float, lon: float) -> Dict[str, Any]:
         """Provides realistic weather data if network query is blocked."""
         now = datetime.now()

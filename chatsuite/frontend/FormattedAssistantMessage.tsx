@@ -1,289 +1,337 @@
-import React, { useState } from 'react';
-import { Copy, Check, Sparkles, Cpu, Info } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Copy, Check, Sprout, Info, TriangleAlert, Database } from 'lucide-react';
 import type { ChatMessage } from './types';
+import {
+  classify,
+  parseReply,
+  riskLevelOf,
+  splitCalloutSource,
+  type Block,
+  type ListBlock,
+  type ListItem,
+  type Section,
+  type TableBlock,
+} from './responseParser';
+import { renderInline, RiskBadge, sanitizeRawText } from './richText';
+import { TopicIcon, TOPIC_META } from './semantics';
+import { formatTime, prettyModel } from './format';
 
 interface FormattedAssistantMessageProps {
   message: ChatMessage;
 }
 
-export const FormattedAssistantMessage: React.FC<FormattedAssistantMessageProps> = ({ message }) => {
-  const [copied, setCopied] = useState(false);
+/* ------------------------------------------------------------------ */
+/* Lists                                                                */
+/* ------------------------------------------------------------------ */
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(message.content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+const isKeyed = (items: ListItem[]) =>
+  items.length > 0 && items.filter((i) => i.key).length >= Math.ceil(items.length / 2);
 
-  /**
-   * Cleans stray artifacts, raw LaTeX fragments, and unparsed escapes from raw text.
-   */
-  const sanitizeRawText = (raw: string): string => {
-    return raw
-      // Replace common LaTeX expressions like $\text{C}_{\text{org}}$ or $\text{K}_2\text{O}$
-      .replace(/\$\\text\{C\}_(?:\{)?(?:\\text\{)?org\}?(?:\})?\$/gi, 'Corg')
-      .replace(/\$\\text\{K\}_2\\text\{O\}\$/gi, 'K₂O')
-      .replace(/\$\\text\{P\}_2\\text\{O\}_5\$/gi, 'P₂O₅')
-      .replace(/\$\\text\{([A-Za-z0-9\s]+)\}\$/g, '$1')
-      .replace(/\$([A-Za-z0-9_\-\+]+)\$/g, '$1')
-      // Remove escaped asterisks like \* or \_
-      .replace(/\\\*/g, '*')
-      .replace(/\\_/g, '_')
-      // Remove standalone redundant divider lines like '---' or '***' if preceded/followed by whitespace
-      .replace(/^\s*[-*_]{3,}\s*$/gm, '---');
-  };
+const ChildList: React.FC<{ item: ListItem }> = ({ item }) => {
+  if (item.children.length === 0) return null;
+  if (item.childrenOrdered) return <Steps items={item.children} nested />;
+  if (isKeyed(item.children)) return <Facts items={item.children} nested />;
+  return <Bullets items={item.children} nested />;
+};
 
-  /**
-   * Renders inline markdown: bold, italic, bold-italic, code spans, numbers.
-   */
-  const renderInlineMarkdown = (text: string): React.ReactNode => {
-    // Clean string first
-    const cleanText = sanitizeRawText(text);
+const Steps: React.FC<{ items: ListItem[]; nested?: boolean }> = ({ items, nested }) => (
+  <ol className={`fs-steps${nested ? ' fs-steps--nested' : ''}`}>
+    {items.map((item, i) => (
+      <li key={i} className="fs-step">
+        <span className="fs-step__n" aria-hidden="true">
+          {i + 1}
+        </span>
+        <div className="fs-step__body">
+          {item.key && <div className="fs-step__key">{renderInline(item.key)}</div>}
+          {item.value && <div className="fs-step__val">{renderInline(item.value, { badges: true })}</div>}
+          <ChildList item={item} />
+        </div>
+      </li>
+    ))}
+  </ol>
+);
 
-    // Regex to split by bold-italic (***text***), bold (**text**), italic (*text* or _text_), or inline code (`code`)
-    const regex = /(\*\*\*[\s\S]+?\*\*\*|\*\*[\s\S]+?\*\*|\*[^\s*][^*]*?[^\s*]\*|`[^`]+`|_[\s\S]+?_)/g;
-    const parts = cleanText.split(regex);
+const Bullets: React.FC<{ items: ListItem[]; nested?: boolean }> = ({ items, nested }) => (
+  <ul className={`fs-bullets${nested ? ' fs-bullets--nested' : ''}`}>
+    {items.map((item, i) => (
+      <li key={i} className="fs-bullet">
+        <span className="fs-dot" aria-hidden="true" />
+        <div>
+          {item.key ? (
+            <>
+              <strong>{renderInline(item.key)}</strong>
+              {item.value ? <> {renderInline(item.value, { badges: true })}</> : null}
+            </>
+          ) : (
+            renderInline(item.value, { badges: true })
+          )}
+          <ChildList item={item} />
+        </div>
+      </li>
+    ))}
+  </ul>
+);
 
-    return parts.map((part, index) => {
-      if (!part) return null;
-
-      // Bold + Italic: ***text***
-      if (part.startsWith('***') && part.endsWith('***') && part.length > 6) {
-        return (
-          <strong key={index} className="ai-msg-strong">
-            <em>{part.slice(3, -3)}</em>
-          </strong>
-        );
-      }
-
-      // Bold: **text**
-      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
-        return (
-          <strong key={index} className="ai-msg-strong">
-            {part.slice(2, -2)}
-          </strong>
-        );
-      }
-
-      // Italic: *text* (or _text_)
-      if (
-        (part.startsWith('*') && part.endsWith('*') && part.length > 2 && !part.startsWith('**')) ||
-        (part.startsWith('_') && part.endsWith('_') && part.length > 2)
-      ) {
-        return (
-          <em key={index} className="ai-msg-italic">
-            {part.slice(1, -1)}
-          </em>
-        );
-      }
-
-      // Inline code: `text`
-      if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
-        return (
-          <code key={index} className="ai-msg-code">
-            {part.slice(1, -1)}
-          </code>
-        );
-      }
-
-      return part;
-    });
-  };
-
-  const renderFormattedContent = (content: string) => {
-    const lines = content.split('\n');
-    const elements: React.ReactNode[] = [];
-    let inTable = false;
-    let tableRows: string[][] = [];
-
-    const flushTable = () => {
-      if (tableRows.length > 0) {
-        const header = tableRows[0];
-        const body = tableRows.slice(1);
-        elements.push(
-          <div key={`table-${elements.length}`} className="ai-table-container">
-            <table className="ai-markdown-table">
-              <thead>
-                <tr>
-                  {header.map((cell, idx) => (
-                    <th key={idx}>{renderInlineMarkdown(cell.trim())}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {body.map((row, rIdx) => (
-                  <tr key={rIdx}>
-                    {row.map((cell, cIdx) => (
-                      <td key={cIdx}>{renderInlineMarkdown(cell.trim())}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-        tableRows = [];
-      }
-      inTable = false;
-    };
-
-    lines.forEach((line, idx) => {
-      const trimmed = line.trim();
-
-      // Table row detected
-      if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-        inTable = true;
-        // Check if separator line (|---|---|)
-        if (/^\|(\s*[-:]+\s*\|)+$/.test(trimmed)) {
-          return;
-        }
-        const cells = trimmed
-          .slice(1, -1)
-          .split('|')
-          .map((c) => c.trim());
-        tableRows.push(cells);
-        return;
-      } else if (inTable) {
-        flushTable();
-      }
-
-      // Horizontal dividers (--- or ***)
-      if (trimmed === '---' || trimmed === '***' || trimmed === '___') {
-        elements.push(<hr key={idx} className="ai-msg-divider" />);
-        return;
-      }
-
-      // Blockquotes (> Quote or note)
-      if (trimmed.startsWith('>')) {
-        const quoteText = trimmed.replace(/^>\s*/, '');
-        elements.push(
-          <div key={idx} className="ai-msg-callout">
-            <Info size={14} className="callout-icon flex-shrink-0 mt-0.5" />
-            <div className="callout-text">{renderInlineMarkdown(quoteText)}</div>
-          </div>
-        );
-        return;
-      }
-
-      // Headers (H1 to H5)
-      const headerMatch = trimmed.match(/^(#{1,5})\s+(.*)$/);
-      if (headerMatch) {
-        const level = headerMatch[1].length;
-        const text = headerMatch[2];
-
-        if (level === 1) {
-          elements.push(
-            <h2 key={idx} className="ai-msg-h1">
-              {renderInlineMarkdown(text)}
-            </h2>
-          );
-        } else if (level === 2) {
-          elements.push(
-            <h3 key={idx} className="ai-msg-h2">
-              {renderInlineMarkdown(text)}
-            </h3>
-          );
-        } else if (level === 3) {
-          elements.push(
-            <h4 key={idx} className="ai-msg-h3">
-              {renderInlineMarkdown(text)}
-            </h4>
-          );
-        } else {
-          // H4, H5 rendered as clean bold sub-headers
-          elements.push(
-            <h5 key={idx} className="ai-msg-h4">
-              {renderInlineMarkdown(text)}
-            </h5>
-          );
-        }
-        return;
-      }
-
-      // Bullet points (- or * or •)
-      if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
-        const bulletContent = trimmed.replace(/^[-*•]\s+/, '');
-        elements.push(
-          <div key={idx} className="ai-msg-bullet">
-            <span className="bullet-dot">•</span>
-            <div className="bullet-text">{renderInlineMarkdown(bulletContent)}</div>
-          </div>
-        );
-        return;
-      }
-
-      // Numbered lists (1. or 2.)
-      const numberedMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
-      if (numberedMatch) {
-        elements.push(
-          <div key={idx} className="ai-msg-bullet numbered">
-            <span className="bullet-num">{numberedMatch[1]}.</span>
-            <div className="bullet-text">{renderInlineMarkdown(numberedMatch[2])}</div>
-          </div>
-        );
-        return;
-      }
-
-      // Empty line / paragraph break
-      if (trimmed === '') {
-        elements.push(<div key={idx} className="ai-msg-spacer" />);
-        return;
-      }
-
-      // Standard paragraph
-      elements.push(
-        <p key={idx} className="ai-msg-paragraph">
-          {renderInlineMarkdown(line)}
-        </p>
+const Facts: React.FC<{ items: ListItem[]; nested?: boolean }> = ({ items, nested }) => (
+  <ul className={`fs-facts${nested ? ' fs-facts--nested' : ''}`}>
+    {items.map((item, i) => {
+      const topic = classify(item.key);
+      const isGroup = Boolean(item.key) && !item.value && item.children.length > 0;
+      const isPlain = !item.key;
+      const cls = ['fs-fact', isGroup && 'fs-fact--group', isPlain && 'fs-fact--plain']
+        .filter(Boolean)
+        .join(' ');
+      return (
+        <li key={i} className={cls}>
+          <span className="fs-fact__lead">
+            {topic ? <TopicIcon topic={topic} /> : <span className="fs-dot" aria-hidden="true" />}
+          </span>
+          {item.key && <div className="fs-fact__key">{renderInline(item.key)}</div>}
+          {item.value && <div className="fs-fact__val">{renderInline(item.value, { badges: true })}</div>}
+          {item.children.length > 0 && (
+            <div className="fs-fact__sub">
+              <ChildList item={item} />
+            </div>
+          )}
+        </li>
       );
-    });
+    })}
+  </ul>
+);
 
-    if (inTable) {
-      flushTable();
-    }
+const ListView: React.FC<{ block: ListBlock }> = ({ block }) => {
+  if (block.ordered) return <Steps items={block.items} />;
+  if (isKeyed(block.items)) return <Facts items={block.items} />;
+  return <Bullets items={block.items} />;
+};
 
-    return elements;
-  };
+/* ------------------------------------------------------------------ */
+/* Tables                                                               */
+/* ------------------------------------------------------------------ */
+
+const NUMERIC_CELL = /^[`~≈<>±]*[-+−]?\d[\d.,]*\s*(?:%|[A-Za-zµ°²³/.\-]+)?`*$/;
+const LEVEL_HEADER = /risk|severity|priority|urgency|level|rating/i;
+
+const DataTable: React.FC<{ block: TableBlock }> = ({ block }) => {
+  const numericCols = block.header.map(
+    (_, c) =>
+      c > 0 &&
+      block.rows.length > 0 &&
+      block.rows.every((r) => NUMERIC_CELL.test((r[c] ?? '').trim()))
+  );
 
   return (
-    <div className="assistant-message-card">
-      <div className="assistant-header-row">
-        <div className="assistant-identity">
-          <div className="ai-icon-badge">
-            <Sparkles size={13} />
-          </div>
-          <span className="assistant-name">Gemini Assistant</span>
-          {message.model && (
-            <span className="assistant-model-tag">
-              <Cpu size={10} className="inline mr-1" />
-              {message.model}
-            </span>
-          )}
-        </div>
+    <div className="fs-table-wrap" role="region" aria-label="Data table" tabIndex={0}>
+      <table className="fs-table">
+        <thead>
+          <tr>
+            {block.header.map((h, i) => (
+              <th key={i} scope="col" className={numericCols[i] ? 'is-num' : undefined}>
+                {renderInline(h)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {block.rows.map((row, r) => (
+            <tr key={r}>
+              {row.map((cell, c) => {
+                const plain = cell.replace(/[`*]/g, '').trim();
+                const level = LEVEL_HEADER.test(block.header[c] ?? '') ? riskLevelOf(plain) : null;
+                return (
+                  <td
+                    key={c}
+                    data-label={block.header[c]?.replace(/[`*]/g, '')}
+                    className={numericCols[c] ? 'is-num' : undefined}
+                  >
+                    {level ? (
+                      <RiskBadge level={level}>{plain}</RiskBadge>
+                    ) : (
+                      renderInline(cell, { badges: true })
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
-        <div className="assistant-actions">
-          <button
-            type="button"
-            className="copy-msg-btn"
-            onClick={handleCopy}
-            title="Copy recommendations"
-          >
-            {copied ? <Check size={13} className="copy-check-icon" /> : <Copy size={13} />}
-            <span>{copied ? 'Copied' : 'Copy'}</span>
-          </button>
-        </div>
-      </div>
+/* ------------------------------------------------------------------ */
+/* Notes (blockquotes)                                                  */
+/* ------------------------------------------------------------------ */
 
-      <div className="assistant-body-content">{renderFormattedContent(message.content)}</div>
-
-      <div className="assistant-footer-meta">
-        <span className="msg-timestamp">
-          {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </span>
-        {message.category && (
-          <span className="msg-category-tag">Topic: {message.category}</span>
+const Note: React.FC<{ text: string }> = ({ text }) => {
+  const { body, source } = splitCalloutSource(text);
+  const stripped = body.replace(/^\*([^*][\s\S]*[^*])\*$/, '$1');
+  const isCaution = /^\W*(warning|caution|achtung|important|attention)\b/i.test(stripped);
+  const Icon = isCaution ? TriangleAlert : Info;
+  return (
+    <div className={`fs-note fs-note--${isCaution ? 'caution' : 'info'}`}>
+      <Icon size={15} strokeWidth={2} aria-hidden={true} className="fs-note__ico" />
+      <div className="fs-note__body">
+        <p>{renderInline(stripped)}</p>
+        {source && (
+          <p className="fs-note__source">
+            <Database size={12} aria-hidden={true} />
+            <span>{renderInline(source)}</span>
+          </p>
         )}
       </div>
     </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* Sections                                                             */
+/* ------------------------------------------------------------------ */
+
+const BlockView: React.FC<{
+  block: Block;
+  prev?: Block;
+  isLastOfMessage: boolean;
+}> = ({ block, prev, isLastOfMessage }) => {
+  switch (block.type) {
+    case 'paragraph': {
+      const isAsk = isLastOfMessage && /\?\s*$/.test(block.text);
+      const isLeadIn = /[:：]\s*$/.test(block.text);
+      const after = prev && (prev.type === 'list' || prev.type === 'table');
+      const cls = ['fs-p', isAsk && 'fs-p--ask', isLeadIn && 'fs-p--leadin', after && !isAsk && 'fs-p--support']
+        .filter(Boolean)
+        .join(' ');
+      return <p className={cls}>{renderInline(block.text)}</p>;
+    }
+    case 'list':
+      return <ListView block={block} />;
+    case 'table':
+      return <DataTable block={block} />;
+    case 'callout':
+      return <Note text={block.text} />;
+    case 'heading':
+      return <h5 className="fs-subtitle">{renderInline(block.text)}</h5>;
+    default:
+      return null;
+  }
+};
+
+const SectionView: React.FC<{ section: Section; isLastSection: boolean }> = ({
+  section,
+  isLastSection,
+}) => {
+  const topic = section.topic;
+  const isAlert = topic === 'warning' || topic === 'risk';
+  const tone = topic ? TOPIC_META[topic].tone : null;
+
+  const body = section.blocks.map((block, i) => (
+    <BlockView
+      key={i}
+      block={block}
+      prev={section.blocks[i - 1]}
+      isLastOfMessage={isLastSection && i === section.blocks.length - 1}
+    />
+  ));
+
+  const title = section.title ? (
+    <h4 className="fs-sec__title">
+      {topic && <TopicIcon topic={topic} />}
+      <span>{renderInline(section.title)}</span>
+    </h4>
+  ) : null;
+
+  return (
+    <section
+      className={['fs-sec', isAlert && `fs-alert fs-alert--${tone}`].filter(Boolean).join(' ')}
+    >
+      {title}
+      {body}
+    </section>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* Message                                                              */
+/* ------------------------------------------------------------------ */
+
+export const FormattedAssistantMessage: React.FC<FormattedAssistantMessageProps> = ({ message }) => {
+  const [copied, setCopied] = useState(false);
+
+  const isContextSummary = message.id.startsWith('welcome-');
+  const isError = /offline/i.test(message.model ?? '');
+
+  const parsed = useMemo(
+    () => parseReply(message.content, { allowLead: !isContextSummary && !isError }),
+    [message.content, isContextSummary, isError]
+  );
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard unavailable (insecure context): leave the button unchanged */
+    }
+  };
+
+  const model = prettyModel(message.model);
+  const time = formatTime(message.timestamp);
+
+  return (
+    <article
+      id={`fs-msg-${message.id}`}
+      className={`fs-msg fs-msg--assistant${isError ? ' fs-msg--error' : ''}`}
+      aria-label="Assistant message"
+    >
+      <header className="fs-msg__head">
+        <span className="fs-avatar" aria-hidden="true">
+          <Sprout size={13} strokeWidth={2.2} />
+        </span>
+        <span className="fs-msg__name">{isError ? 'Connection problem' : 'FieldShift'}</span>
+        {model && <span className="fs-chip fs-chip--quiet">{model}</span>}
+        {time && <time className="fs-msg__time">{time}</time>}
+      </header>
+
+      <div className="fs-msg__body">
+        {isError ? (
+          <div className="fs-notice" role="alert">
+            <TriangleAlert size={16} strokeWidth={2} aria-hidden={true} />
+            <p>{renderInline(sanitizeRawText(message.content))}</p>
+          </div>
+        ) : (
+          <>
+            {parsed.title && <h3 className="fs-msg__title">{renderInline(parsed.title)}</h3>}
+
+            {parsed.lead && (
+              <div className="fs-lead">
+                <span className="fs-lead__ico" aria-hidden="true">
+                  <Sprout size={15} strokeWidth={2.2} />
+                </span>
+                <p>{renderInline(parsed.lead)}</p>
+              </div>
+            )}
+
+            {parsed.sections.map((section, i) => (
+              <SectionView
+                key={i}
+                section={section}
+                isLastSection={i === parsed.sections.length - 1}
+              />
+            ))}
+          </>
+        )}
+      </div>
+
+      {!isError && (
+        <footer className="fs-msg__foot">
+          <button type="button" className="fs-ghost-btn" onClick={handleCopy} aria-label="Copy response">
+            {copied ? <Check size={13} aria-hidden={true} /> : <Copy size={13} aria-hidden={true} />}
+            <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
+          </button>
+        </footer>
+      )}
+    </article>
   );
 };
