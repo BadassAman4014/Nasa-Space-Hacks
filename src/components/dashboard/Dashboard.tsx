@@ -1340,13 +1340,6 @@ export function MapViewV2({
 
           <div className="space-y-2 mt-3">
             <button
-              onClick={() => props.navigate('weather', selected.id)}
-              className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow border border-slate-700 transition-colors"
-            >
-              <CloudSun size={14} className="text-amber-400" /> Weather &amp; 3D Cloud Simulation
-            </button>
-
-            <button
               onClick={() => (onOpenAnalytics ? onOpenAnalytics(selected.id) : navigate('rotation-studio'))}
               className="w-full py-2.5 rounded-xl bg-[#1fa35b] hover:bg-[#188a4c] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow"
             >

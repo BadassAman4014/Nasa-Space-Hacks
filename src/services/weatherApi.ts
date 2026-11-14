@@ -69,6 +69,46 @@ export interface RadarFrame {
   cloud_cover_percent: number;
 }
 
+export interface DailyForecastPoint {
+  date: string;
+  day_name: string;
+  date_label: string;
+  temp_max_c: number;
+  temp_min_c: number;
+  precipitation_mm: number;
+  precipitation_probability: number;
+  wind_speed_ms: number;
+  wind_compass: string;
+  wind_arrow: string;
+  condition: string;
+  icon: string;
+}
+
+export interface MonthlyDayTrend {
+  day_number: number;
+  date: string;
+  label: string;
+  temp_max: number;
+  temp_min: number;
+  temp_avg: number;
+  precip_mm: number;
+  spray_safe: boolean;
+}
+
+export interface MonthlyOutlookPoint {
+  week_label: string;
+  date_range: string;
+  avg_temp_c: number;
+  temp_range: string;
+  total_precip_mm: number;
+  soil_condition: string;
+  spraying_suitability: string;
+  frost_risk: string;
+  gdd_accumulated: number;
+  icon: string;
+  summary: string;
+}
+
 export interface ThreeJsSimulationParams {
   cloud_density: number;
   wind_vector: { x: number; z: number };
@@ -106,6 +146,9 @@ export interface FieldWeatherData {
   };
   incoming_clouds: IncomingCloudsInfo;
   forecast_hourly: HourlyForecastPoint[];
+  forecast_daily?: DailyForecastPoint[];
+  forecast_monthly?: MonthlyOutlookPoint[];
+  monthly_trend_days?: MonthlyDayTrend[];
   radar_timeline: RadarFrame[];
   threejs_simulation: ThreeJsSimulationParams;
 }

@@ -23,6 +23,12 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
+$ProgressPreference = "SilentlyContinue"
+try {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+}
+catch {}
+
 $RootPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 Set-Location $RootPath
 
@@ -30,8 +36,8 @@ function Write-BrandHeader {
     Clear-Host
     Write-Host ""
     Write-Host " ==================================================================" -ForegroundColor Green
-    Write-Host "   🌱 FieldShift AI - Meteorological & Agricultural Intelligence" -ForegroundColor White
-    Write-Host "   NASA Space Hacks • High-Precision Farm Satellite Platform" -ForegroundColor DarkGray
+    Write-Host "   FieldShift AI - High-Precision Satellite & Weather Platform" -ForegroundColor White
+    Write-Host "   NASA Space Hacks • Automated Full-Stack Environment" -ForegroundColor DarkGray
     Write-Host " ==================================================================" -ForegroundColor Green
     Write-Host ""
 }
@@ -47,10 +53,27 @@ function Stop-PortProcess([int]$Port) {
                     Stop-Process -Id $pidToKill -Force -ErrorAction SilentlyContinue
                 }
             }
-            Start-Sleep -Milliseconds 800
+            Start-Sleep -Milliseconds 600
         }
-    } catch {
-        # Ignore permission issues on system PID
+    }
+    catch {}
+}
+
+function Test-PortOpen([string]$HostName, [int]$Port) {
+    try {
+        $client = New-Object System.Net.Sockets.TcpClient
+        $connect = $client.BeginConnect($HostName, $Port, $null, $null)
+        $wait = $connect.AsyncWaitHandle.WaitOne(400, $false)
+        if ($wait) {
+            $client.EndConnect($connect)
+            $client.Close()
+            return $true
+        }
+        $client.Close()
+        return $false
+    }
+    catch {
+        return $false
     }
 }
 
@@ -59,7 +82,7 @@ if ($Stop) {
     Write-Host " Stopping all FieldShift AI services..." -ForegroundColor Yellow
     Stop-PortProcess -Port 8000
     Stop-PortProcess -Port 5173
-    Write-Host " [SUCCESS] All backend and frontend services have been stopped." -ForegroundColor Green
+    Write-Host " [SUCCESS] All backend and frontend services have been stopped.`n" -ForegroundColor Green
     exit 0
 }
 
@@ -74,7 +97,7 @@ if (-not $pythonCmd) {
     Write-Host " [ERROR] Python was not found in PATH. Please install Python 3.10+." -ForegroundColor Red
     exit 1
 }
-Write-Host "   ✓ Python: $($pythonCmd.Source)" -ForegroundColor DarkGray
+Write-Host "   [OK] Python: $($pythonCmd.Source)" -ForegroundColor DarkGray
 
 # Check Node / npm
 $npmCmd = Get-Command npm -ErrorAction SilentlyContinue
@@ -82,7 +105,7 @@ if (-not $npmCmd) {
     Write-Host " [ERROR] npm was not found in PATH. Please install Node.js 18+." -ForegroundColor Red
     exit 1
 }
-Write-Host "   ✓ npm: $($npmCmd.Source)" -ForegroundColor DarkGray
+Write-Host "   [OK] npm:    $($npmCmd.Source)" -ForegroundColor DarkGray
 
 # Check node_modules
 if (-not (Test-Path "$RootPath\node_modules")) {
@@ -107,7 +130,8 @@ if ($SeparateWindows) {
 
     Write-Host "   -> Launching Vite Frontend in dedicated window..." -ForegroundColor White
     $frontendProcess = Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$RootPath'; `$host.UI.RawUI.WindowTitle = 'FieldShift AI - Frontend (5173)'; $frontendScript" -PassThru
-} else {
+}
+else {
     Write-Host "   -> Starting FastAPI Backend (http://127.0.0.1:8000)..." -ForegroundColor White
     $backendProcess = Start-Process powershell -ArgumentList "-Command", "cd '$RootPath'; $backendScript" -WindowStyle Hidden -PassThru
 
@@ -119,23 +143,17 @@ if ($SeparateWindows) {
 Write-Host "`n [4/4] Awaiting health readiness..." -ForegroundColor Cyan
 $backendReady = $false
 $frontendReady = $false
-$retries = 25
+$retries = 30
 
 for ($i = 0; $i -lt $retries; $i++) {
-    Start-Sleep -Milliseconds 600
+    Start-Sleep -Milliseconds 500
 
     if (-not $backendReady) {
-        try {
-            $tcp = Test-NetConnection -ComputerName 127.0.0.1 -Port 8000 -WarningAction SilentlyContinue -InformationLevel Quiet
-            if ($tcp) { $backendReady = $true }
-        } catch {}
+        if (Test-PortOpen "127.0.0.1" 8000) { $backendReady = $true }
     }
 
     if (-not $frontendReady) {
-        try {
-            $tcp = Test-NetConnection -ComputerName 127.0.0.1 -Port 5173 -WarningAction SilentlyContinue -InformationLevel Quiet
-            if ($tcp) { $frontendReady = $true }
-        } catch {}
+        if (Test-PortOpen "127.0.0.1" 5173) { $frontendReady = $true }
     }
 
     if ($backendReady -and $frontendReady) { break }
@@ -143,22 +161,24 @@ for ($i = 0; $i -lt $retries; $i++) {
 
 Write-Host ""
 if ($backendReady) {
-    Write-Host "   🟢 Backend API:      http://127.0.0.1:8000" -ForegroundColor Green
-    Write-Host "      API Documentation: http://127.0.0.1:8000/docs" -ForegroundColor DarkGray
-} else {
-    Write-Host "   🟡 Backend starting up on http://127.0.0.1:8000..." -ForegroundColor Yellow
+    Write-Host "   [ONLINE] Backend API:      http://127.0.0.1:8000" -ForegroundColor Green
+    Write-Host "            API Documentation: http://127.0.0.1:8000/docs" -ForegroundColor DarkGray
+}
+else {
+    Write-Host "   [WAITING] Backend starting up on http://127.0.0.1:8000..." -ForegroundColor Yellow
 }
 
 if ($frontendReady) {
-    Write-Host "   🟢 Vite Frontend:    http://127.0.0.1:5173" -ForegroundColor Green
-    Write-Host "   🟢 Weather Studio:   http://127.0.0.1:5173/weather" -ForegroundColor Green
-} else {
-    Write-Host "   🟡 Frontend starting up on http://127.0.0.1:5173..." -ForegroundColor Yellow
+    Write-Host "   [ONLINE] Vite Frontend:    http://127.0.0.1:5173" -ForegroundColor Green
+    Write-Host "   [ONLINE] Weather Studio:   http://127.0.0.1:5173/weather" -ForegroundColor Green
+}
+else {
+    Write-Host "   [WAITING] Frontend starting up on http://127.0.0.1:5173..." -ForegroundColor Yellow
 }
 
 # Open browser
 if (-not $NoBrowser) {
-    Start-Sleep -Milliseconds 800
+    Start-Sleep -Milliseconds 600
     Write-Host "`n [BROWSER] Opening http://localhost:5173 in default browser..." -ForegroundColor Cyan
     Start-Process "http://localhost:5173"
 }
@@ -179,14 +199,14 @@ try {
                 break
             }
         }
-        # Check if child processes are still alive
         if ($backendProcess.HasExited -and $frontendProcess.HasExited) {
             Write-Host "`nBoth processes have terminated." -ForegroundColor DarkGray
             break
         }
         Start-Sleep -Milliseconds 500
     }
-} finally {
+}
+finally {
     Write-Host "`n [SHUTDOWN] Terminating services gracefully..." -ForegroundColor Yellow
     if ($backendProcess -and -not $backendProcess.HasExited) {
         Stop-Process -Id $backendProcess.Id -Force -ErrorAction SilentlyContinue
