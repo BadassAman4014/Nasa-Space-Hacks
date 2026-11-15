@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "retrieved": "2026-11-15",
+  "kind": "reference constants (published table), not field data",
+  "available_water": {
+    "source": {
+      "name": "FAO Irrigation and Drainage Paper 56, Table 19: Typical soil water characteristics for different soil types (USDA soil texture classification)",
+      "url": "https://www.fao.org/4/x0490e/x0490e0c.htm"
+    },
+    "unit": "m3/m3",
+    "note": "Ranges as printed in the table. FieldShift uses the midpoint of the (FC - WP) range and always shows the range. The table has no row for sandy clay loam, clay loam or sandy clay, so no value is used for those classes.",
+    "by_usda_class": {
+      "Sand":            {"fc": [0.07, 0.17], "wp": [0.02, 0.07], "awc": [0.05, 0.11]},
+      "Loamy Sand":      {"fc": [0.11, 0.19], "wp": [0.03, 0.10], "awc": [0.06, 0.12]},
+      "Sandy Loam":      {"fc": [0.18, 0.28], "wp": [0.06, 0.16], "awc": [0.11, 0.15]},
+      "Loam":            {"fc": [0.20, 0.30], "wp": [0.07, 0.17], "awc": [0.13, 0.18]},
+      "Silt Loam":       {"fc": [0.22, 0.36], "wp": [0.09, 0.21], "awc": [0.13, 0.19]},
+      "Silt":            {"fc": [0.28, 0.36], "wp": [0.12, 0.22], "awc": [0.16, 0.20]},
+      "Silty Clay Loam": {"fc": [0.30, 0.37], "wp": [0.17, 0.24], "awc": [0.13, 0.18]},
+      "Silty Clay":      {"fc": [0.30, 0.42], "wp": [0.17, 0.29], "awc": [0.13, 0.19]},
+      "Clay":            {"fc": [0.32, 0.40], "wp": [0.20, 0.24], "awc": [0.12, 0.20]}
+    },
+    "row_name_note": "Table 19 prints 'Silt clay loam' for the class FieldShift's classifier calls 'Silty Clay Loam'."
+  }
+}

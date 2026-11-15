@@ -1,0 +1,1067 @@
+{
+  "schema_version": 1,
+  "retrieved": "2026-11-15",
+  "generated_by": "backend/scripts/build_crop_profiles.py",
+  "sources": {
+    "ecocrop": {
+      "name": "FAO EcoCrop database (EcoCrop_DB.csv, mirrored by OpenCLIM/ecocrop and rockerBOO/ecocrop)",
+      "url": "https://huggingface.co/datasets/rockerBOO/ecocrop",
+      "original": "https://gaez.fao.org/pages/ecocrop",
+      "note": "Species-level, global. Temperatures are mean daily air temperatures in deg C, rainfall in mm per growing cycle as used by the OpenCLIM EcoCrop model.",
+      "sha256": "4187e8846336e185c4583165211c5981855e95adfbefd897bd2bd481de48d106"
+    },
+    "sacks2010": {
+      "name": "Sacks, Deryng, Foley, Ramankutty (2010): Crop planting dates, Global Ecology and Biogeography 19, 607-620. Crop Calendar Dataset (national level, Germany, source: MWCACP Updates)",
+      "url": "https://sage.nelson.wisc.edu/data-and-models/datasets/crop-calendar-dataset/",
+      "note": "National Germany windows, not Brandenburg-specific.",
+      "sha256": "ed82ea969c523f779dbbcb29e5dc3c8efd8fe80d41bc53c8880a9813ca876032"
+    },
+    "duev_anlage4": {
+      "name": "Düngeverordnung (DüV) Anlage 4: Tabellen 2, 3 und 7",
+      "url": "https://www.gesetze-im-internet.de/d_v_2017/anlage_4.html",
+      "note": "Federal law text. Table 2 lists no N requirement value for grain legumes, so none is assumed."
+    },
+    "fao56_t22": {
+      "name": "FAO Irrigation and Drainage Paper 56, Table 22: maximum effective rooting depth",
+      "url": "https://www.fao.org/4/x0490e/x0490e0e.htm",
+      "note": "Rye and lupin are not listed, so they get no rooting depth."
+    },
+    "lfl_erbse_ff": {
+      "name": "LfL Bayern: Erbse - Fruchtfolge und Bodenbearbeitung",
+      "url": "https://www.lfl.bayern.de/ipz/oelfruechte/066675/",
+      "note": "Bavarian advisory page."
+    },
+    "lfl_erbse_saat": {
+      "name": "LfL Bayern: Erbse - Saat",
+      "url": "https://www.lfl.bayern.de/ipz/oelfruechte/066683/",
+      "note": "Bavarian advisory page."
+    },
+    "lfl_erbse_ernte": {
+      "name": "LfL Bayern: Erbse (Ernte)",
+      "url": "https://lfl.bayern.de/ipz/oelfruechte/067195/index.php",
+      "note": "Bavarian advisory page; states harvest readiness in the first half of August."
+    },
+    "lfl_ackerbohne_ff": {
+      "name": "LfL Bayern: Ackerbohne - Fruchtfolge und Bodenbearbeitung",
+      "url": "https://lfl.bayern.de/ipz/oelfruechte/068565/index.php",
+      "note": "Bavarian advisory page."
+    },
+    "lfl_ackerbohne_saat": {
+      "name": "LfL Bayern: Ackerbohne (Saat)",
+      "url": "https://lfl.bayern.de/ipz/oelfruechte/068567/index.php",
+      "note": "Bavarian advisory page."
+    },
+    "lfl_ackerbohne_ernte": {
+      "name": "LfL Bayern: Ackerbohne - Ernte",
+      "url": "https://www.lfl.bayern.de/ipz/oelfruechte/068617/index.php",
+      "note": "Bavarian advisory page."
+    },
+    "bzl_fruchtfolge": {
+      "name": "BZL (BLE): Die Fruchtfolge in der Landwirtschaft (updated 28 Aug 2025)",
+      "url": "https://www.landwirtschaft.de/tier-und-pflanze/pflanze/nutzpflanzen-allgemein/die-fruchtfolge-in-der-landwirtschaft",
+      "note": "Federal information service of the BMLEH."
+    },
+    "oekolandbau_lupine": {
+      "name": "BZL oekolandbau.de: Lupinenanbau in der ökologischen Landwirtschaft",
+      "url": "https://www.oekolandbau.de/bio-in-der-praxis/oekologische-landwirtschaft/oekologischer-pflanzenbau/bio-anbausteckbriefe/koernerleguminosen/lupinen/",
+      "note": "Federal information service; refers to the blue lupin (L. angustifolius)."
+    },
+    "tll_ww": {
+      "name": "TLL Thüringen: Leitlinie Winterweizen (8th ed. 2015)",
+      "url": "https://www.tll.de/www/daten/publikationen/leitlinien/ll_ww.pdf",
+      "note": "Regional guideline from Thuringia."
+    },
+    "tll_wra": {
+      "name": "TLL Thüringen: Leitlinie Winterraps",
+      "url": "https://www.tll.de/www/daten/publikationen/leitlinien/ll_wra.pdf",
+      "note": "Regional guideline from Thuringia."
+    }
+  },
+  "cover_crop": {
+    "label_en": "Catch crop after harvest (non-legume)",
+    "label_de": "Zwischenfrucht (Nichtleguminose)",
+    "duev_previous_crop_deduction_kg_n_ha": {
+      "value": 0,
+      "source": "duev_anlage4",
+      "ref": "Table 7: Zwischenfrucht Nichtleguminosen, abgefroren 0; im Herbst eingearbeitet 0 (spring incorporation would be 20). The legal minimum of 0 is used.",
+      "verify": true
+    },
+    "examples": {
+      "value": [
+        "Phacelia",
+        "Gelbsenf",
+        "Ölrettich",
+        "Klee"
+      ],
+      "source": "bzl_fruchtfolge",
+      "ref": "Named as typical Zwischenfrüchte by BZL; no species-level parameters are used.",
+      "verify": false
+    }
+  },
+  "crops": {
+    "winter_wheat": {
+      "id": "winter_wheat",
+      "label_en": "Winter wheat",
+      "label_de": "Winterweizen",
+      "attributes": {
+        "botanical_family": {
+          "value": "Gramineae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 2114, Triticum aestivum, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Triticum aestivum",
+            "tmin": 5.0,
+            "topmn": 15.0,
+            "topmx": 23.0,
+            "tmax": 27.0,
+            "rmin": 300.0,
+            "ropmn": 750.0,
+            "ropmx": 900.0,
+            "rmax": 1600.0,
+            "killing_temp_early": 0.0,
+            "killing_temp_rest": -20.0,
+            "cycle_days_min": 90.0,
+            "cycle_days_max": 250.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 2114",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "calendar": {
+          "value": {
+            "sow_start_doy": 272,
+            "sow_end_doy": 308,
+            "sow_median_doy": 290.0,
+            "harvest_start_doy": 209,
+            "harvest_end_doy": 246,
+            "harvest_median_doy": 227.5,
+            "winter_sown": true
+          },
+          "source": "sacks2010",
+          "ref": "Germany, national, Wheat Winter (Data.ID 711), planting 9/29-11/4, harvest 7/28-9/3",
+          "verify": true
+        },
+        "duev_n_requirement": {
+          "value": {
+            "n_kg_ha": 230,
+            "reference_yield": 80,
+            "yield_unit": "dt/ha",
+            "yield_step": 10,
+            "up_kg_per_step": 10,
+            "down_kg_per_step": 15,
+            "max_up_kg": 40
+          },
+          "source": "duev_anlage4",
+          "ref": "Table 2 row 'Winterweizen A, B' (80 dt/ha, 230 kg N/ha); Table 3 yield correction",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 0,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Getreide (mit und ohne Stroh), Silomais, Körnermais, Kartoffel: 0",
+          "verify": false
+        },
+        "rooting_depth_m": {
+          "value": {
+            "min": 1.5,
+            "max": 1.8
+          },
+          "source": "fao56_t22",
+          "ref": "Table 22 row 'Winter Wheat'",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 2,
+            "max": 3
+          },
+          "source": "bzl_fruchtfolge",
+          "ref": "'bei Weizen in der Regel zwei bis drei Jahre Anbaupause ausreichen'",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": false,
+          "source": "duev_anlage4",
+          "ref": "Not a grain legume",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": true,
+        "missing": []
+      }
+    },
+    "winter_barley": {
+      "id": "winter_barley",
+      "label_en": "Winter barley",
+      "label_de": "Wintergerste",
+      "attributes": {
+        "botanical_family": {
+          "value": "Gramineae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 1232, Hordeum vulgare, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Hordeum vulgare",
+            "tmin": 2.0,
+            "topmn": 15.0,
+            "topmx": 20.0,
+            "tmax": 40.0,
+            "rmin": 200.0,
+            "ropmn": 500.0,
+            "ropmx": 1000.0,
+            "rmax": 2000.0,
+            "killing_temp_early": 0.0,
+            "killing_temp_rest": -4.0,
+            "cycle_days_min": 90.0,
+            "cycle_days_max": 240.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 1232",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "calendar": {
+          "value": {
+            "sow_start_doy": 242,
+            "sow_end_doy": 306,
+            "sow_median_doy": 274.0,
+            "harvest_start_doy": 151,
+            "harvest_end_doy": 211,
+            "harvest_median_doy": 181.0,
+            "winter_sown": true
+          },
+          "source": "sacks2010",
+          "ref": "Germany, national, Barley Winter (Data.ID 712), planting 8/30-11/2, harvest 5/31-7/30",
+          "verify": true
+        },
+        "duev_n_requirement": {
+          "value": {
+            "n_kg_ha": 180,
+            "reference_yield": 70,
+            "yield_unit": "dt/ha",
+            "yield_step": 10,
+            "up_kg_per_step": 10,
+            "down_kg_per_step": 15,
+            "max_up_kg": 40
+          },
+          "source": "duev_anlage4",
+          "ref": "Table 2 row 'Wintergerste' (70 dt/ha, 180 kg N/ha); Table 3 yield correction",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 0,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Getreide (mit und ohne Stroh), Silomais, Körnermais, Kartoffel: 0",
+          "verify": false
+        },
+        "rooting_depth_m": {
+          "value": {
+            "min": 1.0,
+            "max": 1.5
+          },
+          "source": "fao56_t22",
+          "ref": "Table 22 row 'Barley'",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 1,
+            "max": null
+          },
+          "source": "bzl_fruchtfolge",
+          "ref": "'Bei typischen Ackerkulturen wie Getreide, Raps, Kartoffeln ... hat es sich bewährt, jährlich die Felder für den Anbau zu wechseln' read as: not in consecutive years",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": false,
+          "source": "duev_anlage4",
+          "ref": "Not a grain legume",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": true,
+        "missing": []
+      }
+    },
+    "winter_rye": {
+      "id": "winter_rye",
+      "label_en": "Winter rye",
+      "label_de": "Winterroggen",
+      "attributes": {
+        "botanical_family": {
+          "value": "Gramineae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 1929, Secale cereale, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Secale cereale",
+            "tmin": 3.0,
+            "topmn": 15.0,
+            "topmx": 20.0,
+            "tmax": 31.0,
+            "rmin": 400.0,
+            "ropmn": 600.0,
+            "ropmx": 1000.0,
+            "rmax": 2000.0,
+            "killing_temp_early": -1.0,
+            "killing_temp_rest": -18.0,
+            "cycle_days_min": 110.0,
+            "cycle_days_max": 270.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 1929",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "calendar": {
+          "value": {
+            "sow_start_doy": 243,
+            "sow_end_doy": 306,
+            "sow_median_doy": 274.5,
+            "harvest_start_doy": 151,
+            "harvest_end_doy": 212,
+            "harvest_median_doy": 181.5,
+            "winter_sown": true
+          },
+          "source": "sacks2010",
+          "ref": "Germany, national, Rye Winter (Data.ID 714), planting 8/31-11/2, harvest 5/31-7/31",
+          "verify": true
+        },
+        "duev_n_requirement": {
+          "value": {
+            "n_kg_ha": 170,
+            "reference_yield": 70,
+            "yield_unit": "dt/ha",
+            "yield_step": 10,
+            "up_kg_per_step": 10,
+            "down_kg_per_step": 15,
+            "max_up_kg": 40
+          },
+          "source": "duev_anlage4",
+          "ref": "Table 2 row 'Winterroggen' (70 dt/ha, 170 kg N/ha); Table 3 yield correction",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 0,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Getreide (mit und ohne Stroh), Silomais, Körnermais, Kartoffel: 0",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 1,
+            "max": null
+          },
+          "source": "bzl_fruchtfolge",
+          "ref": "'Bei typischen Ackerkulturen wie Getreide, Raps, Kartoffeln ... hat es sich bewährt, jährlich die Felder für den Anbau zu wechseln' read as: not in consecutive years",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": false,
+          "source": "duev_anlage4",
+          "ref": "Not a grain legume",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": false,
+        "missing": [
+          "rooting_depth_m"
+        ]
+      }
+    },
+    "winter_triticale": {
+      "id": "winter_triticale",
+      "label_en": "Winter triticale",
+      "label_de": "Wintertriticale",
+      "attributes": {
+        "duev_n_requirement": {
+          "value": {
+            "n_kg_ha": 190,
+            "reference_yield": 70,
+            "yield_unit": "dt/ha",
+            "yield_step": 10,
+            "up_kg_per_step": 10,
+            "down_kg_per_step": 15,
+            "max_up_kg": 40
+          },
+          "source": "duev_anlage4",
+          "ref": "Table 2 row 'Wintertriticale' (70 dt/ha, 190 kg N/ha); Table 3 yield correction",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 0,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Getreide (mit und ohne Stroh), Silomais, Körnermais, Kartoffel: 0",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 1,
+            "max": null
+          },
+          "source": "bzl_fruchtfolge",
+          "ref": "'Bei typischen Ackerkulturen wie Getreide, Raps, Kartoffeln ... hat es sich bewährt, jährlich die Felder für den Anbau zu wechseln' read as: not in consecutive years",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": false,
+          "source": "duev_anlage4",
+          "ref": "Not a grain legume",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": false,
+        "missing": [
+          "botanical_family",
+          "calendar",
+          "ecocrop",
+          "rooting_depth_m"
+        ]
+      }
+    },
+    "winter_rapeseed": {
+      "id": "winter_rapeseed",
+      "label_en": "Winter oilseed rape",
+      "label_de": "Winterraps",
+      "attributes": {
+        "botanical_family": {
+          "value": "Cruciferae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 549, Brassica napus, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Brassica napus",
+            "tmin": 5.0,
+            "topmn": 15.0,
+            "topmx": 25.0,
+            "tmax": 41.0,
+            "rmin": 400.0,
+            "ropmn": 500.0,
+            "ropmx": 1000.0,
+            "rmax": 2800.0,
+            "killing_temp_early": -6.0,
+            "killing_temp_rest": -15.0,
+            "cycle_days_min": 85.0,
+            "cycle_days_max": 340.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 549",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "calendar": {
+          "value": {
+            "sow_start_doy": 212,
+            "sow_end_doy": 276,
+            "sow_median_doy": 244.0,
+            "harvest_start_doy": 152,
+            "harvest_end_doy": 212,
+            "harvest_median_doy": 182.0,
+            "winter_sown": true
+          },
+          "source": "sacks2010",
+          "ref": "Germany, national, Rapeseed Winter (Data.ID 715), planting 7/31-10/3, harvest 6/1-7/31",
+          "verify": true
+        },
+        "duev_n_requirement": {
+          "value": {
+            "n_kg_ha": 200,
+            "reference_yield": 40,
+            "yield_unit": "dt/ha",
+            "yield_step": 5,
+            "up_kg_per_step": 10,
+            "down_kg_per_step": 15,
+            "max_up_kg": 40
+          },
+          "source": "duev_anlage4",
+          "ref": "Table 2 row 'Winterraps' (40 dt/ha, 200 kg N/ha); Table 3 yield correction",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 10,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Raps, Körnerleguminosen, Kohlgemüse: 10",
+          "verify": false
+        },
+        "rooting_depth_m": {
+          "value": {
+            "min": 1.0,
+            "max": 1.5
+          },
+          "source": "fao56_t22",
+          "ref": "Table 22 row 'Rapeseed, Canola'",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 1,
+            "max": null
+          },
+          "source": "tll_wra",
+          "ref": "'Selbstfolge unbedingt vermeiden (hoher Schaderreger- und Krankheitsdruck)' read as: not in consecutive years",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": false,
+          "source": "duev_anlage4",
+          "ref": "Not a grain legume",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": true,
+        "missing": []
+      }
+    },
+    "silage_maize": {
+      "id": "silage_maize",
+      "label_en": "Silage maize",
+      "label_de": "Silomais",
+      "attributes": {
+        "botanical_family": {
+          "value": "Gramineae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 2175, Zea mays, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Zea mays",
+            "tmin": 10.0,
+            "topmn": 18.0,
+            "topmx": 33.0,
+            "tmax": 47.0,
+            "rmin": 400.0,
+            "ropmn": 600.0,
+            "ropmx": 1200.0,
+            "rmax": 1800.0,
+            "killing_temp_early": null,
+            "killing_temp_rest": null,
+            "cycle_days_min": 65.0,
+            "cycle_days_max": 365.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 2175",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "duev_n_requirement": {
+          "value": {
+            "n_kg_ha": 200,
+            "reference_yield": 450,
+            "yield_unit": "dt/ha",
+            "yield_step": 50,
+            "up_kg_per_step": 10,
+            "down_kg_per_step": 15,
+            "max_up_kg": 40
+          },
+          "source": "duev_anlage4",
+          "ref": "Table 2 row 'Silomais' (450 dt/ha, 200 kg N/ha); Table 3 yield correction",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 0,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Getreide (mit und ohne Stroh), Silomais, Körnermais, Kartoffel: 0",
+          "verify": false
+        },
+        "rooting_depth_m": {
+          "value": {
+            "min": 1.0,
+            "max": 1.7
+          },
+          "source": "fao56_t22",
+          "ref": "Table 22 row 'Maize, Field (grain) (field corn); silage maize not listed separately'",
+          "verify": true
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 1,
+            "max": null
+          },
+          "source": "bzl_fruchtfolge",
+          "ref": "'Bei typischen Ackerkulturen wie Getreide, Raps, Kartoffeln ... hat es sich bewährt, jährlich die Felder für den Anbau zu wechseln' read as: not in consecutive years",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": false,
+          "source": "duev_anlage4",
+          "ref": "Not a grain legume",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": false,
+        "missing": [
+          "calendar"
+        ]
+      }
+    },
+    "sugar_beet": {
+      "id": "sugar_beet",
+      "label_en": "Sugar beet",
+      "label_de": "Zuckerrübe",
+      "attributes": {
+        "botanical_family": {
+          "value": "Chenopodiaceae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 48742, Beta vulgaris var. saccharifera, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Beta vulgaris var. saccharifera",
+            "tmin": 7.0,
+            "topmn": 15.0,
+            "topmx": 25.0,
+            "tmax": 30.0,
+            "rmin": 250.0,
+            "ropmn": 400.0,
+            "ropmx": 700.0,
+            "rmax": 1000.0,
+            "killing_temp_early": -1.0,
+            "killing_temp_rest": -3.0,
+            "cycle_days_min": 60.0,
+            "cycle_days_max": 140.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 48742",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "calendar": {
+          "value": {
+            "sow_start_doy": 85,
+            "sow_end_doy": 150,
+            "sow_median_doy": 117.5,
+            "harvest_start_doy": 243,
+            "harvest_end_doy": 304,
+            "harvest_median_doy": 273.5,
+            "winter_sown": false
+          },
+          "source": "sacks2010",
+          "ref": "Germany, national, Sugarbeets  (Data.ID 716), planting 3/26-5/30, harvest 8/31-10/31",
+          "verify": true
+        },
+        "duev_n_requirement": {
+          "value": {
+            "n_kg_ha": 170,
+            "reference_yield": 650,
+            "yield_unit": "dt/ha",
+            "yield_step": 100,
+            "up_kg_per_step": 10,
+            "down_kg_per_step": 15,
+            "max_up_kg": 40
+          },
+          "source": "duev_anlage4",
+          "ref": "Table 2 row 'Zuckerrübe' (650 dt/ha, 170 kg N/ha); Table 3 yield correction",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 10,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Zuckerrüben ohne Blattbergung: 10 (leaves left on the field)",
+          "verify": false
+        },
+        "rooting_depth_m": {
+          "value": {
+            "min": 0.7,
+            "max": 1.2
+          },
+          "source": "fao56_t22",
+          "ref": "Table 22 row 'Sugar Beet'",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 1,
+            "max": null
+          },
+          "source": "bzl_fruchtfolge",
+          "ref": "'Bei typischen Ackerkulturen wie Getreide, Raps, Kartoffeln ... hat es sich bewährt, jährlich die Felder für den Anbau zu wechseln' read as: not in consecutive years",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": false,
+          "source": "duev_anlage4",
+          "ref": "Not a grain legume",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": true,
+        "missing": []
+      }
+    },
+    "potato": {
+      "id": "potato",
+      "label_en": "Potato",
+      "label_de": "Kartoffel",
+      "attributes": {
+        "botanical_family": {
+          "value": "Solanaceae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 1971, Solanum tuberosum, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Solanum tuberosum",
+            "tmin": 7.0,
+            "topmn": 15.0,
+            "topmx": 25.0,
+            "tmax": 30.0,
+            "rmin": 250.0,
+            "ropmn": 500.0,
+            "ropmx": 800.0,
+            "rmax": 2000.0,
+            "killing_temp_early": 0.0,
+            "killing_temp_rest": -1.0,
+            "cycle_days_min": 90.0,
+            "cycle_days_max": 160.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 1971",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "duev_n_requirement": {
+          "value": {
+            "n_kg_ha": 180,
+            "reference_yield": 450,
+            "yield_unit": "dt/ha",
+            "yield_step": 50,
+            "up_kg_per_step": 10,
+            "down_kg_per_step": 10,
+            "max_up_kg": 40
+          },
+          "source": "duev_anlage4",
+          "ref": "Table 2 row 'Kartoffel' (450 dt/ha, 180 kg N/ha); Table 3 yield correction",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 0,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Getreide (mit und ohne Stroh), Silomais, Körnermais, Kartoffel: 0",
+          "verify": false
+        },
+        "rooting_depth_m": {
+          "value": {
+            "min": 0.4,
+            "max": 0.6
+          },
+          "source": "fao56_t22",
+          "ref": "Table 22 row 'Potato'",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 1,
+            "max": null
+          },
+          "source": "bzl_fruchtfolge",
+          "ref": "'Bei typischen Ackerkulturen wie Getreide, Raps, Kartoffeln ... hat es sich bewährt, jährlich die Felder für den Anbau zu wechseln' read as: not in consecutive years",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": false,
+          "source": "duev_anlage4",
+          "ref": "Not a grain legume",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": false,
+        "missing": [
+          "calendar"
+        ]
+      }
+    },
+    "faba_bean": {
+      "id": "faba_bean",
+      "label_en": "Field bean (faba)",
+      "label_de": "Ackerbohne",
+      "attributes": {
+        "botanical_family": {
+          "value": "Leguminosae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 2146, Vicia faba, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Vicia faba",
+            "tmin": 5.0,
+            "topmn": 18.0,
+            "topmx": 28.0,
+            "tmax": 32.0,
+            "rmin": 250.0,
+            "ropmn": 650.0,
+            "ropmx": 1000.0,
+            "rmax": 2600.0,
+            "killing_temp_early": null,
+            "killing_temp_rest": null,
+            "cycle_days_min": 100.0,
+            "cycle_days_max": 150.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 2146",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "calendar": {
+          "value": {
+            "sow_start_doy": 60,
+            "sow_end_doy": 100,
+            "sow_median_doy": 80.0,
+            "harvest_start_doy": 213,
+            "harvest_end_doy": 273,
+            "harvest_median_doy": 243.0,
+            "winter_sown": false
+          },
+          "source": "lfl_ackerbohne_saat",
+          "ref": "sowing: 'von März bis spätestens Anfang April' read as 1 March to 10 April; harvest (lfl_ackerbohne_ernte): 'Im August/September ... sind Ackerbohnen zur Ernte reif' read as 1 Aug to 30 Sep",
+          "verify": true,
+          "note": "Words in the source were converted to dates; the median is the midpoint of the window."
+        },
+        "duev_n_requirement": {
+          "value": null,
+          "source": "duev_anlage4",
+          "ref": "Not listed in Table 2: no N requirement value exists for this crop in DüV Anlage 4.",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 10,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Raps, Körnerleguminosen, Kohlgemüse: 10",
+          "verify": false
+        },
+        "rooting_depth_m": {
+          "value": {
+            "min": 0.5,
+            "max": 0.7
+          },
+          "source": "fao56_t22",
+          "ref": "Table 22 row 'Fababean (broad bean) - Dry/Seed'",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 4,
+            "max": 5
+          },
+          "source": "lfl_ackerbohne_ff",
+          "ref": "'sollte eine Anbaupause von mindestens 4 bis 5 Jahren eingehalten werden'",
+          "verify": true
+        },
+        "n_fixation_kg_ha": {
+          "value": 170,
+          "source": "lfl_ackerbohne_ff",
+          "ref": "'im Durchschnitt 170 kg N/ha, wovon für die Nachfrucht ca. 30 kg zur Verfügung stehen'",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": true,
+          "source": "duev_anlage4",
+          "ref": "Körnerleguminosen (Table 7 previous-crop group)",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": true,
+        "missing": []
+      }
+    },
+    "field_pea": {
+      "id": "field_pea",
+      "label_en": "Field pea",
+      "label_de": "Körnererbse",
+      "attributes": {
+        "botanical_family": {
+          "value": "Leguminosae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 1721, Pisum sativum, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Pisum sativum",
+            "tmin": 4.0,
+            "topmn": 10.0,
+            "topmx": 24.0,
+            "tmax": 30.0,
+            "rmin": 350.0,
+            "ropmn": 800.0,
+            "ropmx": 1200.0,
+            "rmax": 2500.0,
+            "killing_temp_early": 0.0,
+            "killing_temp_rest": -2.0,
+            "cycle_days_min": 60.0,
+            "cycle_days_max": 140.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 1721",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "calendar": {
+          "value": {
+            "sow_start_doy": 80,
+            "sow_end_doy": 120,
+            "sow_median_doy": 100.0,
+            "harvest_start_doy": 213,
+            "harvest_end_doy": 227,
+            "harvest_median_doy": 220.0,
+            "winter_sown": false
+          },
+          "source": "lfl_erbse_saat",
+          "ref": "sowing: 'ab Ende März bis spätestens Ende April' read as 21 March to 30 April; harvest (lfl_erbse_ernte): 'In der ersten Augusthälfte sind Körnererbsen i.d.R. erntereif' read as 1 to 15 Aug",
+          "verify": true,
+          "note": "Words in the source were converted to dates; the median is the midpoint of the window."
+        },
+        "duev_n_requirement": {
+          "value": null,
+          "source": "duev_anlage4",
+          "ref": "Not listed in Table 2: no N requirement value exists for this crop in DüV Anlage 4.",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 10,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Raps, Körnerleguminosen, Kohlgemüse: 10",
+          "verify": false
+        },
+        "rooting_depth_m": {
+          "value": {
+            "min": 0.6,
+            "max": 1.0
+          },
+          "source": "fao56_t22",
+          "ref": "Table 22 row 'Peas - Dry/Seed'",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 5,
+            "max": 6
+          },
+          "source": "lfl_erbse_ff",
+          "ref": "'muss eine Anbaupause von 5 bis 6 Jahren eingehalten werden'",
+          "verify": true
+        },
+        "n_fixation_kg_ha": {
+          "value": 150,
+          "source": "lfl_erbse_ff",
+          "ref": "'biologische Stickstofffixierung beträgt im Durchschnitt 150 kg N/ha'",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": true,
+          "source": "duev_anlage4",
+          "ref": "Körnerleguminosen (Table 7 previous-crop group)",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": true,
+        "missing": []
+      }
+    },
+    "blue_lupin": {
+      "id": "blue_lupin",
+      "label_en": "Blue lupin",
+      "label_de": "Blaue Lupine",
+      "attributes": {
+        "botanical_family": {
+          "value": "Leguminosae",
+          "source": "ecocrop",
+          "ref": "EcoPortCode 2519, Lupinus angustifolius, FAMNAME",
+          "verify": false
+        },
+        "ecocrop": {
+          "value": {
+            "scientific_name": "Lupinus angustifolius",
+            "tmin": 4.0,
+            "topmn": 12.0,
+            "topmx": 18.0,
+            "tmax": 26.0,
+            "rmin": 350.0,
+            "ropmn": 400.0,
+            "ropmx": 1000.0,
+            "rmax": 1700.0,
+            "killing_temp_early": -6.0,
+            "killing_temp_rest": -6.0,
+            "cycle_days_min": 100.0,
+            "cycle_days_max": 180.0
+          },
+          "source": "ecocrop",
+          "ref": "EcoPortCode 2519",
+          "verify": true,
+          "note": "Species-level values. Winter and spring forms are not distinguished."
+        },
+        "calendar": {
+          "value": {
+            "sow_start_doy": 74,
+            "sow_end_doy": 100,
+            "sow_median_doy": 87.0,
+            "harvest_start_doy": 237,
+            "harvest_end_doy": 273,
+            "harvest_median_doy": 255.0,
+            "winter_sown": false
+          },
+          "source": "oekolandbau_lupine",
+          "ref": "sowing: 'zwischen Mitte März und Anfang April' read as 15 March to 10 April (terminal types to mid-April); harvest (oekolandbau_lupine): 'Endständige Sorten reifen Ende August ... Verzweigungstypen ... bis Ende September' read as 25 Aug to 30 Sep",
+          "verify": true,
+          "note": "Words in the source were converted to dates; the median is the midpoint of the window."
+        },
+        "duev_n_requirement": {
+          "value": null,
+          "source": "duev_anlage4",
+          "ref": "Not listed in Table 2: no N requirement value exists for this crop in DüV Anlage 4.",
+          "verify": false
+        },
+        "duev_previous_crop_deduction_kg_n_ha": {
+          "value": 10,
+          "source": "duev_anlage4",
+          "ref": "Table 7: Raps, Körnerleguminosen, Kohlgemüse: 10",
+          "verify": false
+        },
+        "rotation_break_years": {
+          "value": {
+            "min": 6,
+            "max": null
+          },
+          "source": "oekolandbau_lupine",
+          "ref": "'Anbaupausen von mindestens sechs Jahren eingehalten werden'",
+          "verify": true
+        },
+        "grain_legume": {
+          "value": true,
+          "source": "duev_anlage4",
+          "ref": "Körnerleguminosen (Table 7 previous-crop group)",
+          "verify": false
+        }
+      },
+      "scoring": {
+        "eligible": false,
+        "missing": [
+          "rooting_depth_m"
+        ]
+      }
+    }
+  }
+}

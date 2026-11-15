@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "MODEL PARAMETERS, not field data",
+  "note": "These numbers are design choices that set how strongly each factor counts. They are not measurements. Change them here and the scores, explanations and tests follow. Each is listed in the 'Limitations' box of a recommendation.",
+  "climate_window": {"years": 10, "end_year": "last complete calendar year"},
+  "factor_weights": {
+    "water": {"rain_adequacy": 0.5, "soil_water_buffer": 0.5},
+    "soil_cover": {"erosion_weighted_cover": 1.0},
+    "nitrogen": {"fertiliser_need": 0.6, "leaching_exposure": 0.4},
+    "heat": {"temperature_suitability": 0.5, "frost_survival": 0.2, "field_evaporative_stress": 0.3}
+  },
+  "priority_axis_weights": {
+    "save_water": {"water": 0.4, "soil_cover": 0.2, "nitrogen": 0.2, "heat": 0.2},
+    "reduce_nitrogen": {"water": 0.2, "soil_cover": 0.2, "nitrogen": 0.4, "heat": 0.2},
+    "prevent_erosion": {"water": 0.2, "soil_cover": 0.4, "nitrogen": 0.2, "heat": 0.2},
+    "break_pest_cycles": {"water": 0.25, "soil_cover": 0.25, "nitrogen": 0.25, "heat": 0.25}
+  },
+  "rotation_terms": {
+    "diversity_weight": 0.10,
+    "legume_in_rotation_bonus": 0.05,
+    "break_violation_penalty_per_case": 0.10,
+    "pest_priority_diversity_weight": 0.25
+  },
+  "feasibility": {
+    "min_gap_days_between_harvest_and_sowing": 14,
+    "min_catch_crop_window_days": 30,
+    "note": "Gap days and catch-crop window are model parameters. Qualitative support: BZL (Raps is sown in mid-August, so late-harvested crops are not suitable predecessors) and TLL Winterroggen guideline (late-clearing predecessors such as maize or beet are unsuitable)."
+  },
+  "bare_ndvi_threshold": {"value": 0.25, "ref": "Same threshold the existing FieldShift erosion screening uses (health/risks.py)."},
+  "heavy_rain_mm_day": {"value": 20.0, "ref": "Same threshold the existing FieldShift rain summary uses (health/risks.py)."},
+  "percolation_months": {"value": [10, 11, 12, 1, 2, 3], "ref": "Model choice: months in which rainfall mostly drains below the root zone in a central European climate."},
+  "timeline": {
+    "hazard_bands": {"medium_from": 0.33, "high_from": 0.66},
+    "cover_bands": {"partly_from": 0.2, "shielded_from": 0.8},
+    "note": "Display bands for the vulnerability timeline. Hazard values are scaled to the field's own wettest/driest/frostiest month, so 'high' means high compared with the rest of this field's year."
+  },
+  "traffic_light": {
+    "heat_stress_esi": {"yellow_below": 0.6, "red_below": 0.4},
+    "bare_days": {"yellow_from": 110, "red_from": 183},
+    "note": "Display colours for the risk card only. They do not feed the scores. 110 days is the 30 % of a year that the existing FieldShift erosion screening already uses for bare soil; 183 days is half a year. The ESI bands are display choices."
+  }
+}

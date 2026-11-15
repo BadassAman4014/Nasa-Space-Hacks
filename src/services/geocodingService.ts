@@ -293,6 +293,34 @@ export async function executeUnifiedSearch(
     }
   }
 
+  // 4. Remote lookup for German postal codes (e.g. 03046) and places missing from the local catalog.
+  const hasPostcode = /(^|\s)\d{5}(\s|$)/.test(q);
+  if (!parsedCoords && (hasPostcode || (locationResults.length === 0 && q.length >= 4))) {
+    try {
+      const res = await fetch(`/api/boundaries/geocode?q=${encodeURIComponent(query.trim())}`);
+      if (res.ok) {
+        const places: { title: string; display_name: string; lat: number; lon: number; bounds?: [[number, number], [number, number]] | null }[] =
+          await res.json();
+        for (const p of places) {
+          const inBB = isWithinBrandenburg(p.lat, p.lon);
+          locationResults.push({
+            id: `geo-${p.lat}-${p.lon}`,
+            category: 'location',
+            title: p.title,
+            subtitle: p.display_name,
+            badge: inBB ? 'Address' : 'Outside Brandenburg',
+            lat: p.lat,
+            lon: p.lon,
+            bounds: p.bounds || undefined,
+            inBrandenburg: inBB,
+          });
+        }
+      }
+    } catch {
+      // Remote lookup is optional; the local catalog results still apply.
+    }
+  }
+
   // Ranking logic based on page context:
   if (options.mode === 'dashboard') {
     // Dashboard Priority:

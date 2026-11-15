@@ -1,0 +1,146 @@
+[
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "",
+  "url": "https://www.google.com/ccm/collect?rcb=8&frm=0&apvc=1&ae=g&auid=138944782.1794686475&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&en=page_view&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b9"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "",
+  "url": "https://www.google.com/ccm/collect?rcb=3&frm=0&apvc=0&ae=g&auid=138944782.1794686475&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&tid=AW-809967204&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "",
+  "url": "https://ad.doubleclick.net/ccm/s/collect?_gsid=2jpJZs1OAHUIWwuxFb5Sno_j1QrC6_c-Wg&auid=138944782.1794686475&gtm=45He6bb1v79263775za200zd79263775xeaxf1&fmt=8"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-4ZE0YNFRSC&gtm=45je6bb1v868861139za20ozb79263775zd79263775xf1&_p=1794686474481&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGAC&cid=1285371576.1794686475"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "application/json",
+  "url": "https://platform-api.onesoil.ai/v2/translations/plain?filter{language}=en"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1v877019550za208zb79263775zd79263775xf1&_p=1794686474481&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGAC&_prs=ok&cid=1285371576.17"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "",
+  "url": "https://region1.analytics.google.com/measurement/conversion?random=1794686476758&cv=11&tid=G-GG1QD01YHB&fst=1794686476758&fmt=8&en=session_start&gtm=45je6bb1v877019550za208zb79263775zd79263775xecxf1&gcd=13l3lPl2l1l1&dma_"
+ },
+ {
+  "status": 200,
+  "type": "xhr",
+  "ct": "text/plain",
+  "url": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=1793279347&t=pageview&_s=1&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Freport%3Fll%3D28.383681%253A49.412995%26z%3D14.86&ul=en-u"
+ },
+ {
+  "status": 200,
+  "type": "xhr",
+  "ct": "text/plain",
+  "url": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=1453455307&t=pageview&_s=1&dl=https%3A%2F%2Fapp.onesoil.ai%2Fauth%2Flogin%3Fapp%3Dhttps%3A%2F%2Fapp.yield.onesoil.ai%2Fauthorize%26embedded&dr=https%3A%2F%2Fapp.yi"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "",
+  "url": "https://ad.doubleclick.net/ccm/s/collect?_gsid=_7p_AXubwF4fgEgig9us421BqMPeAT7PLA&auid=138944782.1794686475&gtm=45He6bb1v79263775za200zd79263775xeaxf1&fmt=8"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "",
+  "url": "https://www.google.com/ccm/collect?rcb=3&frm=0&apvc=1&ae=g&auid=138944782.1794686475&dt=OneSoil&en=page_view&dl=https%3A%2F%2Fapp.onesoil.ai%2Fauth%2Flogin%3Fapp%3Dhttps%3A%2F%2Fapp.yield.onesoil.ai%2Fauthorize%26embedde"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1v877019550za20ozb78912859zd78912859xf1&_p=1794686476951&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGQC&cid=1285371576.1794686475&frm=0&"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "",
+  "url": "https://www.google.com/ccm/collect?rcb=4&frm=0&apvc=0&ae=g&auid=138944782.1794686475&dt=OneSoil&tid=AW-809967204&dl=https%3A%2F%2Fapp.onesoil.ai%2Fauth%2Flogin%3Fapp%3Dhttps%3A%2F%2Fapp.yield.onesoil.ai%2Fauthorize%26emb"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-5WN396QT3F&gtm=45je6bb1h1v9135665246za20gxf1&_p=1794686476951&_gaz=1&gcd=13l3lPl2l3l1&npa=1&dma_cps=a&dma=1&_eu=EBAIACAC&cid=1285371576.1794686475&frm=0&ibt=1&ir=1"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1v877019550za20gzb78912859zd78912859xf1&_p=1794686476951&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AEAAAGQC&ae=a&cid=1285371576.1794686475&f"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "application/json",
+  "url": "https://platform-api.onesoil.ai/v2/translations/plain?filter{language}=en"
+ },
+ {
+  "status": 400,
+  "type": "xhr",
+  "ct": "application/json; charset=utf-8",
+  "url": "https://app.adjust.com/session"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "application/json; charset=UTF-8",
+  "url": "https://firebaseinstallations.googleapis.com/v1/projects/onesoil-scouting/installations"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "application/json; charset=UTF-8",
+  "url": "https://firebaseremoteconfig.googleapis.com/v1/projects/onesoil-scouting/namespaces/firebase:fetch?key=AIzaSyC8xpip2-HfeI2NFV3JeM1D_b4V3aHf884"
+ },
+ {
+  "status": 200,
+  "type": "fetch",
+  "ct": "application/json; charset=UTF-8",
+  "url": "https://firebaseremoteconfig.googleapis.com/v1/projects/onesoil-scouting/namespaces/firebase:fetch?key=AIzaSyC8xpip2-HfeI2NFV3JeM1D_b4V3aHf884"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-4ZE0YNFRSC&gtm=45je6bb1v868861139za20ozb79263775zd79263775xf1&_p=1794686476951&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGQC&cid=1285371576.1794686475&frm=0&"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1v877019550za20ozb78912859zd78912859xf1&_p=1794686476951&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAACAGQC&cid=1285371576.1794686475&frm=0&"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-4ZE0YNFRSC&gtm=45je6bb1v868861139za20gzb79263775zd79263775xf1&_p=1794686476951&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AEAAAGQC&ae=a&cid=1285371576.1794686475&f"
+ },
+ {
+  "status": 204,
+  "type": "fetch",
+  "ct": "text/plain",
+  "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1v877019550za20gzb78912859zd78912859xf1&_p=1794686476951&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AEAAAGQC&ae=a&cid=1285371576.1794686475&f"
+ }
+]

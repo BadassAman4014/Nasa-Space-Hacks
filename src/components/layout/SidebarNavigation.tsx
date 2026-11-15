@@ -45,7 +45,7 @@ export const NAV_ITEMS: NavItemConfig[] = [
 
   // Group 2 — Farm Operations
   { id: 'farmer-profile',     labelKey: 'nav.farmerProfile',     defaultLabel: 'Farmer Profile',   group: 2, icon: Users },
-  { id: 'rotation-studio',    labelKey: 'nav.rotationStudio',    defaultLabel: 'Rotation Studio',  group: 2, icon: Sprout, badge: 'NEW' },
+  { id: 'rotation-studio',    labelKey: 'nav.rotationStudio',    defaultLabel: 'Crop Planner',  group: 2, icon: Sprout, badge: 'NEW' },
   { id: 'scenario-simulator', labelKey: 'nav.scenarioSimulator', defaultLabel: 'Scenarios',        group: 2, icon: SlidersHorizontal },
 
   // Group 3 — Reporting

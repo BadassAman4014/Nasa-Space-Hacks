@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GeoJSON, MapContainer, ScaleControl, TileLayer, ZoomControl } from 'react-leaflet';
-import type { FeatureCollection, Polygon } from 'geojson';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { SidebarV2 } from './components/shell/Sidebar';
 import { DashboardV2 } from './components/dashboard/Dashboard';
@@ -9,13 +7,14 @@ import { FieldAnalyticsWorkspace } from './components/analytics/FieldAnalyticsWo
 import { WeatherView } from './components/weather/WeatherView';
 import { AIAssistantView } from './components/ai-assistant/AIAssistantView';
 import { AdvisorDrawer } from './components/advisor/AdvisorDrawer';
+import { CropPlannerView } from './components/crop-planner/CropPlannerView';
 import { SettingsModal } from './components/common/SettingsModal';
 import { useI18n } from './i18n';
 import {
-  Activity, ArrowLeft, BarChart3, Bell, BrainCircuit, Check, ChevronDown, ChevronRight,
-  CircleHelp, CloudRain, CloudSun, Compass, Download, Droplets, Eye, FileText, Globe2,
-  Layers3, Leaf, Map, MapPin, Menu, MoreHorizontal, Navigation, Plus, Search, Settings,
-  ShieldCheck, SlidersHorizontal, Sprout, Sun, Thermometer, TrendingUp, Users, X, Zap
+  Activity, ArrowLeft, Bell, BrainCircuit, Check, ChevronDown, ChevronRight,
+  CircleHelp, CloudRain, Download, Droplets, Eye, Globe2,
+  Leaf, Menu, Plus, Search, Settings,
+  ShieldCheck, Sprout, Sun, Thermometer, TrendingUp, X
 } from 'lucide-react';
 
 export type PageKey =
@@ -120,6 +119,7 @@ function App() {
               onClose={() => navigate('dashboard')}
               notify={notify}
               onSelectField={(id) => setAnalyticsFieldId(id)}
+              onNavigate={(p) => navigate(p as PageKey)}
             />
           )}
           {page === 'ai-assistant' && (
@@ -140,7 +140,9 @@ function App() {
           )}
           {page === 'environment' && <Environment />}
           {page === 'farmer-profile' && <FarmerProfile notify={notify} />}
-          {page === 'rotation-studio' && <RotationStudio notify={notify} />}
+          {page === 'rotation-studio' && (
+            <CropPlannerView fieldId={analyticsFieldId} onSelectField={(id) => setAnalyticsFieldId(id)} notify={notify} />
+          )}
           {page === 'scenario-simulator' && <ScenarioSimulator notify={notify} />}
           {page === 'reports' && <Reports notify={notify} />}
         </div>
@@ -248,26 +250,6 @@ function CardHeader({ title, subtitle, action }: { title: string; subtitle?: str
         {subtitle && <span>{subtitle}</span>}
       </div>
       {action}
-    </div>
-  );
-}
-
-function Metric({ label, value, unit, trend, icon: Icon, tone = 'green' }: { label: string; value: string; unit?: string; trend?: string; icon: typeof Droplets; tone?: string }) {
-  return (
-    <div className="metric">
-      <div className="metric-top">
-        <span>{label}</span>
-        <span className={`metric-icon ${tone}`}><Icon size={16} /></span>
-      </div>
-      <div className="metric-value">
-        {value}
-        <small>{unit}</small>
-      </div>
-      {trend && (
-        <div className="metric-trend">
-          <TrendingUp size={13} /> {trend}
-        </div>
-      )}
     </div>
   );
 }
@@ -622,295 +604,6 @@ function CropHistory() {
         ))}
       </div>
     </>
-  );
-}
-
-function RotationStudio({ notify }: { notify: (message: string) => void }) {
-  const { t } = useI18n();
-  const [generated, setGenerated] = useState(false);
-  const [active, setActive] = useState('comparison');
-
-  const strategies = [
-    {
-      name: t('rotationStudio.strategies.existing.name'),
-      tag: t('rotationStudio.strategies.existing.tag'),
-      score: 62,
-      description: t('rotationStudio.strategies.existing.description'),
-      color: 'neutral',
-      crops: [
-        t('farmerProfile.crops.winterWheat'),
-        t('farmerProfile.crops.fieldPeas'),
-        t('farmerProfile.crops.winterBarley'),
-        t('farmerProfile.crops.coverCrop'),
-      ],
-      benefits: [
-        t('rotationStudio.strategies.existing.benefit1'),
-        t('rotationStudio.strategies.existing.benefit2'),
-      ],
-      risks: [t('rotationStudio.strategies.existing.risk1')],
-    },
-    {
-      name: t('rotationStudio.strategies.waterResilient.name'),
-      tag: t('rotationStudio.strategies.waterResilient.tag'),
-      score: 84,
-      description: t('rotationStudio.strategies.waterResilient.description'),
-      color: 'green',
-      crops: [
-        t('farmerProfile.crops.winterWheat'),
-        t('farmerProfile.crops.fieldPeas'),
-        t('farmerProfile.crops.sorghum'),
-        t('farmerProfile.crops.coverCrop'),
-      ],
-      benefits: [
-        t('rotationStudio.strategies.waterResilient.benefit1'),
-        t('rotationStudio.strategies.waterResilient.benefit2'),
-      ],
-      risks: [t('rotationStudio.strategies.waterResilient.risk1')],
-    },
-    {
-      name: t('rotationStudio.strategies.soilHealth.name'),
-      tag: t('rotationStudio.strategies.soilHealth.tag'),
-      score: 79,
-      description: t('rotationStudio.strategies.soilHealth.description'),
-      color: 'blue',
-      crops: [
-        t('farmerProfile.crops.winterBarley'),
-        t('farmerProfile.crops.clover'),
-        t('farmerProfile.crops.winterWheat'),
-        t('farmerProfile.crops.fieldPeas'),
-      ],
-      benefits: [
-        t('rotationStudio.strategies.soilHealth.benefit1'),
-        t('rotationStudio.strategies.soilHealth.benefit2'),
-      ],
-      risks: [t('rotationStudio.strategies.soilHealth.risk1')],
-    },
-  ];
-
-  return (
-    <>
-      <PageTitle
-        eyebrow={t('rotationStudio.eyebrow')}
-        title={t('rotationStudio.title')}
-        description={t('rotationStudio.description')}
-        action={generated ? t('rotationStudio.regenerate') : t('rotationStudio.generateRecommendations')}
-        onAction={() => {
-          setGenerated(true);
-          notify(t('rotationStudio.threeStrategiesNotify'));
-        }}
-      />
-      <div className="studio-banner">
-        <div className="banner-icon"><BrainCircuit size={22} /></div>
-        <div>
-          <strong>
-            {generated
-              ? t('rotationStudio.readyToReviewTitle')
-              : t('rotationStudio.readyToExploreTitle')}
-          </strong>
-          <p>
-            {generated
-              ? t('rotationStudio.readyToReviewDesc')
-              : t('rotationStudio.readyToExploreDesc')}
-          </p>
-        </div>
-        <div className="confidence">
-          <span>{t('rotationStudio.modelConfidence')}</span>
-          <strong>{t('rotationStudio.confidenceModerate')}</strong>
-          <small>{t('rotationStudio.basedOnDemo')}</small>
-        </div>
-      </div>
-
-      <div className="studio-tabs">
-        {[
-          ['comparison', t('rotationStudio.tabs.strategyComparison')],
-          ['timeline', t('rotationStudio.tabs.timeline')],
-          ['metrics', t('rotationStudio.tabs.metrics')],
-          ['evidence', t('rotationStudio.tabs.evidence')],
-        ].map(([id, label]) => (
-          <button className={active === id ? 'active' : ''} onClick={() => setActive(id)} key={id}>
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {active === 'comparison' && (
-        <div className="strategy-grid">
-          {strategies.map((strategy) => (
-            <StrategyCard
-              key={strategy.name}
-              {...strategy}
-              onCompare={() => notify(t('rotationStudio.strategyAddedNotify', { name: strategy.name }))}
-            />
-          ))}
-        </div>
-      )}
-
-      {active === 'timeline' && (
-        <Card>
-          <CardHeader
-            title={t('rotationStudio.fourYearTimelineTitle')}
-            subtitle={t('rotationStudio.waterResilientSubtitle')}
-          />
-          <div className="timeline">
-            {['2026', '2027', '2028', '2029'].map((year, index) => (
-              <div className="timeline-year" key={year}>
-                <span>{year}</span>
-                <div className={`crop-tile crop-${index}`}>
-                  <Sprout size={22} />
-                  <strong>
-                    {[
-                      t('farmerProfile.crops.winterWheat'),
-                      t('farmerProfile.crops.fieldPeas'),
-                      t('farmerProfile.crops.sorghum'),
-                      t('farmerProfile.crops.coverCrop'),
-                    ][index]}
-                  </strong>
-                  <small>
-                    {[
-                      'High water efficiency',
-                      'Nitrogen fixing',
-                      'Drought tolerant',
-                      'Soil protection',
-                    ][index]}
-                  </small>
-                </div>
-                {index < 3 && <ChevronRight className="timeline-arrow" />}
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {active === 'metrics' && (
-        <Card>
-          <CardHeader
-            title={t('rotationStudio.metricsTitle')}
-            subtitle={t('rotationStudio.metricsSubtitle')}
-          />
-          <div className="comparison-table">
-            {[
-              t('rotationStudio.metricsTable.waterDemand'),
-              t('rotationStudio.metricsTable.nitrogenContribution'),
-              t('rotationStudio.metricsTable.soilCover'),
-              t('rotationStudio.metricsTable.cropDiversity'),
-              t('rotationStudio.metricsTable.droughtSuitability'),
-              t('rotationStudio.metricsTable.marketSuitability'),
-            ].map((label, index) => (
-              <div className="table-row" key={label}>
-                <strong>{label}</strong>
-                <span>{[62, 44, 55, 50, 68, 75][index]}</span>
-                <i><b style={{ width: `${[62, 44, 55, 50, 68, 75][index]}%` }} /></i>
-                <em>{[78, 82, 91, 88, 86, 67][index]}</em>
-                <i><b className="orange-bar" style={{ width: `${[78, 82, 91, 88, 86, 67][index]}%` }} /></i>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {active === 'evidence' && (
-        <Card>
-          <CardHeader
-            title={t('rotationStudio.evidenceTitle')}
-            subtitle={t('rotationStudio.evidenceSubtitle')}
-          />
-          <div className="evidence-list">
-            <Evidence
-              icon={Droplets}
-              title={t('rotationStudio.evidence1Title')}
-              text={t('rotationStudio.evidence1Text')}
-            />
-            <Evidence
-              icon={Leaf}
-              title={t('rotationStudio.evidence2Title')}
-              text={t('rotationStudio.evidence2Text')}
-            />
-            <Evidence
-              icon={TrendingUp}
-              title={t('rotationStudio.evidence3Title')}
-              text={t('rotationStudio.evidence3Text')}
-            />
-          </div>
-        </Card>
-      )}
-    </>
-  );
-}
-
-function StrategyCard({
-  name,
-  tag,
-  score,
-  description,
-  color,
-  crops,
-  benefits,
-  risks,
-  onCompare,
-}: {
-  name: string;
-  tag: string;
-  score: number;
-  description: string;
-  color: string;
-  crops: string[];
-  benefits: string[];
-  risks: string[];
-  onCompare: () => void;
-}) {
-  const { t } = useI18n();
-  return (
-    <Card className={`strategy-card ${color}`}>
-      <div className="strategy-top">
-        <span className="strategy-tag">{tag}</span>
-        <div className="strategy-score">
-          <strong>{score}</strong>
-          <small>/100</small>
-        </div>
-      </div>
-      <h2>{name}</h2>
-      <p>{description}</p>
-      <div className="crop-sequence">
-        {crops.map((crop, index) => (
-          <div key={crop}>
-            <span>{index + 1}</span>
-            <strong>{crop}</strong>
-            {index < crops.length - 1 && <ChevronRight size={13} />}
-          </div>
-        ))}
-      </div>
-      <div className="benefit-risk">
-        <div>
-          <span className="section-label">
-            <Check size={13} /> {t('rotationStudio.benefitsLabel')}
-          </span>
-          {benefits.map((b) => (
-            <p key={b}>{b}</p>
-          ))}
-        </div>
-        <div>
-          <span className="section-label risk">
-            <Zap size={13} /> {t('rotationStudio.watchOutLabel')}
-          </span>
-          {risks.map((r) => (
-            <p key={r}>{r}</p>
-          ))}
-        </div>
-      </div>
-      <button className="outline-button full" onClick={onCompare}>
-        {t('rotationStudio.compareStrategyBtn')} <ArrowLeft size={14} className="flip" />
-      </button>
-    </Card>
-  );
-}
-
-function Evidence({ icon: Icon, title, text }: { icon: typeof Droplets; title: string; text: string }) {
-  return (
-    <div className="evidence-row">
-      <div className="evidence-icon"><Icon size={17} /></div>
-      <div><strong>{title}</strong><p>{text}</p></div>
-      <ChevronRight size={16} />
-    </div>
   );
 }
 

@@ -1,0 +1,867 @@
+[
+ {
+  "s": 200,
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=9&frm=0&apvc=1&ae=g&auid=715786891.1794687545&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&en=page_view&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Freport%3Fll%3D28.383681"
+ },
+ {
+  "s": 200,
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=19&frm=0&apvc=0&ae=g&auid=715786891.1794687545&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&tid=AW-809967204&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Freport%3Fll%3D28.3"
+ },
+ {
+  "s": 200,
+  "ct": "text/plain",
+  "u": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=781268943&t=pageview&_s=1&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Freport%3Fll%3D28.383681%253A49.412995%26z%3D14.86&ul=de-de&dt=OneSoil%20Yield%20App%20-%20Simple%2"
+ },
+ {
+  "s": 204,
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-4ZE0YNFRSC&gtm=45je6bc0h2v868861139za20ozb79263775zd79263775xf1&_p=1794687869155&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGQC&cid=1722075642.1794687546&frm=0&pscdl=noapi&rcb=6&sr=1600x1000&"
+ },
+ {
+  "s": 204,
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-5WN396QT3F&gtm=45je6bb1v9135665246za20gxf1&_p=1794687869155&_gaz=1&gcd=13l3lPl2l3l1&npa=1&dma_cps=a&dma=1&_eu=EBAIACQC&cid=1722075642.1794687546&frm=0&ibt=1&ir=1&ngs=1&pscdl=noapi&rcb=9&sr=1600x1000&uaa="
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/translations/plain?filter{language}=de"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results/legend"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-data-layers-properties/meta?data_type=soil-sampling"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/users/1408310?include%5B%5D=permissions&include%5B%5D=settings&include%5B%5D=dealer&include%5B%5D=consultant"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/workspaces-memberships?include%5B%5D=workspace"
+ },
+ {
+  "s": 204,
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bc0h2v877019550za208zb79263775zd79263775xf1&_p=1794687869155&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGQC&cid=1722075642.1794687546&frm=0&pscdl=noapi&rcb=16&sr=1600x1000"
+ },
+ {
+  "s": 200,
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=9&frm=0&apvc=1&ae=g&auid=715786891.1794687545&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&en=user_id_update&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Freport%3Fll%3D28.3"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/weather/28.383681/49.412995"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://iot-meteo.onesoil.ai/v2/api/stations"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/remote-config"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/bb-leap/workspaces?include%5B%5D=bb_leap_machines.%2A"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/workspaces-integrations"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/workspaces?include%5B%5D=integrations&include%5B%5D=planet_start_date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/workspaces/35215e7b-6b7d-436d-bb92-8ba2d1585a0e?include%5B%5D=workspace_accounts"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/palettes/control-lines/by-field"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/folders"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/modems?include%5B%5D=uuid&exclude%5B%5D=%2A"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/seasons?include%5B%5D=has_non_demo_fields"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/crops?include%5B%5D=properties_map"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-data-uploads?include%5B%5D=sources"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9483,5597,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/status?filter%7Bseason_id%7D=1583585&exclude%5B%5D=%2A"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/folder-stats?season_id=1583585"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9482,5597,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9482,5598,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://api.mapbox.com/fonts/v1/onesoil/Open%20Sans%20Regular,Arial%20Unicode%20MS%20Regular/0-255.pbf?access_token=pk.eyJ1Ijoib25lc29pbCIsImEiOiJjbHU1c2kxaGExMHl5MmxuNHZ0bXJza2FwIn0.QRfQuEzp_E_hD6Hr45pV5w"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9483,5598,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results?filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&filter%7Bfield.season_id%7D=1583585&include%5B%5D=data_source.layer.properties&geom_type_in=Point"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9484,5597,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9484,5598,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/json; charset=UTF-",
+  "u": "https://firebaseremoteconfig.googleapis.com/v1/projects/onesoil-scouting/namespaces/firebase:fetch?key=AIzaSyC8xpip2-HfeI2NFV3JeM1D_b4V3aHf884"
+ },
+ {
+  "s": 204,
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bc0h2v877019550za200zb79263775zd79263775xf1&_p=1794687869155&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AEAAAGQC&ae=a&cid=1722075642.1794687546&frm=0&pscdl=noapi&rcb=16&sr=1600x1000&u"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons?page=1&per_page=300&filter%7Bseason_id%7D=1583585&include%5B%5D=active_pa_info.ndvi_scenes&include%5B%5D=active_pa_info.ndvi_trends.ndvi_scenes.%2A&include%5B%5D=active_pa_info.active_ndvi_trend&include%5"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results?filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&filter%7Bfield.season_id%7D=1583585&include%5B%5D=raw_data&include%5B%5D=data_source.layer.properties&geom_type_in=Polygon&geom_type_in=Multi"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://api.mapbox.com/fonts/v1/onesoil/Graphik%20LC%20Web%20Medium,Arial%20Unicode%20MS%20Bold/0-255.pbf?access_token=pk.eyJ1Ijoib25lc29pbCIsImEiOiJjbHU1c2kxaGExMHl5MmxuNHZ0bXJza2FwIn0.QRfQuEzp_E_hD6Hr45pV5w"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-data-layers-properties/meta?data_type=electroconductivity"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/weather/28.383509/49.41303"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v1/seasons/1583585/fields/18063578/crops/6197664/annotations"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results?filter%7Bfield.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&include%5B%5D=data_source.layer.properties&include%5B%5D=data_source.layer.source"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/electroconductivity-analysis-results?filter%7Bfield_user_season_uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&include%5B%5D=data_source.layer.%2A&include%5B%5D=data"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-10-14&to=2026-11-14"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-fast-vra?filter%7Bfield_user_season.uuid.in%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&include%5B%5D=field_user_season.uuid"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-operations/palettes"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-last-clean-date-tasks/check"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/electroconductivity-analysis-results?filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&include%5B%5D=data_source.layer.properties"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-pa-infos/53630007-e88d-437d-9ee6-1ed6d696c161/report"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-operations?filter%7Bfield_uuid%7D=26053157&filter%7Bis_enabled%7D=true&filter%7Bparent_operation_uuid.isnull%7D=true&include%5B%5D=data_source.layer.properties&include%5B%5D=data_source.john_deere_field_operation&inclu"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-10-14&filter%7Bdate.lte%7D=2026-11-14&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/feedback/search?q=bfbaa48e-1892-4799-9b92-cbaff08ed03a"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons?filter%7Bseason_id%7D=1583585&include%5B%5D=uuid&include%5B%5D=last_clean_date&exclude%5B%5D=%2A"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results?filter%7Bfield.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&include%5B%5D=raw_data&include%5B%5D=data_source.layer.properties&include%5B%5D=d"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a?include%5B%5D=field_user&include%5B%5D=crops.color&include%5B%5D=crops.id&include%5B%5D=crops.uuid&include%5B%5D=crops.crop&include%5B%5D=crops.harvest_date&include%5B"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9484,5598,14&q=oxl_Iap929wk6S9KM5l-O&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9482,5597,14&q=oxl_Iap929wk6S9KM5l-O&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9484,5597,14&q=oxl_Iap929wk6S9KM5l-O&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9482,5598,14&q=oxl_Iap929wk6S9KM5l-O&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9483,5597,14&q=oxl_Iap929wk6S9KM5l-O&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9483,5598,14&q=oxl_Iap929wk6S9KM5l-O&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/translations/plain?filter{language}=de"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results/legend"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-data-layers-properties/meta?data_type=soil-sampling"
+ },
+ {
+  "s": 200,
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=5&frm=0&apvc=1&ae=g&auid=715786891.1794687545&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&en=page_view&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Fstatus%3Fll%3D28.383681"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/workspaces-memberships?include%5B%5D=workspace"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/users/1408310?include%5B%5D=permissions&include%5B%5D=settings&include%5B%5D=dealer&include%5B%5D=consultant"
+ },
+ {
+  "s": 204,
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1h1v877019550za208zb79263775zd79263775xf1&_p=1794687895200&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGQC&cid=1722075642.1794687546&frm=0&pscdl=noapi&rcb=5&sr=1600x1000&uaa=x86"
+ },
+ {
+  "s": 200,
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=5&frm=0&apvc=1&ae=g&auid=715786891.1794687545&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&en=user_id_update&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Fstatus%3Fll%3D28.3"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/weather/28.383681/49.412995"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://iot-meteo.onesoil.ai/v2/api/stations"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/workspaces-integrations"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/bb-leap/workspaces?include%5B%5D=bb_leap_machines.%2A"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/palettes/control-lines/by-field"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/workspaces/35215e7b-6b7d-436d-bb92-8ba2d1585a0e?include%5B%5D=workspace_accounts"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/remote-config"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/modems?include%5B%5D=uuid&exclude%5B%5D=%2A"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/folders"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/seasons?include%5B%5D=has_non_demo_fields"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/crops?include%5B%5D=properties_map"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-data-uploads?include%5B%5D=sources"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/status?filter%7Bseason_id%7D=1583585&exclude%5B%5D=%2A"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://api.mapbox.com/fonts/v1/onesoil/Open%20Sans%20Regular,Arial%20Unicode%20MS%20Regular/0-255.pbf?access_token=pk.eyJ1Ijoib25lc29pbCIsImEiOiJjbHU1c2kxaGExMHl5MmxuNHZ0bXJza2FwIn0.QRfQuEzp_E_hD6Hr45pV5w"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9483,5597,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/folder-stats?season_id=1583585"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results?filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&filter%7Bfield.season_id%7D=1583585&include%5B%5D=data_source.layer.properties&geom_type_in=Point"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9483,5598,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "text/plain",
+  "u": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=1274772101&t=pageview&_s=1&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Fstatus%3Fll%3D28.383681%253A49.412995%26z%3D14.93&ul=de-de&dt=OneSoil%20Yield%20App%20-%20Simple%"
+ },
+ {
+  "s": 200,
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=17&frm=0&apvc=0&ae=g&auid=715786891.1794687545&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&tid=AW-809967204&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Fstatus%3Fll%3D28.3"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9484,5597,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons?page=1&per_page=300&filter%7Bseason_id%7D=1583585&include%5B%5D=active_pa_info.ndvi_scenes&include%5B%5D=active_pa_info.ndvi_trends.ndvi_scenes.%2A&include%5B%5D=active_pa_info.active_ndvi_trend&include%5"
+ },
+ {
+  "s": 204,
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1h1v877019550za200zb79263775zd79263775xf1&_p=1794687895200&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AEAAAGQC&ae=a&cid=1722075642.1794687546&frm=0&pscdl=noapi&rcb=5&sr=1600x1000&ua"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9484,5598,14&q=&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FIMtID1xaNYz6N9TGKFwo1m"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results?filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&filter%7Bfield.season_id%7D=1583585&include%5B%5D=raw_data&include%5B%5D=data_source.layer.properties&geom_type_in=Polygon&geom_type_in=Multi"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://api.mapbox.com/fonts/v1/onesoil/Graphik%20LC%20Web%20Medium,Arial%20Unicode%20MS%20Bold/0-255.pbf?access_token=pk.eyJ1Ijoib25lc29pbCIsImEiOiJjbHU1c2kxaGExMHl5MmxuNHZ0bXJza2FwIn0.QRfQuEzp_E_hD6Hr45pV5w"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-last-clean-date-tasks/check"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-data-layers-properties/meta?data_type=electroconductivity"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-operations/palettes"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/weather/28.383509/49.41303"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v1/seasons/1583585/fields/18063578/crops/6197664/annotations"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/electroconductivity-analysis-results?filter%7Bfield_user_season_uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&include%5B%5D=data_source.layer.%2A&include%5B%5D=data"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/electroconductivity-analysis-results?filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&include%5B%5D=data_source.layer.properties"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-10-14&to=2026-11-14"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results?filter%7Bfield.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&include%5B%5D=data_source.layer.properties&include%5B%5D=data_source.layer.source"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-fast-vra?filter%7Bfield_user_season.uuid.in%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&include%5B%5D=field_user_season.uuid"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-operations?filter%7Bfield_uuid%7D=26053157&filter%7Bis_enabled%7D=true&filter%7Bparent_operation_uuid.isnull%7D=true&include%5B%5D=data_source.layer.properties&include%5B%5D=data_source.john_deere_field_operation&inclu"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons?filter%7Bseason_id%7D=1583585&include%5B%5D=uuid&include%5B%5D=last_clean_date&exclude%5B%5D=%2A"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-10-14&filter%7Bdate.lte%7D=2026-11-14&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-pa-infos/53630007-e88d-437d-9ee6-1ed6d696c161/report"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/workspaces?include%5B%5D=integrations&include%5B%5D=planet_start_date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/soil-sampling-results?filter%7Bfield.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdata_source.layer.properties.target_name.isnull%7D=0&include%5B%5D=raw_data&include%5B%5D=data_source.layer.properties&include%5B%5D=d"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a?include%5B%5D=field_user&include%5B%5D=crops.color&include%5B%5D=crops.id&include%5B%5D=crops.uuid&include%5B%5D=crops.crop&include%5B%5D=crops.harvest_date&include%5B"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9484,5597,14&q=_oL0OVVYgQF2T_rNhbBeO&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9484,5598,14&q=_oL0OVVYgQF2T_rNhbBeO&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/precipitations?start_date=2026-01-01&end_date=2026-11-14"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9483,5597,14&q=_oL0OVVYgQF2T_rNhbBeO&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/x-protobuf",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles?tile=9483,5598,14&q=_oL0OVVYgQF2T_rNhbBeO&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNDA4MzEwLCJlbWFpbCI6InJhdXRhbWFuNDQxMjAzQGdtYWlsLmNvbSIsImlhdCI6MTc5NDY4NzY2OH0.i3TqDUfZgO4T2FI"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/search-dates?start_date=2020-01-01&end_date=2026-11-14"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/temperatures?start_date=2026-01-01&end_date=2026-11-14"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-11-02&to=2026-11-14"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/search-clean-dates?start_date=2026-10-15&end_date=2026-11-14&min_clean=65"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/weather"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/search-dates?start_date=2020-01-01&end_date=2026-11-14"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-11-02&filter%7Bdate.lte%7D=2026-11-14&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-10-19&to=2026-11-01"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-10-19&filter%7Bdate.lte%7D=2026-11-01&sort%5B%5D=date"
+ },
+ {
+  "s": 204,
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-4ZE0YNFRSC&gtm=45je6bc0h2v868861139za20ozb79263775zd79263775xf1&_p=1794687895200&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGQC&cid=1722075642.1794687546&frm=0&pscdl=noapi&rcb=14&sr=1600x1000&uaa=x8"
+ },
+ {
+  "s": 204,
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-5WN396QT3F&gtm=45je6bb1v9135665246za20gxf1&_p=1794687895200&gcd=13l3lPl2l3l1&npa=1&dma_cps=a&dma=1&_eu=EBAIACQC&cid=1722075642.1794687546&frm=0&ibt=1&ir=1&ngs=1&pscdl=noapi&rcb=15&sr=1600x1000&uaa=x86&ua"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-10-05&to=2026-10-18"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-10-05&filter%7Bdate.lte%7D=2026-10-18&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-09-21&to=2026-10-04"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-09-21&filter%7Bdate.lte%7D=2026-10-04&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-09-07&to=2026-09-20"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-09-07&filter%7Bdate.lte%7D=2026-09-20&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-08-24&to=2026-09-06"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-08-24&filter%7Bdate.lte%7D=2026-09-06&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-08-10&to=2026-08-23"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-08-10&filter%7Bdate.lte%7D=2026-08-23&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-07-27&to=2026-08-09"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-07-27&filter%7Bdate.lte%7D=2026-08-09&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-07-13&to=2026-07-26"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-07-13&filter%7Bdate.lte%7D=2026-07-26&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-06-29&to=2026-07-12"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-06-29&filter%7Bdate.lte%7D=2026-07-12&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-06-15&to=2026-06-28"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-06-15&filter%7Bdate.lte%7D=2026-06-28&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-06-01&to=2026-06-14"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-06-01&filter%7Bdate.lte%7D=2026-06-14&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-05-18&to=2026-05-31"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-05-18&filter%7Bdate.lte%7D=2026-05-31&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-05-04&to=2026-05-17"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-05-04&filter%7Bdate.lte%7D=2026-05-17&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-04-20&to=2026-05-03"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-04-20&filter%7Bdate.lte%7D=2026-05-03&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-04-06&to=2026-04-19"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-04-06&filter%7Bdate.lte%7D=2026-04-19&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-03-23&to=2026-04-05"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-03-23&filter%7Bdate.lte%7D=2026-04-05&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-03-09&to=2026-03-22"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-03-09&filter%7Bdate.lte%7D=2026-03-22&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-02-23&to=2026-03-08"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-02-23&filter%7Bdate.lte%7D=2026-03-08&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-02-09&to=2026-02-22"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-02-09&filter%7Bdate.lte%7D=2026-02-22&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-01-26&to=2026-02-08"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-01-26&filter%7Bdate.lte%7D=2026-02-08&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-01-12&to=2026-01-25"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-01-12&filter%7Bdate.lte%7D=2026-01-25&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart?since=2026-01-01&to=2026-01-11"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta?filter%7Bfield_user_season.uuid%7D=bfbaa48e-1892-4799-9b92-cbaff08ed03a&filter%7Bdate.gte%7D=2026-01-01&filter%7Bdate.lte%7D=2026-01-11&sort%5B%5D=date"
+ },
+ {
+  "s": 200,
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/fields-operations?page=1&per_page=700&filter%7Bparent_operation_uuid.isnull%7D=true&filter%7Bis_enabled%7D=true&exclude%5B%5D=%2A&include%5B%5D=uuid&include%5B%5D=field_uuid&include%5B%5D=has_legend&include%5B%5D=created_at&i"
+ }
+]

@@ -1,0 +1,170 @@
+[
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=4&frm=0&apvc=1&ae=g&auid=715786891.1794687545&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&en=page_view&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08e"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "",
+  "u": "https://ad.doubleclick.net/ccm/s/collect?auid=715786891.1794687545&gtm=45He6bc0h2v79263775za200zd79263775xeaxf1&fmt=8"
+ },
+ {
+  "s": 200,
+  "t": "xhr",
+  "ct": "text/plain",
+  "u": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=796217082&t=pageview&_s=1&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaff08ed03a%2Freport%3Fll%3D28.383681%253A49.412995%26z%3D14.86&ul=de-de&dt=OneSoi"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-4ZE0YNFRSC&gtm=45je6bc0h2v868861139za20ozb79263775zd79263775xf1&_p=1794687545114&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGAC&cid=1722075642.1794687546&frm=0&p"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=1&frm=0&apvc=0&ae=g&auid=715786891.1794687545&dt=OneSoil%20Yield%20App%20-%20Simple%20Precision%20Farming&tid=AW-809967204&dl=https%3A%2F%2Fapp.yield.onesoil.ai%2Fbfbaa48e-1892-4799-9b92-cbaf"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-5WN396QT3F&gtm=45je6bb1v9135665246za20gxf1&_p=1794687545114&_gaz=1&gcd=13l3lPl2l3l1&npa=1&dma_cps=a&dma=1&_eu=EBAIACAC&cid=1722075642.1794687546&frm=0&ibt=1&ir=1&ngs=1&pscdl"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/translations/plain?filter{language}=de"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1h1v877019550za208zb79263775zd79263775xf1&_p=1794687545114&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGAC&_prs=ok&cid=1722075642.1794687546"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "",
+  "u": "https://region1.analytics.google.com/measurement/conversion?random=1794687548393&cv=11&tid=G-GG1QD01YHB&fst=1794687548393&fmt=8&en=session_start&gtm=45je6bb1h1v877019550za208zb79263775zd79263775xecxf1&gcd=13l3lPl2l1l1&dma_cps=a&dm"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=1&frm=0&apvc=1&ae=g&auid=715786891.1794687545&dt=OneSoil&en=page_view&dl=https%3A%2F%2Fapp.onesoil.ai%2Fauth%2Flogin%3Fapp%3Dhttps%3A%2F%2Fapp.yield.onesoil.ai%2Fauthorize%26embedded&dr=https"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "",
+  "u": "https://ad.doubleclick.net/ccm/s/collect?auid=715786891.1794687545&gtm=45He6bc0h2v79263775za200zd79263775xeaxf1&fmt=8"
+ },
+ {
+  "s": 200,
+  "t": "xhr",
+  "ct": "text/plain",
+  "u": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=414838059&t=pageview&_s=1&dl=https%3A%2F%2Fapp.onesoil.ai%2Fauth%2Flogin%3Fapp%3Dhttps%3A%2F%2Fapp.yield.onesoil.ai%2Fauthorize%26embedded&dr=https%3A%2F%2Fapp.yield.onesoil"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "",
+  "u": "https://www.google.com/ccm/collect?rcb=4&frm=0&apvc=0&ae=g&auid=715786891.1794687545&dt=OneSoil&tid=AW-809967204&dl=https%3A%2F%2Fapp.onesoil.ai%2Fauth%2Flogin%3Fapp%3Dhttps%3A%2F%2Fapp.yield.onesoil.ai%2Fauthorize%26embedded&dr=h"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1h1v877019550za20ozb78912859zd78912859xf1&_p=1794687548645&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGQC&cid=1722075642.1794687546&frm=0&pscdl=no"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1h1v877019550za20gzb78912859zd78912859xf1&_p=1794687548645&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AEAAAGQC&ae=a&cid=1722075642.1794687546&frm=0&psc"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "application/json",
+  "u": "https://platform-api.onesoil.ai/v2/translations/plain?filter{language}=de"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "application/json; charset=UTF-8",
+  "u": "https://firebaseinstallations.googleapis.com/v1/projects/onesoil-scouting/installations"
+ },
+ {
+  "s": 400,
+  "t": "xhr",
+  "ct": "application/json; charset=utf-8",
+  "u": "https://app.adjust.com/session"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "application/json; charset=UTF-8",
+  "u": "https://firebaseremoteconfig.googleapis.com/v1/projects/onesoil-scouting/namespaces/firebase:fetch?key=AIzaSyC8xpip2-HfeI2NFV3JeM1D_b4V3aHf884"
+ },
+ {
+  "s": 200,
+  "t": "fetch",
+  "ct": "application/json; charset=UTF-8",
+  "u": "https://firebaseremoteconfig.googleapis.com/v1/projects/onesoil-scouting/namespaces/firebase:fetch?key=AIzaSyC8xpip2-HfeI2NFV3JeM1D_b4V3aHf884"
+ },
+ {
+  "s": 200,
+  "t": "xhr",
+  "ct": "application/json; charset=utf-8",
+  "u": "https://api-iam.intercom.io/messenger/web/launcher_settings"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-4ZE0YNFRSC&gtm=45je6bc0h2v868861139za20ozb79263775zd79263775xf1&_p=1794687548645&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAAAAGQC&cid=1722075642.1794687546&frm=0&pscdl=no"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1h1v877019550za20ozb78912859zd78912859xf1&_p=1794687548645&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AAACAGQC&cid=1722075642.1794687546&frm=0&pscdl=no"
+ },
+ {
+  "s": 200,
+  "t": "xhr",
+  "ct": "application/json; charset=utf-8",
+  "u": "https://api-iam.intercom.io/messenger/web/ping"
+ },
+ {
+  "s": 200,
+  "t": "xhr",
+  "ct": "application/json; charset=utf-8",
+  "u": "https://api-iam.intercom.io/messenger/web/ping"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-5WN396QT3F&gtm=45je6bb1v9135665246za20gxf1&_p=1794687548645&gcd=13l3lPl2l3l1&npa=1&dma_cps=a&dma=1&_eu=EBAIACQC&cid=1722075642.1794687546&frm=0&ibt=1&ir=1&ngs=1&pscdl=noapi&"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-4ZE0YNFRSC&gtm=45je6bc0h2v868861139za20gzb79263775zd79263775xf1&_p=1794687548645&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AEAAAGQC&ae=a&cid=1722075642.1794687546&frm=0&psc"
+ },
+ {
+  "s": 204,
+  "t": "fetch",
+  "ct": "text/plain",
+  "u": "https://region1.analytics.google.com/g/collect?v=2&tid=G-GG1QD01YHB&gtm=45je6bb1h1v877019550za20gzb78912859zd78912859xf1&_p=1794687548645&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&_eu=AEAAAGQC&ae=a&cid=1722075642.1794687546&frm=0&psc"
+ }
+]

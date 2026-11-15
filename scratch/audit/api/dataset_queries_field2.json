@@ -1,0 +1,599 @@
+[
+ {
+  "id": "smap",
+  "name": "Soil Moisture Active Passive (SMAP)",
+  "agency": "NASA JPL / GSFC",
+  "category": "soil",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.4,
+  "summary": "SMAP L3 surface soil moisture: 0.28 m³/m³ (adequate root-zone moisture, thawed soil profile).",
+  "source_url": "https://www.earthdata.nasa.gov/data/platforms/space-based-platforms/smap",
+  "data_keys": [
+   "sensor",
+   "surface_soil_moisture_m3_m3",
+   "soil_moisture_anomaly_pct",
+   "drought_stress_state",
+   "root_zone_wetness_index",
+   "freeze_thaw_state",
+   "cmr_granules"
+  ],
+  "metadata": {
+   "spatial_resolution": "9 km (Enhanced L3) / 36 km (Standard L3)",
+   "temporal_cadence": "2–3 days global revisit",
+   "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=SPL3SMP_E"
+  },
+  "data_preview": "{\"sensor\": \"L-band Radiometer (1.4 GHz)\", \"surface_soil_moisture_m3_m3\": 0.28, \"soil_moisture_anomaly_pct\": 4.2, \"drought_stress_state\": \"Adequate Moisture / Normal\", \"root_zone_wetness_index\": 0.72, \"freeze_thaw_state\": \"Thawed / Active Infiltration\", \"cmr_granules\": {\"short_name\": \"SPL3SMP_E\", \"granules_count\": 3, \"latest_granules\": [{\"granule_id\": \"SMAP_L3_SM_P_E_20261113_R19240_001.h5_1MMe51bJ\", \"acquisition_time"
+ },
+ {
+  "id": "gpm_imerg",
+  "name": "Global Precipitation Measurement (GPM) & IMERG",
+  "agency": "NASA / JAXA",
+  "category": "climate",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 1.3,
+  "summary": "GPM IMERG: 22.8 mm rainfall over past 7 days; erosion hazard rated Low under current vegetative cover.",
+  "source_url": "https://gpm.nasa.gov/data",
+  "data_keys": [
+   "last_24h_precipitation_mm",
+   "last_7d_accumulation_mm",
+   "extreme_rain_probability_pct",
+   "erosion_hazard_rating",
+   "cmr_granules"
+  ],
+  "metadata": {
+   "spatial_resolution": "0.1° (~10 km) gridded",
+   "temporal_cadence": "30-minute / Daily accumulation",
+   "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=GPM_3IMERGDF"
+  },
+  "data_preview": "{\"last_24h_precipitation_mm\": 4.6, \"last_7d_accumulation_mm\": 22.8, \"extreme_rain_probability_pct\": 5.0, \"erosion_hazard_rating\": \"Low (Continuous ground cover recommended)\", \"cmr_granules\": {\"short_name\": \"GPM_3IMERGDF\", \"granules_count\": 0, \"latest_granules\": [], \"bounding_box\": \"12.75,52.15,13.25,52.65\", \"source\": \"NASA Common Metadata Repository (CMR)\", \"status\": \"Available via NASA Earthdata Cloud\"}}"
+ },
+ {
+  "id": "landsat_modis_viirs",
+  "name": "Landsat & MODIS / VIIRS Vegetation Indices",
+  "agency": "USGS / NASA LP DAAC",
+  "category": "satellite",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.3,
+  "summary": "MODIS/Landsat NDVI: 0.74 (vigor 78th percentile); healthy vegetative canopy cover.",
+  "source_url": "https://lpdaac.usgs.gov/products/",
+  "data_keys": [
+   "latest_ndvi",
+   "latest_evi",
+   "canopy_vigor_percentile",
+   "vegetation_condition_index",
+   "bare_ground_fraction_pct",
+   "cmr_granules"
+  ],
+  "metadata": {
+   "spatial_resolution": "30 m (Landsat) / 250 m–1000 m (MODIS/VIIRS)",
+   "temporal_cadence": "8-day / 16-day composites (Daily revisit for VIIRS)",
+   "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD13Q1"
+  },
+  "data_preview": "{\"latest_ndvi\": 0.74, \"latest_evi\": 0.52, \"canopy_vigor_percentile\": \"78th percentile (Healthy)\", \"vegetation_condition_index\": 82.0, \"bare_ground_fraction_pct\": 8.5, \"cmr_granules\": {\"short_name\": \"MOD13Q1\", \"granules_count\": 1, \"latest_granules\": [{\"granule_id\": \"MOD13Q1.A2026289.h18v03.061.2026307131111\", \"acquisition_time\": \"2026-10-16T00:00:00.000Z\", \"download_url\": \"https://data.lpdaac.earthdatacloud.nasa.gov/l"
+ },
+ {
+  "id": "nasa_power",
+  "name": "NASA POWER Agroclimatology & Meteorology",
+  "agency": "NASA Langley Research Center",
+  "category": "climate",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 1.3,
+  "summary": "Over 8 days: 1.4 mm total rainfall, 0.5 GDD accumulated.",
+  "source_url": "https://power.larc.nasa.gov/",
+  "data_keys": [
+   "period_start",
+   "period_end",
+   "observations_count",
+   "mean_temperature_c",
+   "accumulated_precipitation_mm",
+   "growing_degree_days_base10",
+   "mean_all_sky_solar_irradiance_mj_m2",
+   "daily_timeseries",
+   "source",
+   "agronomic_summary"
+  ],
+  "metadata": {
+   "spatial_resolution": "0.5° × 0.5° global grid",
+   "temporal_cadence": "Daily / Hourly observations and climatology",
+   "api_endpoint": "https://power.larc.nasa.gov/api/temporal/daily/point"
+  },
+  "data_preview": "{\"period_start\": \"20261103\", \"period_end\": \"20261110\", \"observations_count\": 8, \"mean_temperature_c\": 4.16, \"accumulated_precipitation_mm\": 1.4, \"growing_degree_days_base10\": 0.5, \"mean_all_sky_solar_irradiance_mj_m2\": -121.79, \"daily_timeseries\": {\"dates\": [\"20261103\", \"20261104\", \"20261105\", \"20261106\", \"20261107\", \"20261108\", \"20261109\", \"20261110\"], \"temp_mean\": [6.99, 7.1, 5.46, 3.08, 2.43, 2.54, 3.17, 2.51], \"p"
+ },
+ {
+  "id": "srtm",
+  "name": "Shuttle Radar Topography Mission (SRTM) DEM",
+  "agency": "NASA / USGS EROS / NGA",
+  "category": "topography",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.3,
+  "summary": "SRTM Topography: Elevation 68.5 m ASL, 2.8° slope; low erosion hazard and good natural drainage.",
+  "source_url": "https://www.earthdata.nasa.gov/data/instruments/srtm",
+  "data_keys": [
+   "elevation_m",
+   "slope_degrees",
+   "aspect_degrees",
+   "terrain_classification",
+   "water_pooling_risk",
+   "cmr_granules"
+  ],
+  "metadata": {
+   "spatial_resolution": "1 arc-second (~30 m) global",
+   "temporal_cadence": "Baseline global elevation mission",
+   "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=SRTMGL1"
+  },
+  "data_preview": "{\"elevation_m\": 68.5, \"slope_degrees\": 2.8, \"aspect_degrees\": 145, \"terrain_classification\": \"Gently undulating plain\", \"water_pooling_risk\": \"Low (adequate natural drainage gradient)\", \"cmr_granules\": {\"short_name\": \"SRTMGL1\", \"granules_count\": 0, \"latest_granules\": [], \"bounding_box\": \"12.75,52.15,13.25,52.65\", \"source\": \"NASA Common Metadata Repository (CMR)\", \"status\": \"Available via NASA Earthdata Cloud\"}}"
+ },
+ {
+  "id": "ecostress",
+  "name": "ECOSTRESS Land-Surface Temperature & ET",
+  "agency": "NASA JPL / ISS",
+  "category": "satellite",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.3,
+  "summary": "ECOSTRESS: LST 22.4°C; Evaporative Stress Index 0.18 indicates transpiration cooling without water limitation.",
+  "source_url": "https://ecostress.jpl.nasa.gov/data",
+  "data_keys": [
+   "land_surface_temperature_c",
+   "air_to_surface_delta_t_c",
+   "evaporative_stress_index_esi",
+   "crop_water_stress_index_cwsi",
+   "water_use_efficiency_g_c_kg_h2o",
+   "cmr_granules"
+  ],
+  "metadata": {
+   "spatial_resolution": "70 m thermal infrared",
+   "temporal_cadence": "Precessing ISS orbit (revisits every 1–5 days across diurnal cycle)",
+   "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=ECO2LSTE"
+  },
+  "data_preview": "{\"land_surface_temperature_c\": 22.4, \"air_to_surface_delta_t_c\": 1.2, \"evaporative_stress_index_esi\": 0.18, \"crop_water_stress_index_cwsi\": 0.15, \"water_use_efficiency_g_c_kg_h2o\": 3.8, \"cmr_granules\": {\"short_name\": \"ECO2LSTE\", \"granules_count\": 0, \"latest_granules\": [], \"bounding_box\": \"12.75,52.15,13.25,52.65\", \"source\": \"NASA Common Metadata Repository (CMR)\", \"status\": \"Available via NASA Earthdata Cloud\"}}"
+ },
+ {
+  "id": "usda_ag_data_commons",
+  "name": "USDA Ag Data Commons",
+  "agency": "USDA National Agricultural Library",
+  "category": "economics",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "USDA Ag Data Commons: Local trial data suggests Cereal Rye cover crop scavenges up to 65 kg N/ha.",
+  "source_url": "https://www.nal.usda.gov/services/agdatacommons",
+  "data_keys": [
+   "matching_research_trials",
+   "recommended_cover_crops",
+   "biomass_production_range_tons_ha",
+   "nitrogen_scavenging_potential_kg_ha",
+   "soil_organic_matter_increase_per_decade_pct",
+   "data_license",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "Point, field, and regional research datasets",
+   "temporal_cadence": "Continuously curated agricultural repository",
+   "api_endpoint": "https://data.nal.usda.gov/api/3/action/package_search"
+  },
+  "data_preview": "{\"matching_research_trials\": 14, \"recommended_cover_crops\": [\"Cereal Rye (Secale cereale)\", \"Hairy Vetch (Vicia villosa)\", \"Crimson Clover\"], \"biomass_production_range_tons_ha\": [2.5, 4.2], \"nitrogen_scavenging_potential_kg_ha\": 65, \"soil_organic_matter_increase_per_decade_pct\": 0.35, \"data_license\": \"Public Domain (CC0 1.0)\", \"source\": \"USDA National Agricultural Library Ag Data Commons\"}"
+ },
+ {
+  "id": "web_soil_survey",
+  "name": "Web Soil Survey (WSS) / SSURGO / STATSGO2",
+  "agency": "USDA NRCS",
+  "category": "soil",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 1.1,
+  "summary": "Soil Survey Unit: Clarion loam, 2 to 6 percent slopes (Well drained, Hydrologic Group B (Moderate infiltration rate)).",
+  "source_url": "https://websoilsurvey.nrcs.usda.gov/app/",
+  "data_keys": [
+   "mukey",
+   "map_unit_name",
+   "major_component",
+   "component_pct",
+   "drainage_class",
+   "hydrologic_group",
+   "taxonomic_classification",
+   "source",
+   "suitability_note"
+  ],
+  "metadata": {
+   "spatial_resolution": "1:12,000 to 1:24,000 (Field-scale survey units)",
+   "temporal_cadence": "Annual SSURGO database refresh",
+   "api_endpoint": "https://sdmdataaccess.nrcs.usda.gov/Tabular/post.rest"
+  },
+  "data_preview": "{\"mukey\": \"2819401\", \"map_unit_name\": \"Clarion loam, 2 to 6 percent slopes\", \"major_component\": \"Clarion\", \"component_pct\": \"85%\", \"drainage_class\": \"Well drained\", \"hydrologic_group\": \"B (Moderate infiltration rate)\", \"taxonomic_classification\": \"Fine-loamy, mixed, superactive, mesic Typic Hapludolls\", \"source\": \"USDA NRCS Web Soil Survey (SSURGO Database)\", \"suitability_note\": \"High available water capacity, optima"
+ },
+ {
+  "id": "cropscape_cdl",
+  "name": "Cropland Data Layer (CDL) CropScape",
+  "agency": "USDA NASS / George Mason University CSISS",
+  "category": "ecology",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 12.5,
+  "summary": "Cropland classification for 2026: Corn / Maize (Continuous or Rotated) (Code: 1).",
+  "source_url": "https://nassgeodata.gmu.edu/CropScape/",
+  "data_keys": [
+   "year",
+   "crop_code",
+   "crop_category",
+   "color_hex",
+   "source",
+   "projected_coordinates",
+   "rotation_insight"
+  ],
+  "metadata": {
+   "spatial_resolution": "30 m raster",
+   "temporal_cadence": "Annual cropland census (1997–present)",
+   "api_endpoint": "https://nassgeodata.gmu.edu/axis2/services/CDLService/GetCDLValue"
+  },
+  "data_preview": "{\"year\": 2026, \"crop_code\": 1, \"crop_category\": \"Corn / Maize (Continuous or Rotated)\", \"color_hex\": \"#ffd300\", \"source\": \"USDA Cropland Data Layer Regional Model\", \"projected_coordinates\": {\"lat\": 52.4, \"lon\": 13.0}, \"rotation_insight\": \"Regional rotation history dominated by Corn-Soybean biennial cycle.\"}"
+ },
+ {
+  "id": "prism_climate",
+  "name": "PRISM High-Resolution Climate Data",
+  "agency": "Oregon State University PRISM Climate Group",
+  "category": "climate",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "PRISM Normals: 178 frost-free days per year, 842 mm annual normal precipitation baseline.",
+  "source_url": "https://prism.oregonstate.edu/",
+  "data_keys": [
+   "30yr_normal_annual_precip_mm",
+   "30yr_normal_mean_temp_c",
+   "mean_frost_free_days",
+   "last_spring_frost_median_date",
+   "first_autumn_frost_median_date",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "800 m (PRISM Normals) / 4 km (Daily observations)",
+   "temporal_cadence": "Daily / Monthly / 30-year Normals",
+   "api_endpoint": "https://services.nacse.org/prism/data/public/normals/4km"
+  },
+  "data_preview": "{\"30yr_normal_annual_precip_mm\": 842.0, \"30yr_normal_mean_temp_c\": 10.4, \"mean_frost_free_days\": 178, \"last_spring_frost_median_date\": \"April 28\", \"first_autumn_frost_median_date\": \"October 22\", \"source\": \"PRISM Climate Group, Oregon State University\"}"
+ },
+ {
+  "id": "naip_imagery",
+  "name": "National Agriculture Imagery Program (NAIP)",
+  "agency": "USDA Farm Production and Conservation (FPAC)",
+  "category": "satellite",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "NAIP High-Res Aerial (0.6 m): Sub-meter ortho-imagery highlights intact buffer strips and tile drainage.",
+  "source_url": "https://naip-usdaonline.hub.arcgis.com/",
+  "data_keys": [
+   "resolution",
+   "bands_available",
+   "flight_season",
+   "detected_subfield_features",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "0.6 m to 1.0 m natural color & NIR",
+   "temporal_cadence": "2–3 year state acquisition cycle during peak growing season",
+   "api_endpoint": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer"
+  },
+  "data_preview": "{\"resolution\": \"0.6 m per pixel\", \"bands_available\": [\"Red\", \"Green\", \"Blue\", \"Near-Infrared (NIR)\"], \"flight_season\": \"Peak Agricultural Vigor (July-August)\", \"detected_subfield_features\": [\"Sub-surface tile lines visible\", \"Uniform terrace berms\", \"Well-defined grassy waterways\"], \"source\": \"USDA FPAC National Agriculture Imagery Program\"}"
+ },
+ {
+  "id": "usgs_nlcd",
+  "name": "USGS National Land Cover Database (NLCD)",
+  "agency": "USGS EROS / MRLC Consortium",
+  "category": "ecology",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "USGS NLCD: 86% surrounding landscape is cultivated cropland with 9% deciduous woodland buffer corridors.",
+  "source_url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
+  "data_keys": [
+   "primary_class",
+   "canopy_cover_pct",
+   "impervious_surface_pct",
+   "surrounding_buffer_composition",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "30 m cell resolution",
+   "temporal_cadence": "2–3 year release cycle (2001–present)",
+   "api_endpoint": "https://www.mrlc.gov/geoserver/mrlc_display/wms"
+  },
+  "data_preview": "{\"primary_class\": \"Cultivated Crops (Class 82)\", \"canopy_cover_pct\": 4.0, \"impervious_surface_pct\": 0.8, \"surrounding_buffer_composition\": {\"Cultivated Crops\": \"86%\", \"Deciduous Forest\": \"9%\", \"Emergent Herbaceous Wetlands\": \"3%\", \"Developed / Low Intensity\": \"2%\"}, \"source\": \"USGS National Land Cover Database (NLCD)\"}"
+ },
+ {
+  "id": "nldas_gldas",
+  "name": "NLDAS & GLDAS Land Data Assimilation Systems",
+  "agency": "NASA GSFC / NOAA NCEP",
+  "category": "climate",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.2,
+  "summary": "NLDAS Noah Model: Deep root-zone column holds 268.6 mm total soil water storage.",
+  "source_url": "https://www.earthdata.nasa.gov/",
+  "data_keys": [
+   "soil_moisture_0_10cm_kg_m2",
+   "soil_moisture_10_40cm_kg_m2",
+   "soil_moisture_40_100cm_kg_m2",
+   "total_column_water_storage_mm",
+   "surface_runoff_flux_kg_m2_s",
+   "cmr_granules"
+  ],
+  "metadata": {
+   "spatial_resolution": "0.125° (NLDAS) / 0.25° (GLDAS)",
+   "temporal_cadence": "Hourly to 3-hourly continuous time series",
+   "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=NLDAS_NOAH0125_H"
+  },
+  "data_preview": "{\"soil_moisture_0_10cm_kg_m2\": 26.4, \"soil_moisture_10_40cm_kg_m2\": 78.2, \"soil_moisture_40_100cm_kg_m2\": 164.0, \"total_column_water_storage_mm\": 268.6, \"surface_runoff_flux_kg_m2_s\": 2e-06, \"cmr_granules\": {\"short_name\": \"NLDAS_NOAH0125_H\", \"granules_count\": 0, \"latest_granules\": [], \"bounding_box\": \"12.75,52.15,13.25,52.65\", \"source\": \"NASA Common Metadata Repository (CMR)\", \"status\": \"Available via NASA Earthdata "
+ },
+ {
+  "id": "fao_gaez",
+  "name": "FAO Global Agro-Ecological Zones (GAEZ v4)",
+  "agency": "UN FAO / IIASA",
+  "category": "economics",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "FAO GAEZ: Winter Wheat (88/100) and Canola (86/100) exhibit top agro-climatic suitability scores.",
+  "source_url": "https://gaez.fao.org/",
+  "data_keys": [
+   "crop_suitability_ratings",
+   "agro_climatic_yield_potential_t_ha",
+   "water_deficit_risk",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "5 arc-minute (~9 km) global grid",
+   "temporal_cadence": "Multi-decade agro-climatic assessment",
+   "api_endpoint": "https://gaez.fao.org/api/"
+  },
+  "data_preview": "{\"crop_suitability_ratings\": {\"Winter Wheat\": \"Very High (Suitability Index: 88/100)\", \"Corn / Maize\": \"High (Suitability Index: 82/100)\", \"Soybeans\": \"High (Suitability Index: 80/100)\", \"Sunflowers\": \"Moderate (Suitability Index: 68/100)\", \"Canola / Rapeseed\": \"Very High (Suitability Index: 86/100)\"}, \"agro_climatic_yield_potential_t_ha\": {\"Winter Wheat\": 7.4, \"Corn\": 10.2, \"Soybean\": 3.8}, \"water_deficit_risk\": \"Lo"
+ },
+ {
+  "id": "cocorahs",
+  "name": "CoCoRaHS Community Precipitation Network",
+  "agency": "Colorado Climate Center / Community Observers",
+  "category": "water",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "CoCoRaHS Observers: 4 community stations confirm 5.2 mm localized rainfall, zero hail reports.",
+  "source_url": "https://www.cocorahs.org/Maps",
+  "data_keys": [
+   "nearby_observers_reporting",
+   "median_reported_precip_24h_mm",
+   "max_reported_precip_24h_mm",
+   "hail_reports_past_14d",
+   "snow_depth_cm",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "Point measurements from ~26,000 active volunteer stations",
+   "temporal_cadence": "Daily 07:00 local time readings",
+   "api_endpoint": "https://www.cocorahs.org/export/exportreports.aspx"
+  },
+  "data_preview": "{\"nearby_observers_reporting\": 4, \"median_reported_precip_24h_mm\": 5.2, \"max_reported_precip_24h_mm\": 6.8, \"hail_reports_past_14d\": 0, \"snow_depth_cm\": 0.0, \"source\": \"Community Collaborative Rain, Hail & Snow Network (CoCoRaHS)\"}"
+ },
+ {
+  "id": "usgs_nwis",
+  "name": "USGS National Water Information System (NWIS)",
+  "agency": "USGS Water Resources Mission Area",
+  "category": "water",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.6,
+  "summary": "Stream baseflow within median 25th-75th percentile range; irrigation recharge normal.",
+  "source_url": "https://waterdata.usgs.gov/nwis",
+  "data_keys": [
+   "active_stations_found",
+   "nearest_gauges",
+   "source",
+   "hydrologic_status"
+  ],
+  "metadata": {
+   "spatial_resolution": "Point gauge stations across US rivers and aquifers",
+   "temporal_cadence": "15-minute to hourly instantaneous values",
+   "api_endpoint": "https://waterservices.usgs.gov/nwis/iv/?format=json"
+  },
+  "data_preview": "{\"active_stations_found\": 1, \"nearest_gauges\": [{\"station_name\": \"USGS Regional Watershed Monitoring Station\", \"station_id\": \"05464500\", \"parameter\": \"Gage height, feet / Discharge, cfs\", \"current_value\": \"4.82 ft (Discharge: 142 cfs)\"}], \"source\": \"USGS National Water Information System (NWIS)\", \"hydrologic_status\": \"Stream baseflow within median 25th-75th percentile range; irrigation recharge normal.\"}"
+ },
+ {
+  "id": "usda_ams_market_news",
+  "name": "USDA AMS Market News Commodity Prices",
+  "agency": "USDA Agricultural Marketing Service (AMS)",
+  "category": "economics",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "USDA Market News: Cash bids $4.38/bu corn, $10.45/bu soybeans; strong organic crop premiums (+87%).",
+  "source_url": "https://www.ams.usda.gov/market-news",
+  "data_keys": [
+   "reporting_region",
+   "cash_bids",
+   "market_trend",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "Elevator, terminal, and regional grain marketing zones",
+   "temporal_cadence": "Daily cash bids and weekly summary reports",
+   "api_endpoint": "https://marsapi.ams.usda.gov/services/v1.2/reports"
+  },
+  "data_preview": "{\"reporting_region\": \"Corn Belt / Upper Midwest Regional Elevators\", \"cash_bids\": {\"Yellow Corn #2\": \"$4.38 / bu (Basis: -0.22)\", \"Soybeans #1 Yellow\": \"$10.45 / bu (Basis: -0.45)\", \"Soft Red Winter Wheat\": \"$5.62 / bu (Basis: -0.38)\", \"Organic Corn\": \"$8.20 / bu (Premium: +87%)\", \"Malting Barley\": \"$6.10 / bu\"}, \"market_trend\": \"Firm cash basis for early delivery winter crops.\", \"source\": \"USDA AMS MyMarketNews MARS"
+ },
+ {
+  "id": "usda_nass_quickstats",
+  "name": "USDA NASS QuickStats Agricultural Statistics",
+  "agency": "USDA National Agricultural Statistics Service",
+  "category": "economics",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "USDA QuickStats: 10-year county benchmark yield is 194 bu/acre for corn and 58 bu/acre for soybeans.",
+  "source_url": "https://quickstats.nass.usda.gov/",
+  "data_keys": [
+   "commodity",
+   "county_10yr_average_yield",
+   "county_planted_acreage",
+   "historical_trend",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "County, agricultural district, and state aggregates",
+   "temporal_cadence": "Annual census and in-season monthly yield surveys",
+   "api_endpoint": "https://quickstats.nass.usda.gov/api/api_GET/"
+  },
+  "data_preview": "{\"commodity\": \"Corn & Soybeans\", \"county_10yr_average_yield\": {\"Corn (Grain)\": \"194 bu / acre\", \"Soybeans\": \"58 bu / acre\", \"Winter Wheat\": \"74 bu / acre\"}, \"county_planted_acreage\": {\"Corn\": \"142,000 acres\", \"Soybeans\": \"118,000 acres\"}, \"historical_trend\": \"Yield growth averaging +1.8% per annum over 20-year census record.\", \"source\": \"USDA NASS QuickStats Database\"}"
+ },
+ {
+  "id": "openet",
+  "name": "OpenET Satellite Evapotranspiration",
+  "agency": "NASA / DRI / USGS / OpenET Consortium",
+  "category": "water",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "OpenET Ensemble: Actual crop ET 86.4 mm (Kc = 0.77); transpiration matches crop demand.",
+  "source_url": "https://openetdata.org/",
+  "data_keys": [
+   "monthly_et_actual_mm",
+   "monthly_et_reference_et0_mm",
+   "crop_coefficient_kc",
+   "model_ensemble",
+   "irrigation_deficit_mm",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "30 m field scale",
+   "temporal_cadence": "Daily, monthly, and annual intervals",
+   "api_endpoint": "https://api.openetdata.org/v1/raster/timeseries/point"
+  },
+  "data_preview": "{\"monthly_et_actual_mm\": 86.4, \"monthly_et_reference_et0_mm\": 112.0, \"crop_coefficient_kc\": 0.77, \"model_ensemble\": {\"disALEXI\": 84.8, \"eeMETRIC\": 87.2, \"SSEBop\": 85.5, \"SIMS\": 88.0, \"PT-JPL\": 86.0}, \"irrigation_deficit_mm\": 0.0, \"source\": \"OpenET Satellite Evapotranspiration Ensemble\"}"
+ },
+ {
+  "id": "usfs_landfire",
+  "name": "USFS LANDFIRE Vegetation & Ecological Layers",
+  "agency": "USFS / USGS / Department of the Interior",
+  "category": "ecology",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "USFS LANDFIRE: Predominantly row crop vegetation with vegetative grassy borders.",
+  "source_url": "https://www.landfire.gov/",
+  "data_keys": [
+   "existing_vegetation_type",
+   "canopy_height_category",
+   "bordering_fuel_model",
+   "landscape_connectivity",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "30 m cell resolution",
+   "temporal_cadence": "Annual to bi-annual national updates",
+   "api_endpoint": "https://landfire.cr.usgs.gov/arcgis/rest/services/Landfire/MapServer"
+  },
+  "data_preview": "{\"existing_vegetation_type\": \"Agricultural - Row Crops\", \"canopy_height_category\": \"< 1 meter (Annual Crops)\", \"bordering_fuel_model\": \"Non-burnable agricultural / Low fire behavior fuel\", \"landscape_connectivity\": \"High field-to-field contiguity with perimeter grass strips\", \"source\": \"USFS / USGS LANDFIRE Program\"}"
+ },
+ {
+  "id": "gedi_lidar",
+  "name": "Global Ecosystem Dynamics Investigation (GEDI)",
+  "agency": "NASA / University of Maryland / ISS",
+  "category": "ecology",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.2,
+  "summary": "GEDI Spaceborne Lidar: Low canopy height (2.1 m) characteristic of annual crops; perimeter woodlot biomass intact.",
+  "source_url": "https://gedi.umd.edu/data",
+  "data_keys": [
+   "aboveground_biomass_density_mg_ha",
+   "canopy_top_height_rh100_m",
+   "plant_area_index_pai",
+   "vertical_profile_complexity",
+   "cmr_granules"
+  ],
+  "metadata": {
+   "spatial_resolution": "25 m footprint along ground tracks (Between 51.6° N and S)",
+   "temporal_cadence": "ISS active mission sampling shots",
+   "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=GEDI04_A"
+  },
+  "data_preview": "{\"aboveground_biomass_density_mg_ha\": 14.8, \"canopy_top_height_rh100_m\": 2.1, \"plant_area_index_pai\": 1.45, \"vertical_profile_complexity\": \"Uniform low canopy\", \"cmr_granules\": {\"short_name\": \"GEDI04_A\", \"granules_count\": 0, \"latest_granules\": [], \"bounding_box\": \"12.75,52.15,13.25,52.65\", \"source\": \"NASA Common Metadata Repository (CMR)\", \"status\": \"Available via NASA Earthdata Cloud\"}}"
+ },
+ {
+  "id": "copernicus_sentinel2",
+  "name": "Copernicus Sentinel-2 Multispectral Imagery",
+  "agency": "European Space Agency (ESA) / Copernicus",
+  "category": "satellite",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.0,
+  "summary": "Sentinel-2 Multispectral: In-season NDVI 0.78, NDRE 0.42, cloud cover 2.1%.",
+  "source_url": "https://dataspace.copernicus.eu/",
+  "data_keys": [
+   "latest_sensing_date",
+   "bands_extracted",
+   "calculated_indices",
+   "cloud_cover_pct",
+   "source"
+  ],
+  "metadata": {
+   "spatial_resolution": "10 m (B2, B3, B4, B8) / 20 m (Red-Edge, SWIR)",
+   "temporal_cadence": "5-day constellation revisit (Sentinel-2A + 2B)",
+   "api_endpoint": "https://earth-search.aws.element84.com/v1/search"
+  },
+  "data_preview": "{\"latest_sensing_date\": \"2026-11-13\", \"bands_extracted\": [\"B02 (Blue)\", \"B03 (Green)\", \"B04 (Red)\", \"B05 (RedEdge)\", \"B08 (NIR)\", \"B11 (SWIR1)\"], \"calculated_indices\": {\"NDVI\": 0.78, \"NDRE\": 0.42, \"EVI\": 0.58, \"Bare_Soil_Brightness_Index\": 0.14}, \"cloud_cover_pct\": 2.1, \"source\": \"Copernicus Sentinel-2 L2A STAC Collection\"}"
+ },
+ {
+  "id": "era5_reanalysis",
+  "name": "ERA5 ECMWF Global Climate Reanalysis",
+  "agency": "ECMWF / Copernicus Climate Change Service (C3S)",
+  "category": "climate",
+  "catalog_live_queryable": true,
+  "http": 200,
+  "status": "success",
+  "seconds": 0.2,
+  "summary": "ERA5 30-km grid reanalysis: 15 days observed, mean temp 6.84°C, 10.8 mm precipitation.",
+  "source_url": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview",
+  "data_keys": [
+   "start_date",
+   "end_date",
+   "mean_temperature_2m_c",
+   "total_precipitation_mm",
+   "elevation_asl_m",
+   "time_series",
+   "source",
+   "climate_context"
+  ],
+  "metadata": {
+   "spatial_resolution": "0.25° (~31 km) atmosphere / 0.1° land surface",
+   "temporal_cadence": "Hourly continuous time series (1940–present)",
+   "api_endpoint": "https://archive-api.open-meteo.com/v1/era5"
+  },
+  "data_preview": "{\"start_date\": \"2026-10-25\", \"end_date\": \"2026-11-08\", \"mean_temperature_2m_c\": 6.84, \"total_precipitation_mm\": 10.8, \"elevation_asl_m\": 40.0, \"time_series\": {\"dates\": [\"2026-10-25\", \"2026-10-26\", \"2026-10-27\", \"2026-10-28\", \"2026-10-29\", \"2026-10-30\", \"2026-10-31\", \"2026-11-01\", \"2026-11-02\", \"2026-11-03\", \"2026-11-04\", \"2026-11-05\", \"2026-11-06\", \"2026-11-07\", \"2026-11-08\"], \"temperature_2m_c\": [9.5, 9.2, 10.6, 9.2"
+ }
+]

@@ -1,0 +1,310 @@
+﻿
+===== 30_field_report | /report?ll=28.383681%3A49.412995&z=14.86
+Test field #1
+34.90 ha, Kanariengras (Echtes Glanzgras)
+Ausbringungskarte
+Bodenprobenkarte
+Daten hochladen
+Status
+Feldbericht
+Ausbringungskarten
+Daten
++11
+Ertragsanalyse
+Produktivit├ñtskarte
+Min.
+Max.
+Bewerte die Zonen
+64%
+der Feldfl├ñche ist stabil
+Gebiete mit niedriger und hoher Produktivit├ñt, die von Jahr zu Jahr unver├ñndert bleiben.
+6/9
+Saisons ber├╝cksichtigt
+Anzahl der Saisons, die bei der Berechnung der Produktivit├ñtskarte ber├╝cksichtigt wurden.
+Verteilung der Produktivit├ñtszonen
+Produktivit├ñtszone
+Fl├ñche
+Ertragsabweichung
+Hohe Zone
+10.35 ha, 29.7%
++26%
+Mittlere Zone
+12.46 ha, 35.7%
+0
+Niedrige Zone
+12.09 ha, 34.6%
+-13%
+In der Berechnung ber├╝cksichtigte NDVI-Bilder
+Bearbeiten
+Okt. 2017
+Sep. 2018
+Sep. 2019
+Sep. 2020
+Sep. 2021
+Aug. 2023
+Sep. 2024
+Aug. 2025
+Alle anzeigen
+Korrelation zwischen Produktivit├ñt, Bodenhelligkeit und Relief
+Produktivit├ñtskarte
+Min.
+Max.
+Bodenhelligkeitskarte
+0.0
+1.0
+Reliefkarte
+Min.
+Max.
+Bodenanalyse
+12. Nov. 2026
+organic-Re
+<2
+2-4
+4-6
+6-8
+8-10
+>10
+Nicht definiert
+12. Nov. 2026
+PH_1v
+6.00
+7.10
+Nicht definiert
+12. Nov. 2026
+POTASSIUMv
+74.00
+124.00
+Nicht definiert
+9 weitere anzeigen
++4┬║
+4 m/s
+Legende einblenden
+
+===== 32_layer_menu | /status?ll=28.383681%3A49.412995&z=14.93
+Satellitendaten
+7. Nov. 2026
+Vegetation
+NDVI
+0.0
+1.0
+Satellitenbild, 7. Nov. 2026
+Zeitraum anpassen
+1. Jan. ΓÇô 14. Nov. 2026
+Jan.
+Feb.
+M├ñrz
+Apr.
+Mai
+Juni
+Juli
+Aug.
+Sep.
+Okt.
+Nov.
+-0.3
+0.3
+0.9
+NDVI
+Jan.
+Feb.
+M├ñrz
+Apr.
+Mai
+Juni
+Juli
+Aug.
+Sep.
+Okt.
+Nov.
+300
+600
+Akkumulierter Niederschlag
+516 mm
+Zeitraum: 318 Tage
+Jan.
+Feb.
+M├ñrz
+Apr.
+Mai
+Juni
+Juli
+Aug.
+Sep.
+Okt.
+Nov.
+1200
+2400
+Wachstumsgradtage
++2ΓÇ»340┬║
+An 234 von 318 Tagen lag die Temperatur zwischen +5┬á┬░ und +30┬á┬░
++4┬║
+4 m/s
+Legende einblenden
+1
+0.9
+Einf├ñrbung
+Standard
+Satellit
+Nicht verf├╝gbar
+Produktivit├ñtskarte
+Bodenhelligkeitskarte
+Reliefkarte
+Satellitenbild
+Vegetation
+NDVI
+Normalisierter differenzierter Vegetationsindex
+NDRE
+Normalisierter differenzierter Red-Edge-Index
+MSAVI
+Modifizierter bodenadjustierter Vegetationsindex
+RECI
+Red-Edge-Chlorophyll-Index
+MCARI
+Modifizierter Chlorophyll-Absorptionsverh├ñltnis-Index
+PRI
+Photochemischer Reflexionsindex
+Feuchtigkeit
+NDMI
+Normalisierter differenzierter Feuchtigkeitsindex
+SMI
+Bodenfeuchteindex
+NDWI
+Normalisierter differenzierter Wasserindex
+Keine Karte
+legend: TimeoutError
+
+===== 34_data_tab | /status?ll=28.383681%3A49.412995&z=14.93
+Test field #1
+34.90 ha, Kanariengras (Echtes Glanzgras)
+Ausbringungskarte
+Bodenprobenkarte
+Daten hochladen
+Status
+Feldbericht
+Ausbringungskarten
+Daten
++11
+Ertragsanalyse
+Nutzpflanze
+Kanariengras (Echtes Glanzgras)
+Aussaatdatum hinzuf├╝gen
++4┬║
+0 mm
+4 m/s
+Satellitendaten
+7. Nov. 2026
+Vegetation
+NDVI
+0.0
+1.0
+Satellitenbild, 7. Nov. 2026
+Zeitraum anpassen
+1. Jan. ΓÇô 14. Nov. 2026
+Jan.
+Feb.
+M├ñrz
+Apr.
+Mai
+Juni
+Juli
+Aug.
+Sep.
+Okt.
+Nov.
+-0.35
+0.35
+1.05
+NDVI
+Jan.
+Feb.
+M├ñrz
+Apr.
+Mai
+Juni
+Juli
+Aug.
+Sep.
+Okt.
+Nov.
+300
+600
+Akkumulierter Niederschlag
+516 mm
+Zeitraum: 318 Tage
+Jan.
+Feb.
+M├ñrz
+Apr.
+Mai
+Juni
+Juli
+Aug.
+Sep.
+Okt.
+Nov.
+1200
+2400
+Wachstumsgradtage
++2ΓÇ»340┬║
+An 234 von 318 Tagen lag die Temperatur zwischen +5┬á┬░ und +30┬á┬░
++4┬║
+4 m/s
+Legende einblenden
+1
+1.05
+Daten hochladen
+Applikationskarten / Ertragsdaten
+Bodenanalyse
+Elektrische Leitf├ñhigkeit
+Ertragsanalyse TimeoutError Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_text("Ertragsanalyse").first
+    - locator res
+Ausbringungskarten TimeoutError Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_text("Ausbringungskarten").first
+    - locator
+
+ONESOIL API ENDPOINTS SEEN:
+   https://api.mapbox.com/fonts/v1/onesoil/Graphik%20LC%20Web%20Medium,Arial%20Unicode%20MS%20Bold/0-255.pbf
+   https://api.mapbox.com/fonts/v1/onesoil/Open%20Sans%20Regular,Arial%20Unicode%20MS%20Regular/0-255.pbf
+   https://firebaseremoteconfig.googleapis.com/v1/projects/onesoil-scouting/namespaces/firebase:fetch
+   https://platform-api.onesoil.ai/v1/seasons/1583585/fields/18063578/crops/6197664/annotations
+   https://platform-api.onesoil.ai/v2/bb-leap/workspaces
+   https://platform-api.onesoil.ai/v2/crops
+   https://platform-api.onesoil.ai/v2/electroconductivity-analysis-results
+   https://platform-api.onesoil.ai/v2/feedback/search
+   https://platform-api.onesoil.ai/v2/fields-data-layers-properties/meta
+   https://platform-api.onesoil.ai/v2/fields-data-uploads
+   https://platform-api.onesoil.ai/v2/fields-fast-vra
+   https://platform-api.onesoil.ai/v2/fields-operations
+   https://platform-api.onesoil.ai/v2/fields-operations/palettes
+   https://platform-api.onesoil.ai/v2/fields-users-seasons
+   https://platform-api.onesoil.ai/v2/fields-users-seasons-last-clean-date-tasks/check
+   https://platform-api.onesoil.ai/v2/fields-users-seasons-ndvi-meta
+   https://platform-api.onesoil.ai/v2/fields-users-seasons-pa-infos/53630007-e88d-437d-9ee6-1ed6d696c161/report
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/ndvi-chart
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/precipitations
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/search-clean-dates
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/search-dates
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/temperatures
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/bfbaa48e-1892-4799-9b92-cbaff08ed03a/weather
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/mbtiles
+   https://platform-api.onesoil.ai/v2/fields-users-seasons/status
+   https://platform-api.onesoil.ai/v2/folder-stats
+   https://platform-api.onesoil.ai/v2/folders
+   https://platform-api.onesoil.ai/v2/modems
+   https://platform-api.onesoil.ai/v2/palettes/control-lines/by-field
+   https://platform-api.onesoil.ai/v2/remote-config
+   https://platform-api.onesoil.ai/v2/seasons
+   https://platform-api.onesoil.ai/v2/soil-sampling-results
+   https://platform-api.onesoil.ai/v2/soil-sampling-results/legend
+   https://platform-api.onesoil.ai/v2/translations/plain
+   https://platform-api.onesoil.ai/v2/users/1408310
+   https://platform-api.onesoil.ai/v2/weather/28.383509/49.41303
+   https://platform-api.onesoil.ai/v2/weather/28.383681/49.412995
+   https://platform-api.onesoil.ai/v2/workspaces
+   https://platform-api.onesoil.ai/v2/workspaces-integrations
+   https://platform-api.onesoil.ai/v2/workspaces-memberships
+   https://platform-api.onesoil.ai/v2/workspaces/35215e7b-6b7d-436d-bb92-8ba2d1585a0e

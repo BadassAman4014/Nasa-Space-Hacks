@@ -28,6 +28,8 @@ from app.api import (
     nasa_challenge,
     weather,
     ai_assistant,
+    field_health,
+    crop_planner,
 )
 
 app = FastAPI(title='FieldShift AI API', version='0.2.0')
@@ -55,8 +57,18 @@ for router in [
     nasa_challenge.router,
     weather.router,
     ai_assistant.router,
+    field_health.router,
+    crop_planner.router,
 ]:
     app.include_router(router, prefix='/api')
+
+@app.on_event('startup')
+def _start_appeears_worker() -> None:
+    """Poll NASA AppEEARS in the background so queued SMAP/ECOSTRESS extractions get ingested."""
+    from app.services.nasa.real.appeears import appeears_worker
+
+    appeears_worker.start()
+
 
 @app.get('/health')
 def health() -> dict[str, str]:

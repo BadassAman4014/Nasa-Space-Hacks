@@ -1,0 +1,417 @@
+﻿
+######## TAB: Status (page height 1000 px)
+FieldShiftAI
+Dashboard
+Field Explorer
+Field Analytics
+Weather
+Environmental Profile
+Farmer Profile
+Crop Planner
+NEW
+Scenario Simulator
+Reports & Evidence
+Settings
+Help & Support
+JS
+Jonas Schmidt
+Farm manager
+Field 2
+12.34 ha
+ΓÇó
+No crop assigned
+ΓÇó
+Cottbus Farm
+ΓÇó
+Potsdam, Brandenburg
+Field Map
+Field Health
+Status
+Data
++23
+CURRENT CROP
+No crop assigned
+12.34 ha arable land ΓÇó Unallocated
+Rotational Group: Unassigned
+Unallocated
+PLANTING DATE
+10/18/2024
+758 days since emergence
+Durable Field Record
+Autumn seeding
+CURRENT WEATHER
+-0.3┬░C
+Mainly clear ΓÇó Feels like -3.8┬░C
+Rain: 0 mm
+Wind: 7.7 km/h
+Open-Meteo / WMO Station (51.77┬░N, 14.27┬░E)
+Live Observation
+Sentinel-2 Satellite & Spatial NDVI Analysis
+10-meter surface reflectance clipped to actual field polygon
+All
+2026
+2025
+2024
+2023
+2026-11-13 (Cloud: 6.72%)
+2026-10-26 (Cloud: 16.98%)
+2026-10-19 (Cloud: 10.66%)
+2026-10-06 (Cloud: 19.62%)
+2026-09-26 (Cloud: 2.91%)
+2026-08-27 (Cloud: 0%)
+2026-08-15 (Cloud: 0%)
+2026-07-16 (Cloud: 18.7%)
+2026-07-08 (Cloud: 8.95%)
+2026-06-26 (Cloud: 0%)
+2026-05-29 (Cloud: 18.35%)
+2026-05-27 (Cloud: 0.14%)
+2026-05-02 (Cloud: 0%)
+2026-04-29 (Cloud: 0.84%)
+2026-04-22 (Cloud: 17.36%)
+2026-04-17 (Cloud: 3.3%)
+2026-03-23 (Cloud: 2.13%)
+2026-03-18 (Cloud: 0%)
+2026-03-13 (Cloud: 10.8%)
+2026-03-03 (Cloud: 1.26%)
+2026-01-22 (Cloud: 0.1%)
+2025-12-28 (Cloud: 10.89%)
+2025-12-08 (Cloud: 19.92%)
+2025-11-23 (Cloud: 14.43%)
+2025-11-08 (Cloud: 0.6%)
+2025-09-11 (Cloud: 0.06%)
+2025-08-30 (Cloud: 19.24%)
+2025-08-12 (Cloud: 0%)
+2025-07-01 (Cloud: 0%)
+2025-06-13 (Cloud: 3.44%)
+2025-04-27 (Cloud: 1.01%)
+2025-04-04 (Cloud: 0.03%)
+2025-03-28 (Cloud: 0.02%)
+2025-03-08 (Cloud: 0.26%)
+2025-02-11 (Cloud: 7.13%)
+2024-10-24 (Cloud: 4.03%)
+2024-10-09 (Cloud: 11.27%)
+2024-09-19 (Cloud: 5.65%)
+2024-09-04 (Cloud: 0%)
+2024-08-20 (Cloud: 3.04%)
+2024-07-21 (Cloud: 2.87%)
+2024-07-06 (Cloud: 13.54%)
+2024-06-26 (Cloud: 0.65%)
+2024-05-02 (Cloud: 10.47%)
+2024-03-08 (Cloud: 0.03%)
+2024-01-28 (Cloud: 9.7%)
+2024-01-08 (Cloud: 14.86%)
+2023-11-04 (Cloud: 3.62%)
+2023-09-15 (Cloud: 11.13%)
+2023-09-10 (Cloud: 0.13%)
+2023-08-11 (Cloud: 14.86%)
+2023-07-07 (Cloud: 11.05%)
+2023-05-28 (Cloud: 0.07%)
+2023-05-13 (Cloud: 6.94%)
+2023-05-08 (Cloud: 3.28%)
+2023-02-07 (Cloud: 1.92%)
+2023-01-03 (Cloud: 17.99%)
+SPATIAL NDVI MAP
+Mean NDVI: 0.71
+Vegetation
+NDVI
+1.0
+0.7
+0.4
+0.2
+0.0
+Range: 0.55 ΓÇö 0.86
+SATELLITE IMAGE HISTORY
+True Color (RGB)
+False Color (NIR)
+Satellite image, Nov 13, 2026
+Sensor: Sentinel-2 L2A (10m)
+Cloud Cover: 6.72%
+Polygon boundary clipped
+Historical NDVI Time Series
+Multi-year Sentinel-2 Level-2A surface reflectance vegetation index
+57 scenes synced
+LATEST NDVI
+0.71 (2026-11-13)
+DELTA VS PREVIOUS
+-2%
+0.2
+0.4
+0.6
+0.8
+2023-01-03
+ΓÇó
+Chronological progression (57 acquisitions plotted)
+ΓÇó
+2026-11-13
+ACCUMULATED PRECIPITATION
+NASA POWER GPM/MERRA-2 PRECTOTCORR
+399 mm
+Season Total
+2024-03-01
+Accumulated mm (Daily)
+2024-10-31
+GROWING DEGREE-DAYS (GDD)
+Thermal time: max(0, ((Tmax + Tmin)/2) - Tbase)
+Tbase:
+0.0┬░C (Cereals)
+4.4┬░C (Wheat)
+5.0┬░C (Rapeseed)
+8.0┬░C (Sunflower)
+10.0┬░C (Corn/Maize)
+2833.9 ┬░C┬╖days
+245 seasonal days
+Emergence
+Accumulated GDD Heat Units
+Maturity
+
+#### Status: 31 visible controls
+   button button | Dashboard
+   button button | Field Explorer
+   button button | Field Analytics
+   button button | Weather
+   button button | Environmental Profile
+   button button | Farmer Profile
+   button button | Crop Planner NEW
+   button button | Scenario Simulator
+   button button | Reports & Evidence
+   button button | Settings
+   button button | Help & Support
+   button submit | Back to Map
+   button button | Field 2
+   button button | Field Map
+   button button | Field Health
+   button button | Status
+   button button | Data +23
+   button submit | Edit planting date
+   button submit | All
+   button submit | 2026
+   button submit | 2025
+   button submit | 2024
+   button submit | 2023
+   button submit | Newer acquisition
+   select select-one | 2026-11-13 (Cloud: 6.72%) 2026-10-26 (Cloud: 16.98%) 2026-10
+   button submit | Older acquisition
+   button submit | Expand map
+   button submit | True Color (RGB)
+   button submit | False Color (NIR)
+   button submit | Expand scene
+   select select-one | 0.0┬░C (Cereals) 4.4┬░C (Wheat) 5.0┬░C (Rapeseed) 8.0┬░C (Sunflo
+
+######## TAB: Data (page height 1000 px)
+FieldShiftAI
+Dashboard
+Field Explorer
+Field Analytics
+Weather
+Environmental Profile
+Farmer Profile
+Crop Planner
+NEW
+Scenario Simulator
+Reports & Evidence
+Settings
+Help & Support
+JS
+Jonas Schmidt
+Farm manager
+Field 2
+12.34 ha
+ΓÇó
+No crop assigned
+ΓÇó
+Cottbus Farm
+ΓÇó
+Potsdam, Brandenburg
+Field Map
+Field Health
+Status
+Data
++23
+NASA CHALLENGE DATA HUB
+23 Official Datasets
+┬╖ Field 2 (12.34 ha)
+Earth Observation & Agricultural Data Hub
+Direct API access and scientific exploration for all 23 official NASA Space Apps Challenge data sources: soil moisture, precipitation, vegetation reflectance, agroclimatology, terrain elevation, thermal stress, cropland classification, and market economics.
+Probe Core Sensors for Field
+Upload Data
+NASA Challenge Datasets (23)
+Field Operational Layers (10)
+All Resources (23)
+Soil & Properties
+Climate & Weather
+Satellite & Indices
+Topography & DEM
+Land Cover & Ecology
+Water & Hydrology
+Agronomic Economics
+NASA JPL / GSFC
+Soil
+Soil Moisture Active Passive (SMAP)
+SMAP provides global measurements of surface soil moisture (top 5 cm) and freeze/thaw state using L-band microwave radiometry.
+Crop Rotation & Resilience:
+Identifies drought stress, root zone infiltration potential, water availability, and early crop-stress signals for crop rotation and irrigation timing.
+Resolution:
+9 km (Enhanced L3) / 36 km (Standard L3)
+Cadence:
+2ΓÇô3 days global revisit
+Query for Field
+NASA / JAXA
+Climate
+Global Precipitation Measurement (GPM) & IMERG
+Integrated Multi-satellitE Retrievals for GPM (IMERG) provides global precipitation rate and accumulation estimates combining passive microwave and infrared sensors.
+Crop Rotation & Resilience:
+Assesses rainfall reliability, extreme-storm frequency, erosion risk, water input to soils, and seasonal water balance for rotation crop selection.
+Resolution:
+0.1┬░ (~10 km) gridded
+Cadence:
+30-minute / Daily accumulation
+Query for Field
+USGS / NASA LP DAAC
+Satellite
+Landsat & MODIS / VIIRS Vegetation Indices
+Corrected surface reflectance, Normalized Difference Vegetation Index (NDVI), and Enhanced Vegetation Index (EVI) tracking plant stress, bare ground, and phenology.
+Crop Rotation & Resilience:
+Maps crop vigor, tracks seasonal transitions, detects high-stress periods, and visually compares multi-year rotation performance.
+Resolution:
+30 m (Landsat) / 250 mΓÇô1000 m (MODIS/VIIRS)
+Cadence:
+8-day / 16-day composites (Daily revisit for VIIRS)
+Query for Field
+NASA Langley Research Center
+Climate
+NASA POWER Agroclimatology & Meteorology
+Accessible solar irradiance, meteorological, and climatology datasets synthesized from GEOS-5 atmospheric assimilation models and satellite observations.
+Crop Rotation & Resilience:
+Estimates crop water use, growing degree-days (GDD), frost risk, solar radiation accumulation, and climate suitability for potential rotation crops.
+Resolution:
+0.5┬░ ├ù 0.5┬░ global grid
+Cadence:
+Daily / Hourly observations and climatology
+Query for Field
+NASA / USGS EROS / NGA
+Topography
+Shuttle Radar Topography Mission (SRTM) DEM
+High-resolution digital elevation model (DEM) captured by spaceborne radar interferometry during Endeavour mission STS-99.
+Crop Rotation & Resilience:
+Analyzes field slope, surface runoff, soil erosion risk, water pooling depressions, and terrain-driven stress conditions for soil conservation crops.
+Resolution:
+1 arc-second (~30 m) global
+Cadence:
+Baseline global elevation mission
+Query for Field
+NASA JPL / ISS
+Satellite
+ECOSTRESS Land-Surface Temperature & ET
+Thermal infrared radiometer mounted on the International Space Station measuring Land Surface Temperature (LST) and Evapotranspiration (ET).
+Crop Rotation & Resilience:
+Detects hotspots of plant thermal stress, shallow-root water vulnerability, crop-water demand, and intra-field microclimate variations before visible damage.
+Resolution:
+70 m thermal infrared
+Cadence:
+Precessing ISS orbit (revisits every 1ΓÇô5 days across diurnal cycle)
+Query for Field
+USDA National Agricultural Library
+Economics
+USDA Ag Data Commons
+Open-access agricultural repository covering soils, crops, climate, management practices, phenology, water quality, and agronomic trials.
+Crop Rotation & Resilience:
+Incorporates local field-trial measurements, soil-health research, and management practices into rotation models to match real farm constraints.
+Resolution:
+Point, field, and regional research datasets
+Cadence:
+Continuously curated agricultural repository
+Query for Field
+USDA NRCS
+Soil
+Web Soil Survey (WSS) / SSURGO / STATSGO2
+Official USDA soil survey database providing soil series, horizons, texture classes, hydrologic groups, drainage classifications, and available water capacity.
+Crop Rotation & Resilience:
+Identifies soil organic matter gradients, texture, water infiltration, and compaction risk to optimize sustainable crop rotation choices.
+Resolution:
+1:12,000 to 1:24,000 (Field-scale survey units)
+Cadence:
+Annual SSURGO database refresh
+Query for Field
+USDA NASS / George Mason University CSISS
+Ecology
+Cropland Data Layer (CDL) CropScape
+High-resolution geo-referenced raster classifying specific crop varieties across the United States using satellite imagery and extensive ground truth.
+Crop Rotation & Resilience:
+Reconstructs historical crop rotations, verifies rotation diversity, determines multi-year planting frequencies, and detects regional cropping shifts.
+Resolution:
+30 m raster
+Cadence:
+Annual cropland census (1997ΓÇôpresent)
+Query for Field
+Oregon State University PRISM Climate Group
+Climate
+PRISM High-Resolution Climate Data
+Topographically-adjusted spatial climate grids integrating elevation, aspect, and coastal proximity with quality-controlled weather stations.
+Crop Rotation & Resilience:
+Provides terrain-sensitive temperature and precipitation baselines, frost recurrence probabilities, and extreme event thresholds for resilient rotations.
+Resolution:
+800 m (PRISM Normals) / 4 km (Daily observations)
+Cadence:
+Daily / Monthly / 30-year Normals
+Query for Field
+USDA Farm Productio
+
+#### Data: 76 visible controls
+   button button | Dashboard
+   button button | Field Explorer
+   button button | Field Analytics
+   button button | Weather
+   button button | Environmental Profile
+   button button | Farmer Profile
+   button button | Crop Planner NEW
+   button button | Scenario Simulator
+   button button | Reports & Evidence
+   button button | Settings
+   button button | Help & Support
+   button submit | Back to Map
+   button button | Field 2
+   button button | Field Map
+   button button | Field Health
+   button button | Status
+   button button | Data +23
+   button button | Probe Core Sensors for Field
+   button button | Upload Data
+   button button | NASA Challenge Datasets (23)
+   button button | Field Operational Layers (10)
+   input text | Search datasets, sensors, APIs...
+   button button | All Resources (23)
+   button button | Soil & Properties
+   button button | Climate & Weather
+   button button | Satellite & Indices
+   button button | Topography & DEM
+   button button | Land Cover & Ecology
+   button button | Water & Hydrology
+   button button | Agronomic Economics
+   button button | Query for Field
+   a  | Open official documentation and data portal
+
+API calls captured: 24
+  200 GET /fields
+  200 GET /fields
+  200 GET /fields
+  200 GET /fields
+  404 GET /fields/field-c6bb6ab214/analytics/summary
+  404 GET /fields/field-c6bb6ab214/analytics/gdd?base_temp=4.4
+  404 GET /fields/field-c6bb6ab214/analytics/summary
+  404 GET /fields/field-c6bb6ab214/analytics/weather
+  404 GET /fields/field-c6bb6ab214/analytics/ndvi?limit=20&order=desc
+  404 GET /fields/field-c6bb6ab214/analytics/gdd?base_temp=4.4
+  404 GET /fields/field-c6bb6ab214/analytics/weather
+  404 GET /fields/field-c6bb6ab214/analytics/ndvi?limit=20&order=desc
+  200 GET /fields/field-2bf954950c/analytics/weather
+  200 GET /fields/field-2bf954950c/analytics/ndvi?limit=20&order=desc
+  200 GET /fields/field-2bf954950c/analytics/summary
+  200 GET /fields/field-2bf954950c/analytics/gdd?base_temp=4.4
+  200 GET /fields/field-2bf954950c/analytics/ndvi?limit=20&offset=20&order=desc
+  200 GET /fields/field-2bf954950c/analytics/ndvi?limit=20&offset=40&order=desc
+  200 GET /field-health/fields/field-2bf954950c/card
+  200 GET /field-health/fields/field-2bf954950c/card
+  200 GET /field-health/map
+  200 GET /field-health/map
+  200 GET /nasa-challenge/catalog
+  200 GET /nasa-challenge/catalog

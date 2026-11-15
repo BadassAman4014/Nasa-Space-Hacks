@@ -1,0 +1,2469 @@
+[
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields",
+  "body": [
+   {
+    "id": "field-2bf954950c",
+    "farm_id": "farm-57e8ada1",
+    "farm_name": "Cottbus Farm",
+    "farm_location": "Potsdam, Brandenburg",
+    "name": "Field 2",
+    "source_boundary_id": "DEBBLI0271020782",
+    "boundary_source": "DFBK",
+    "land_use_category": "AL",
+    "original_geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "area_hectares": 12.342,
+    "current_crop": "",
+    "attribution": "© MLEUV, dl-de/by-2-0",
+    "created_at": "2026-11-14T19:15:37.186821+00:00",
+    "updated_at": "2026-11-14T19:15:37.186821+00:00"
+   },
+   {
+    "id": "field-c3de879b16",
+    "farm_id": "farm-57e8ada1",
+    "farm_name": "Cottbus Farm",
+    "farm_location": "Potsdam, Brandenburg",
+    "name": "Field 1",
+    "source_boundary_id": "DEBBLI0552390602",
+    "boundary_source": "DFBK",
+    "land_use_category": "GL",
+    "original_geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "area_hectares": 6.362,
+    "current_crop": "",
+    "attribution": "© MLEUV, dl-de/by-2-0",
+    "created_at": "2026-11-14T19:15:20.851662+00:00",
+    "updated_at": "2026-11-14T19:15:20.851662+00:00"
+   }
+  ]
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields",
+  "body": [
+   {
+    "id": "field-2bf954950c",
+    "farm_id": "farm-57e8ada1",
+    "farm_name": "Cottbus Farm",
+    "farm_location": "Potsdam, Brandenburg",
+    "name": "Field 2",
+    "source_boundary_id": "DEBBLI0271020782",
+    "boundary_source": "DFBK",
+    "land_use_category": "AL",
+    "original_geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "area_hectares": 12.342,
+    "current_crop": "",
+    "attribution": "© MLEUV, dl-de/by-2-0",
+    "created_at": "2026-11-14T19:15:37.186821+00:00",
+    "updated_at": "2026-11-14T19:15:37.186821+00:00"
+   },
+   {
+    "id": "field-c3de879b16",
+    "farm_id": "farm-57e8ada1",
+    "farm_name": "Cottbus Farm",
+    "farm_location": "Potsdam, Brandenburg",
+    "name": "Field 1",
+    "source_boundary_id": "DEBBLI0552390602",
+    "boundary_source": "DFBK",
+    "land_use_category": "GL",
+    "original_geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "area_hectares": 6.362,
+    "current_crop": "",
+    "attribution": "© MLEUV, dl-de/by-2-0",
+    "created_at": "2026-11-14T19:15:20.851662+00:00",
+    "updated_at": "2026-11-14T19:15:20.851662+00:00"
+   }
+  ]
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields",
+  "body": [
+   {
+    "id": "field-2bf954950c",
+    "farm_id": "farm-57e8ada1",
+    "farm_name": "Cottbus Farm",
+    "farm_location": "Potsdam, Brandenburg",
+    "name": "Field 2",
+    "source_boundary_id": "DEBBLI0271020782",
+    "boundary_source": "DFBK",
+    "land_use_category": "AL",
+    "original_geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "area_hectares": 12.342,
+    "current_crop": "",
+    "attribution": "© MLEUV, dl-de/by-2-0",
+    "created_at": "2026-11-14T19:15:37.186821+00:00",
+    "updated_at": "2026-11-14T19:15:37.186821+00:00"
+   },
+   {
+    "id": "field-c3de879b16",
+    "farm_id": "farm-57e8ada1",
+    "farm_name": "Cottbus Farm",
+    "farm_location": "Potsdam, Brandenburg",
+    "name": "Field 1",
+    "source_boundary_id": "DEBBLI0552390602",
+    "boundary_source": "DFBK",
+    "land_use_category": "GL",
+    "original_geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "area_hectares": 6.362,
+    "current_crop": "",
+    "attribution": "© MLEUV, dl-de/by-2-0",
+    "created_at": "2026-11-14T19:15:20.851662+00:00",
+    "updated_at": "2026-11-14T19:15:20.851662+00:00"
+   }
+  ]
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields",
+  "body": [
+   {
+    "id": "field-2bf954950c",
+    "farm_id": "farm-57e8ada1",
+    "farm_name": "Cottbus Farm",
+    "farm_location": "Potsdam, Brandenburg",
+    "name": "Field 2",
+    "source_boundary_id": "DEBBLI0271020782",
+    "boundary_source": "DFBK",
+    "land_use_category": "AL",
+    "original_geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "area_hectares": 12.342,
+    "current_crop": "",
+    "attribution": "© MLEUV, dl-de/by-2-0",
+    "created_at": "2026-11-14T19:15:37.186821+00:00",
+    "updated_at": "2026-11-14T19:15:37.186821+00:00"
+   },
+   {
+    "id": "field-c3de879b16",
+    "farm_id": "farm-57e8ada1",
+    "farm_name": "Cottbus Farm",
+    "farm_location": "Potsdam, Brandenburg",
+    "name": "Field 1",
+    "source_boundary_id": "DEBBLI0552390602",
+    "boundary_source": "DFBK",
+    "land_use_category": "GL",
+    "original_geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "area_hectares": 6.362,
+    "current_crop": "",
+    "attribution": "© MLEUV, dl-de/by-2-0",
+    "created_at": "2026-11-14T19:15:20.851662+00:00",
+    "updated_at": "2026-11-14T19:15:20.851662+00:00"
+   }
+  ]
+ },
+ {
+  "status": 404,
+  "method": "GET",
+  "url": "/fields/field-c6bb6ab214/analytics/summary",
+  "body": {
+   "detail": "Field 'field-c6bb6ab214' not found in saved records."
+  }
+ },
+ {
+  "status": 404,
+  "method": "GET",
+  "url": "/fields/field-c6bb6ab214/analytics/gdd?base_temp=4.4",
+  "body": {
+   "detail": "Field 'field-c6bb6ab214' not found."
+  }
+ },
+ {
+  "status": 404,
+  "method": "GET",
+  "url": "/fields/field-c6bb6ab214/analytics/summary",
+  "body": {
+   "detail": "Field 'field-c6bb6ab214' not found in saved records."
+  }
+ },
+ {
+  "status": 404,
+  "method": "GET",
+  "url": "/fields/field-c6bb6ab214/analytics/weather",
+  "body": {
+   "detail": "Field 'field-c6bb6ab214' not found."
+  }
+ },
+ {
+  "status": 404,
+  "method": "GET",
+  "url": "/fields/field-c6bb6ab214/analytics/ndvi?limit=20&order=desc",
+  "body": {
+   "detail": "Field 'field-c6bb6ab214' not found."
+  }
+ },
+ {
+  "status": 404,
+  "method": "GET",
+  "url": "/fields/field-c6bb6ab214/analytics/gdd?base_temp=4.4",
+  "body": {
+   "detail": "Field 'field-c6bb6ab214' not found."
+  }
+ },
+ {
+  "status": 404,
+  "method": "GET",
+  "url": "/fields/field-c6bb6ab214/analytics/weather",
+  "body": {
+   "detail": "Field 'field-c6bb6ab214' not found."
+  }
+ },
+ {
+  "status": 404,
+  "method": "GET",
+  "url": "/fields/field-c6bb6ab214/analytics/ndvi?limit=20&order=desc",
+  "body": {
+   "detail": "Field 'field-c6bb6ab214' not found."
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields/field-2bf954950c/analytics/weather",
+  "body": {
+   "field_id": "field-2bf954950c",
+   "start_date": "2024-03-01",
+   "end_date": "2024-10-31",
+   "total_accumulated_mm": 399.0,
+   "daily_records": [
+    {
+     "date": "2024-03-01",
+     "daily_mm": 0.25,
+     "accumulated_mm": 0.25
+    },
+    {
+     "date": "2024-03-02",
+     "daily_mm": 0.2,
+     "accumulated_mm": 0.45
+    },
+    {
+     "date": "2024-03-03",
+     "daily_mm": 0.04,
+     "accumulated_mm": 0.49
+    },
+    "...[245 items]"
+   ],
+   "data_source": "NASA POWER Daily API (GPM/MERRA-2 PRECTOTCORR)",
+   "resolution": "0.5° × 0.5°",
+   "last_updated": "2026-11-14"
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields/field-2bf954950c/analytics/ndvi?limit=20&order=desc",
+  "body": {
+   "field_id": "field-2bf954950c",
+   "field_name": "Field 2",
+   "area_ha": 12.34,
+   "observations": [
+    {
+     "id": "obs_field-2b_20261113",
+     "scene_id": "S2C_33UVT_20261113_0_L2A",
+     "acquisition_date": "2026-11-13",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 6.72,
+     "mean_ndvi": 0.7117,
+     "median_ndvi": 0.7199,
+     "min_ndvi": 0.5494,
+     "max_ndvi": 0.8574,
+     "std_ndvi": 0.063,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2026",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4994 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[3854 chars]"
+    },
+    {
+     "id": "obs_field-2b_20261026",
+     "scene_id": "S2A_33UVT_20261026_0_L2A",
+     "acquisition_date": "2026-10-26",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 16.98,
+     "mean_ndvi": 0.7262,
+     "median_ndvi": 0.7366,
+     "min_ndvi": 0.5655,
+     "max_ndvi": 0.86,
+     "std_ndvi": 0.0647,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2026",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4926 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[3802 chars]"
+    },
+    {
+     "id": "obs_field-2b_20261019",
+     "scene_id": "S2B_33UVT_20261019_0_L2A",
+     "acquisition_date": "2026-10-19",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 10.66,
+     "mean_ndvi": 0.7585,
+     "median_ndvi": 0.7708,
+     "min_ndvi": 0.5892,
+     "max_ndvi": 0.9229,
+     "std_ndvi": 0.0705,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2026",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4914 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[3766 chars]"
+    },
+    "...[20 items]"
+   ],
+   "latest_ndvi": 0.7117,
+   "latest_date": "2026-11-13",
+   "previous_ndvi": 0.7262,
+   "previous_date": "2026-10-26",
+   "change_percent": -2.0,
+   "data_source": "Copernicus Sentinel-2 L2A (10m Surface Reflectance)",
+   "resolution": "10 meters",
+   "unavailable_note": null,
+   "total_count": 57,
+   "has_more": true,
+   "batch_offset": 0,
+   "batch_limit": 20
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields/field-2bf954950c/analytics/summary",
+  "body": {
+   "field_id": "field-2bf954950c",
+   "name": "Field 2",
+   "farm_id": "farm-57e8ada1",
+   "farm_name": "Cottbus Farm",
+   "area_ha": 12.34,
+   "current_crop": "",
+   "planting_date": "2024-10-18",
+   "harvest_date": "2025-08-05",
+   "days_since_planting": 758,
+   "location": "Potsdam, Brandenburg",
+   "boundary_source": "DFBK",
+   "analysis_status": "Verified Satellite Analytics",
+   "current_weather": {
+    "temperature_c": -0.3,
+    "feels_like_c": -3.8,
+    "precipitation_mm": 0.0,
+    "wind_speed_kmh": 7.7,
+    "humidity_percent": 92.0,
+    "condition": "Mainly clear",
+    "is_forecast": false,
+    "observation_date": "2026-11-15 00:51 UTC",
+    "station_or_provider": "Open-Meteo / WMO Station (51.77°N, 14.27°E)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       14.271547897741453,
+       51.768672240730275
+      ],
+      [
+       14.271529184248205,
+       51.76862667878058
+      ],
+      [
+       14.271445020859765,
+       51.76854403226964
+      ],
+      "...[69 items]"
+     ]
+    ]
+   },
+   "bounds": [
+    14.26910898953303,
+    51.768210224142685,
+    14.27720650856085,
+    51.77092395187632
+   ]
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields/field-2bf954950c/analytics/gdd?base_temp=4.4",
+  "body": {
+   "field_id": "field-2bf954950c",
+   "crop": "Winter wheat",
+   "base_temperature_c": 4.4,
+   "start_date": "2024-03-01",
+   "end_date": "2024-10-31",
+   "total_accumulated_gdd": 2833.9,
+   "valid_days": 245,
+   "daily_records": [
+    {
+     "date": "2024-03-01",
+     "tmin_c": 4.6,
+     "tmax_c": 12.8,
+     "daily_gdd": 4.31,
+     "accumulated_gdd": 4.3
+    },
+    {
+     "date": "2024-03-02",
+     "tmin_c": 6.2,
+     "tmax_c": 12.0,
+     "daily_gdd": 4.71,
+     "accumulated_gdd": 9.0
+    },
+    {
+     "date": "2024-03-03",
+     "tmin_c": 5.7,
+     "tmax_c": 14.2,
+     "daily_gdd": 5.54,
+     "accumulated_gdd": 14.6
+    },
+    "...[245 items]"
+   ],
+   "data_source": "NASA POWER Daily API (T2M_MIN, T2M_MAX)",
+   "formula": "GDD = max(0, ((Tmax + Tmin)/2) - Tbase)"
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields/field-2bf954950c/analytics/ndvi?limit=20&offset=20&order=desc",
+  "body": {
+   "field_id": "field-2bf954950c",
+   "field_name": "Field 2",
+   "area_ha": 12.34,
+   "observations": [
+    {
+     "id": "obs_field-2b_20260122",
+     "scene_id": "S2B_33UVT_20260122_0_L2A",
+     "acquisition_date": "2026-01-22",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 0.1,
+     "mean_ndvi": 0.3569,
+     "median_ndvi": 0.3559,
+     "min_ndvi": 0.156,
+     "max_ndvi": 0.6069,
+     "std_ndvi": 0.1048,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2026",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[5162 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[3602 chars]"
+    },
+    {
+     "id": "obs_field-2b_20251228",
+     "scene_id": "S2C_33UVT_20251228_0_L2A",
+     "acquisition_date": "2025-12-28",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 10.89,
+     "mean_ndvi": 0.4267,
+     "median_ndvi": 0.4276,
+     "min_ndvi": 0.1497,
+     "max_ndvi": 0.7882,
+     "std_ndvi": 0.1589,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2025",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[5222 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[3982 chars]"
+    },
+    {
+     "id": "obs_field-2b_20251208",
+     "scene_id": "S2C_33UVT_20251208_0_L2A",
+     "acquisition_date": "2025-12-08",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 19.92,
+     "mean_ndvi": 0.4424,
+     "median_ndvi": 0.4309,
+     "min_ndvi": 0.2001,
+     "max_ndvi": 0.8402,
+     "std_ndvi": 0.1916,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2025",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4986 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4106 chars]"
+    },
+    "...[20 items]"
+   ],
+   "latest_ndvi": 0.7117,
+   "latest_date": "2026-11-13",
+   "previous_ndvi": 0.7262,
+   "previous_date": "2026-10-26",
+   "change_percent": -2.0,
+   "data_source": "Copernicus Sentinel-2 L2A (10m Surface Reflectance)",
+   "resolution": "10 meters",
+   "unavailable_note": null,
+   "total_count": 57,
+   "has_more": true,
+   "batch_offset": 20,
+   "batch_limit": 20
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/fields/field-2bf954950c/analytics/ndvi?limit=20&offset=40&order=desc",
+  "body": {
+   "field_id": "field-2bf954950c",
+   "field_name": "Field 2",
+   "area_ha": 12.34,
+   "observations": [
+    {
+     "id": "obs_field-2b_20240721",
+     "scene_id": "S2B_33UVT_20240721_0_L2A",
+     "acquisition_date": "2024-07-21",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 2.87,
+     "mean_ndvi": 0.3905,
+     "median_ndvi": 0.3765,
+     "min_ndvi": 0.1932,
+     "max_ndvi": 0.7634,
+     "std_ndvi": 0.1456,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2024",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4862 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[3770 chars]"
+    },
+    {
+     "id": "obs_field-2b_20240706",
+     "scene_id": "S2A_33UVT_20240706_0_L2A",
+     "acquisition_date": "2024-07-06",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 13.54,
+     "mean_ndvi": 0.5684,
+     "median_ndvi": 0.5942,
+     "min_ndvi": 0.2854,
+     "max_ndvi": 0.8781,
+     "std_ndvi": 0.1829,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2024",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4746 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4278 chars]"
+    },
+    {
+     "id": "obs_field-2b_20240626",
+     "scene_id": "S2A_33UVT_20240626_0_L2A",
+     "acquisition_date": "2024-06-26",
+     "sensor": "Sentinel-2 L2A",
+     "cloud_cover_percent": 0.65,
+     "mean_ndvi": 0.5158,
+     "median_ndvi": 0.5301,
+     "min_ndvi": 0.258,
+     "max_ndvi": 0.8548,
+     "std_ndvi": 0.1921,
+     "valid_pixel_percent": 100.0,
+     "valid_pixel_count": 1271,
+     "is_included": true,
+     "season": "2024",
+     "rgb_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4898 chars]",
+     "ndvi_preview_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAYAAA...[4338 chars]"
+    },
+    "...[17 items]"
+   ],
+   "latest_ndvi": 0.7117,
+   "latest_date": "2026-11-13",
+   "previous_ndvi": 0.7262,
+   "previous_date": "2026-10-26",
+   "change_percent": -2.0,
+   "data_source": "Copernicus Sentinel-2 L2A (10m Surface Reflectance)",
+   "resolution": "10 meters",
+   "unavailable_note": null,
+   "total_count": 57,
+   "has_more": false,
+   "batch_offset": 40,
+   "batch_limit": 20
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/field-health/fields/field-2bf954950c/card",
+  "body": {
+   "field_id": "field-2bf954950c",
+   "name": "Field 2",
+   "area_ha": 12.34,
+   "crop": null,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       14.271547897741453,
+       51.768672240730275
+      ],
+      [
+       14.271529184248205,
+       51.76862667878058
+      ],
+      [
+       14.271445020859765,
+       51.76854403226964
+      ],
+      "...[69 items]"
+     ]
+    ]
+   },
+   "moisture": {
+    "available": true,
+    "class": "red",
+    "label": "Low moisture, possible stress",
+    "percentile": 0.0,
+    "rootzone_m3m3": 0.074,
+    "date": "2026-11-10",
+    "provenance": "modelled",
+    "source": "NASA SMAP L4 (SPL4SMGP.008) root zone 0-100 cm, 9 km cell",
+    "rule": "Rank of today's value among 310 values for the same cell within +-15 days of this date in 2016-2025: < 20 red, 20-40 yellow, >= 40 green",
+    "climatology_median_m3m3": 0.1318,
+    "climatology_p10_m3m3": 0.114,
+    "climatology_p90_m3m3": 0.1511,
+    "climatology_samples": 310,
+    "climatology_years": "2016-2025",
+    "scale_note": "The 9 km cell is larger than the field; this is the moisture situation around the field.",
+    "source_ref": "NASA SMAP L4 granule SMAP_L4_SM_gph_20261110T103000_Vv8013_001.h5_u9loH5HD (cell x=2080, y=172)"
+   },
+   "rain": {
+    "available": true,
+    "provenance": "satellite_estimate",
+    "source": "NASA GPM IMERG Late Run daily (GPM_3IMERGDL.07), 0.1° cell",
+    "cell": {
+     "lat": 51.75,
+     "lon": 14.25,
+     "size_deg": 0.1
+    },
+    "as_of": "2026-11-13",
+    "days_since_rain": 19,
+    "days_since_rain_rule": "Days since the last day with >= 1 mm",
+    "rain_7d_mm": 1.1,
+    "rain_30d_mm": 21.7,
+    "rain_365d_mm": 500.4,
+    "heavy_days_365d": 4,
+    "daily": [
+     {
+      "date": "2026-09-15",
+      "precip_mm": 0.0,
+      "granule": "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20260915-S000000-E235959.V07C.nc4"
+     },
+     {
+      "date": "2026-09-16",
+      "precip_mm": 9.33,
+      "granule": "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20260916-S000000-E235959.V07C.nc4"
+     },
+     {
+      "date": "2026-09-17",
+      "precip_mm": 0.0,
+      "granule": "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20260917-S000000-E235959.V07C.nc4"
+     },
+     "...[60 items]"
+    ],
+    "missing_days": 1
+   },
+   "soil_health": {
+    "available": true,
+    "score": 97,
+    "label": "good",
+    "components": [
+     {
+      "name": "Soil reaction (pH)",
+      "value": 6.2,
+      "unit": "pH",
+      "score": 100.0,
+      "rule": "100 between pH 6.0 and 7.2; falls to 0 at 4.5 and 8.5"
+     },
+     {
+      "name": "Organic carbon",
+      "value": 2.66,
+      "unit": "%",
+      "score": 100.0,
+      "rule": "0 at 0.5 %, 100 at 2.0 % and above"
+     },
+     {
+      "name": "Nutrient holding (CEC)",
+      "value": 237.0,
+      "unit": "mmol(c)/kg",
+      "score": 100.0,
+      "rule": "0 at 30, 100 at 150 mmol(c)/kg and above"
+     },
+     {
+      "name": "Compaction (bulk density)",
+      "value": 1.44,
+      "unit": "g/cm³",
+      "score": 88.6,
+      "rule": "100 at 1.40 g/cm³ and below, 0 at 1.75"
+     }
+    ],
+    "weakest": "Compaction (bulk density)",
+    "texture": "Sandy Loam",
+    "sand_pct": 75.0,
+    "clay_pct": 8.5,
+    "silt_pct": 16.4,
+    "provenance": "derived",
+    "source": "ISRIC SoilGrids v2.0, 0-30 cm, 250 m",
+    "method": "Equal-weight mean of four component scores. A FieldShift indicator, not an official soil index."
+   },
+   "nitrogen": {
+    "available": false,
+    "provenance": "unavailable",
+    "reason": "Enter crop, yield target and spring Nmin to estimate the nitrogen requirement.",
+    "missing_inputs": [
+     "crop",
+     "yield_target",
+     "nmin_kg_ha"
+    ],
+    "options": {
+     "crops": {
+      "winter_wheat": "Winter wheat (A/B)",
+      "winter_barley": "Winter barley",
+      "winter_rye": "Winter rye",
+      "winter_triticale": "Winter triticale",
+      "spring_barley": "Spring barley",
+      "winter_rapeseed": "Winter oilseed rape",
+      "silage_maize": "Silage maize",
+      "grain_maize": "Grain maize",
+      "sugar_beet": "Sugar beet"
+     },
+     "previous_crops": {
+      "cereals": "Cereals",
+      "maize": "Maize",
+      "rapeseed": "Oilseed rape",
+      "grain_legumes": "Grain legumes (peas, beans, lupins)",
+      "sugar_beet_leaves_left": "Sugar beet, leaves left on field",
+      "grass_clover": "Grass/clover ley",
+      "other": "Other / none"
+     }
+    },
+    "inputs": {
+     "field_id": "field-2bf954950c",
+     "updated_at": "2026-11-14T22:02:13.811124+00:00",
+     "crop": null,
+     "yield_target": null,
+     "previous_crop": null,
+     "nmin_kg_ha": null,
+     "organic_n_last_year_kg_ha": null,
+     "last_n_application_date": null,
+     "last_n_application_kg_ha": null
+    }
+   },
+   "weather": {
+    "available": true,
+    "provenance": "modelled",
+    "source": "Open-Meteo forecast model; warnings from DWD",
+    "current": {
+     "temperature_c": -0.3,
+     "feels_like_c": -3.8,
+     "humidity_percent": 92.0,
+     "wind_speed_ms": 2.1,
+     "wind_compass": "SE",
+     "precipitation_mm": 0.0,
+     "condition": "Partly cloudy",
+     "icon": "partly_cloudy",
+     "observation_time": "01:45"
+    },
+    "forecast_3d": [
+     {
+      "date": "2026-11-15",
+      "day_name": "Today",
+      "temp_min_c": -0.7,
+      "temp_max_c": 7.4,
+      "precipitation_mm": 0.0,
+      "precipitation_probability": 18,
+      "wind_speed_ms": 4.8,
+      "condition": "Overcast",
+      "icon": "cloudy"
+     },
+     {
+      "date": "2026-11-16",
+      "day_name": "Mon",
+      "temp_min_c": 5.0,
+      "temp_max_c": 11.9,
+      "precipitation_mm": 2.2,
+      "precipitation_probability": 50,
+      "wind_speed_ms": 5.7,
+      "condition": "Rain showers",
+      "icon": "rain"
+     },
+     {
+      "date": "2026-11-17",
+      "day_name": "Tue",
+      "temp_min_c": 3.5,
+      "temp_max_c": 11.9,
+      "precipitation_mm": 12.0,
+      "precipitation_probability": 95,
+      "wind_speed_ms": 6.8,
+      "condition": "Rain showers",
+      "icon": "rain"
+     }
+    ],
+    "alerts": {
+     "source": "Deutscher Wetterdienst (DWD)",
+     "region": "Kreis Spree-Neiße",
+     "alerts": [],
+     "available": false,
+     "reason": "DWD warnings unavailable: HTTPError"
+    }
+   },
+   "generated_at": "2026-11-15"
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/field-health/fields/field-2bf954950c/card",
+  "body": {
+   "field_id": "field-2bf954950c",
+   "name": "Field 2",
+   "area_ha": 12.34,
+   "crop": null,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       14.271547897741453,
+       51.768672240730275
+      ],
+      [
+       14.271529184248205,
+       51.76862667878058
+      ],
+      [
+       14.271445020859765,
+       51.76854403226964
+      ],
+      "...[69 items]"
+     ]
+    ]
+   },
+   "moisture": {
+    "available": true,
+    "class": "red",
+    "label": "Low moisture, possible stress",
+    "percentile": 0.0,
+    "rootzone_m3m3": 0.074,
+    "date": "2026-11-10",
+    "provenance": "modelled",
+    "source": "NASA SMAP L4 (SPL4SMGP.008) root zone 0-100 cm, 9 km cell",
+    "rule": "Rank of today's value among 310 values for the same cell within +-15 days of this date in 2016-2025: < 20 red, 20-40 yellow, >= 40 green",
+    "climatology_median_m3m3": 0.1318,
+    "climatology_p10_m3m3": 0.114,
+    "climatology_p90_m3m3": 0.1511,
+    "climatology_samples": 310,
+    "climatology_years": "2016-2025",
+    "scale_note": "The 9 km cell is larger than the field; this is the moisture situation around the field.",
+    "source_ref": "NASA SMAP L4 granule SMAP_L4_SM_gph_20261110T103000_Vv8013_001.h5_u9loH5HD (cell x=2080, y=172)"
+   },
+   "rain": {
+    "available": true,
+    "provenance": "satellite_estimate",
+    "source": "NASA GPM IMERG Late Run daily (GPM_3IMERGDL.07), 0.1° cell",
+    "cell": {
+     "lat": 51.75,
+     "lon": 14.25,
+     "size_deg": 0.1
+    },
+    "as_of": "2026-11-13",
+    "days_since_rain": 19,
+    "days_since_rain_rule": "Days since the last day with >= 1 mm",
+    "rain_7d_mm": 1.1,
+    "rain_30d_mm": 21.7,
+    "rain_365d_mm": 500.4,
+    "heavy_days_365d": 4,
+    "daily": [
+     {
+      "date": "2026-09-15",
+      "precip_mm": 0.0,
+      "granule": "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20260915-S000000-E235959.V07C.nc4"
+     },
+     {
+      "date": "2026-09-16",
+      "precip_mm": 9.33,
+      "granule": "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20260916-S000000-E235959.V07C.nc4"
+     },
+     {
+      "date": "2026-09-17",
+      "precip_mm": 0.0,
+      "granule": "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20260917-S000000-E235959.V07C.nc4"
+     },
+     "...[60 items]"
+    ],
+    "missing_days": 1
+   },
+   "soil_health": {
+    "available": true,
+    "score": 97,
+    "label": "good",
+    "components": [
+     {
+      "name": "Soil reaction (pH)",
+      "value": 6.2,
+      "unit": "pH",
+      "score": 100.0,
+      "rule": "100 between pH 6.0 and 7.2; falls to 0 at 4.5 and 8.5"
+     },
+     {
+      "name": "Organic carbon",
+      "value": 2.66,
+      "unit": "%",
+      "score": 100.0,
+      "rule": "0 at 0.5 %, 100 at 2.0 % and above"
+     },
+     {
+      "name": "Nutrient holding (CEC)",
+      "value": 237.0,
+      "unit": "mmol(c)/kg",
+      "score": 100.0,
+      "rule": "0 at 30, 100 at 150 mmol(c)/kg and above"
+     },
+     {
+      "name": "Compaction (bulk density)",
+      "value": 1.44,
+      "unit": "g/cm³",
+      "score": 88.6,
+      "rule": "100 at 1.40 g/cm³ and below, 0 at 1.75"
+     }
+    ],
+    "weakest": "Compaction (bulk density)",
+    "texture": "Sandy Loam",
+    "sand_pct": 75.0,
+    "clay_pct": 8.5,
+    "silt_pct": 16.4,
+    "provenance": "derived",
+    "source": "ISRIC SoilGrids v2.0, 0-30 cm, 250 m",
+    "method": "Equal-weight mean of four component scores. A FieldShift indicator, not an official soil index."
+   },
+   "nitrogen": {
+    "available": false,
+    "provenance": "unavailable",
+    "reason": "Enter crop, yield target and spring Nmin to estimate the nitrogen requirement.",
+    "missing_inputs": [
+     "crop",
+     "yield_target",
+     "nmin_kg_ha"
+    ],
+    "options": {
+     "crops": {
+      "winter_wheat": "Winter wheat (A/B)",
+      "winter_barley": "Winter barley",
+      "winter_rye": "Winter rye",
+      "winter_triticale": "Winter triticale",
+      "spring_barley": "Spring barley",
+      "winter_rapeseed": "Winter oilseed rape",
+      "silage_maize": "Silage maize",
+      "grain_maize": "Grain maize",
+      "sugar_beet": "Sugar beet"
+     },
+     "previous_crops": {
+      "cereals": "Cereals",
+      "maize": "Maize",
+      "rapeseed": "Oilseed rape",
+      "grain_legumes": "Grain legumes (peas, beans, lupins)",
+      "sugar_beet_leaves_left": "Sugar beet, leaves left on field",
+      "grass_clover": "Grass/clover ley",
+      "other": "Other / none"
+     }
+    },
+    "inputs": {
+     "field_id": "field-2bf954950c",
+     "updated_at": "2026-11-14T22:02:13.811124+00:00",
+     "crop": null,
+     "yield_target": null,
+     "previous_crop": null,
+     "nmin_kg_ha": null,
+     "organic_n_last_year_kg_ha": null,
+     "last_n_application_date": null,
+     "last_n_application_kg_ha": null
+    }
+   },
+   "weather": {
+    "available": true,
+    "provenance": "modelled",
+    "source": "Open-Meteo forecast model; warnings from DWD",
+    "current": {
+     "temperature_c": -0.3,
+     "feels_like_c": -3.8,
+     "humidity_percent": 92.0,
+     "wind_speed_ms": 2.1,
+     "wind_compass": "SE",
+     "precipitation_mm": 0.0,
+     "condition": "Partly cloudy",
+     "icon": "partly_cloudy",
+     "observation_time": "01:45"
+    },
+    "forecast_3d": [
+     {
+      "date": "2026-11-15",
+      "day_name": "Today",
+      "temp_min_c": -0.7,
+      "temp_max_c": 7.4,
+      "precipitation_mm": 0.0,
+      "precipitation_probability": 18,
+      "wind_speed_ms": 4.8,
+      "condition": "Overcast",
+      "icon": "cloudy"
+     },
+     {
+      "date": "2026-11-16",
+      "day_name": "Mon",
+      "temp_min_c": 5.0,
+      "temp_max_c": 11.9,
+      "precipitation_mm": 2.2,
+      "precipitation_probability": 50,
+      "wind_speed_ms": 5.7,
+      "condition": "Rain showers",
+      "icon": "rain"
+     },
+     {
+      "date": "2026-11-17",
+      "day_name": "Tue",
+      "temp_min_c": 3.5,
+      "temp_max_c": 11.9,
+      "precipitation_mm": 12.0,
+      "precipitation_probability": 95,
+      "wind_speed_ms": 6.8,
+      "condition": "Rain showers",
+      "icon": "rain"
+     }
+    ],
+    "alerts": {
+     "source": "Deutscher Wetterdienst (DWD)",
+     "region": "Kreis Spree-Neiße",
+     "alerts": [],
+     "available": false,
+     "reason": "DWD warnings unavailable: HTTPError"
+    }
+   },
+   "generated_at": "2026-11-15"
+  }
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/field-health/map",
+  "body": [
+   {
+    "field_id": "field-2bf954950c",
+    "name": "Field 2",
+    "farm_name": "Cottbus Farm",
+    "area_ha": 12.34,
+    "crop": null,
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "moisture": {
+     "available": true,
+     "class": "red",
+     "label": "Low moisture, possible stress",
+     "percentile": 0.0,
+     "rootzone_m3m3": 0.074,
+     "date": "2026-11-10",
+     "provenance": "modelled",
+     "source": "NASA SMAP L4 (SPL4SMGP.008) root zone 0-100 cm, 9 km cell",
+     "rule": "Rank of today's value among 310 values for the same cell within +-15 days of this date in 2016-2025: < 20 red, 20-40 yellow, >= 40 green",
+     "climatology_median_m3m3": 0.1318,
+     "climatology_p10_m3m3": 0.114,
+     "climatology_p90_m3m3": 0.1511,
+     "climatology_samples": 310,
+     "climatology_years": "2016-2025",
+     "scale_note": "The 9 km cell is larger than the field; this is the moisture situation around the field.",
+     "source_ref": "NASA SMAP L4 granule SMAP_L4_SM_gph_20261110T103000_Vv8013_001.h5_u9loH5HD (cell x=2080, y=172)"
+    },
+    "days_since_rain": 19,
+    "rain_as_of": "2026-11-13"
+   },
+   {
+    "field_id": "field-c3de879b16",
+    "name": "Field 1",
+    "farm_name": "Cottbus Farm",
+    "area_ha": 6.36,
+    "crop": null,
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "moisture": {
+     "available": true,
+     "class": "red",
+     "label": "Low moisture, possible stress",
+     "percentile": 0.0,
+     "rootzone_m3m3": 0.0763,
+     "date": "2026-11-10",
+     "provenance": "modelled",
+     "source": "NASA SMAP L4 (SPL4SMGP.008) root zone 0-100 cm, 9 km cell",
+     "rule": "Rank of today's value among 310 values for the same cell within +-15 days of this date in 2016-2025: < 20 red, 20-40 yellow, >= 40 green",
+     "climatology_median_m3m3": 0.1344,
+     "climatology_p10_m3m3": 0.1169,
+     "climatology_p90_m3m3": 0.1549,
+     "climatology_samples": 310,
+     "climatology_years": "2016-2025",
+     "scale_note": "The 9 km cell is larger than the field; this is the moisture situation around the field.",
+     "source_ref": "AppEEARS task 36999496-a509-42af-8647-3ebdf8abe5f0"
+    },
+    "days_since_rain": 19,
+    "rain_as_of": "2026-11-13"
+   }
+  ]
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/field-health/map",
+  "body": [
+   {
+    "field_id": "field-2bf954950c",
+    "name": "Field 2",
+    "farm_name": "Cottbus Farm",
+    "area_ha": 12.34,
+    "crop": null,
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.271547897741453,
+        51.768672240730275
+       ],
+       [
+        14.271529184248205,
+        51.76862667878058
+       ],
+       [
+        14.271445020859765,
+        51.76854403226964
+       ],
+       "...[69 items]"
+      ]
+     ]
+    },
+    "moisture": {
+     "available": true,
+     "class": "red",
+     "label": "Low moisture, possible stress",
+     "percentile": 0.0,
+     "rootzone_m3m3": 0.074,
+     "date": "2026-11-10",
+     "provenance": "modelled",
+     "source": "NASA SMAP L4 (SPL4SMGP.008) root zone 0-100 cm, 9 km cell",
+     "rule": "Rank of today's value among 310 values for the same cell within +-15 days of this date in 2016-2025: < 20 red, 20-40 yellow, >= 40 green",
+     "climatology_median_m3m3": 0.1318,
+     "climatology_p10_m3m3": 0.114,
+     "climatology_p90_m3m3": 0.1511,
+     "climatology_samples": 310,
+     "climatology_years": "2016-2025",
+     "scale_note": "The 9 km cell is larger than the field; this is the moisture situation around the field.",
+     "source_ref": "NASA SMAP L4 granule SMAP_L4_SM_gph_20261110T103000_Vv8013_001.h5_u9loH5HD (cell x=2080, y=172)"
+    },
+    "days_since_rain": 19,
+    "rain_as_of": "2026-11-13"
+   },
+   {
+    "field_id": "field-c3de879b16",
+    "name": "Field 1",
+    "farm_name": "Cottbus Farm",
+    "area_ha": 6.36,
+    "crop": null,
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        14.28234759900073,
+        51.767083436036295
+       ],
+       [
+        14.282018578233776,
+        51.7673678241581
+       ],
+       [
+        14.281958083609544,
+        51.767563648769475
+       ],
+       "...[12 items]"
+      ]
+     ]
+    },
+    "moisture": {
+     "available": true,
+     "class": "red",
+     "label": "Low moisture, possible stress",
+     "percentile": 0.0,
+     "rootzone_m3m3": 0.0763,
+     "date": "2026-11-10",
+     "provenance": "modelled",
+     "source": "NASA SMAP L4 (SPL4SMGP.008) root zone 0-100 cm, 9 km cell",
+     "rule": "Rank of today's value among 310 values for the same cell within +-15 days of this date in 2016-2025: < 20 red, 20-40 yellow, >= 40 green",
+     "climatology_median_m3m3": 0.1344,
+     "climatology_p10_m3m3": 0.1169,
+     "climatology_p90_m3m3": 0.1549,
+     "climatology_samples": 310,
+     "climatology_years": "2016-2025",
+     "scale_note": "The 9 km cell is larger than the field; this is the moisture situation around the field.",
+     "source_ref": "AppEEARS task 36999496-a509-42af-8647-3ebdf8abe5f0"
+    },
+    "days_since_rain": 19,
+    "rain_as_of": "2026-11-13"
+   }
+  ]
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/nasa-challenge/catalog",
+  "body": [
+   {
+    "id": "smap",
+    "name": "Soil Moisture Active Passive (SMAP)",
+    "agency": "NASA JPL / GSFC",
+    "category": "soil",
+    "spatial_resolution": "9 km (Enhanced L3) / 36 km (Standard L3)",
+    "temporal_cadence": "2–3 days global revisit",
+    "official_url": "https://www.earthdata.nasa.gov/data/platforms/space-based-platforms/smap",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=SPL3SMP_E",
+    "description": "SMAP provides global measurements of surface soil moisture (top 5 cm) and freeze/thaw state using L-band microwave radiometry.",
+    "agricultural_application": "Identifies drought stress, root zone infiltration potential, water availability, and early crop-stress signals for crop rotation and irrigation timing.",
+    "supported_parameters": [
+     "soil_moisture_am",
+     "soil_moisture_pm",
+     "retrieval_qual_flag",
+     "surface_temperature",
+     "freeze_thaw_fraction"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "gpm_imerg",
+    "name": "Global Precipitation Measurement (GPM) & IMERG",
+    "agency": "NASA / JAXA",
+    "category": "climate",
+    "spatial_resolution": "0.1° (~10 km) gridded",
+    "temporal_cadence": "30-minute / Daily accumulation",
+    "official_url": "https://gpm.nasa.gov/data",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=GPM_3IMERGDF",
+    "description": "Integrated Multi-satellitE Retrievals for GPM (IMERG) provid...[165 chars]",
+    "agricultural_application": "Assesses rainfall reliability, extreme-storm frequency, erosion risk, water input to soils, and seasonal water balance for rotation crop selection.",
+    "supported_parameters": [
+     "precipitationCal",
+     "precipitationUncal",
+     "probabilityLiquidPrecipitation",
+     "precipitationQualityIndex"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "landsat_modis_viirs",
+    "name": "Landsat & MODIS / VIIRS Vegetation Indices",
+    "agency": "USGS / NASA LP DAAC",
+    "category": "satellite",
+    "spatial_resolution": "30 m (Landsat) / 250 m–1000 m (MODIS/VIIRS)",
+    "temporal_cadence": "8-day / 16-day composites (Daily revisit for VIIRS)",
+    "official_url": "https://lpdaac.usgs.gov/products/",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD13Q1",
+    "description": "Corrected surface reflectance, Normalized Difference Vegetat...[164 chars]",
+    "agricultural_application": "Maps crop vigor, tracks seasonal transitions, detects high-stress periods, and visually compares multi-year rotation performance.",
+    "supported_parameters": [
+     "NDVI",
+     "EVI",
+     "sur_refl_b01",
+     "sur_refl_b02",
+     "pixel_reliability"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "nasa_power",
+    "name": "NASA POWER Agroclimatology & Meteorology",
+    "agency": "NASA Langley Research Center",
+    "category": "climate",
+    "spatial_resolution": "0.5° × 0.5° global grid",
+    "temporal_cadence": "Daily / Hourly observations and climatology",
+    "official_url": "https://power.larc.nasa.gov/",
+    "api_endpoint": "https://power.larc.nasa.gov/api/temporal/daily/point",
+    "description": "Accessible solar irradiance, meteorological, and climatology datasets synthesized from GEOS-5 atmospheric assimilation models and satellite observations.",
+    "agricultural_application": "Estimates crop water use, growing degree-days (GDD), frost risk, solar radiation accumulation, and climate suitability for potential rotation crops.",
+    "supported_parameters": [
+     "T2M",
+     "T2M_MAX",
+     "T2M_MIN",
+     "...[7 items]"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "srtm",
+    "name": "Shuttle Radar Topography Mission (SRTM) DEM",
+    "agency": "NASA / USGS EROS / NGA",
+    "category": "topography",
+    "spatial_resolution": "1 arc-second (~30 m) global",
+    "temporal_cadence": "Baseline global elevation mission",
+    "official_url": "https://www.earthdata.nasa.gov/data/instruments/srtm",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=SRTMGL1",
+    "description": "High-resolution digital elevation model (DEM) captured by spaceborne radar interferometry during Endeavour mission STS-99.",
+    "agricultural_application": "Analyzes field slope, surface runoff, soil erosion risk, water pooling depressions, and terrain-driven stress conditions for soil conservation crops.",
+    "supported_parameters": [
+     "elevation_m",
+     "slope_degrees",
+     "aspect",
+     "terrain_ruggedness"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "ecostress",
+    "name": "ECOSTRESS Land-Surface Temperature & ET",
+    "agency": "NASA JPL / ISS",
+    "category": "satellite",
+    "spatial_resolution": "70 m thermal infrared",
+    "temporal_cadence": "Precessing ISS orbit (revisits every 1–5 days across diurnal cycle)",
+    "official_url": "https://ecostress.jpl.nasa.gov/data",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=ECO2LSTE",
+    "description": "Thermal infrared radiometer mounted on the International Space Station measuring Land Surface Temperature (LST) and Evapotranspiration (ET).",
+    "agricultural_application": "Detects hotspots of plant thermal stress, shallow-root water vulnerability, crop-water demand, and intra-field microclimate variations before visible damage.",
+    "supported_parameters": [
+     "LST",
+     "ET_daily",
+     "Evaporative_Stress_Index",
+     "Water_Use_Efficiency"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usda_ag_data_commons",
+    "name": "USDA Ag Data Commons",
+    "agency": "USDA National Agricultural Library",
+    "category": "economics",
+    "spatial_resolution": "Point, field, and regional research datasets",
+    "temporal_cadence": "Continuously curated agricultural repository",
+    "official_url": "https://www.nal.usda.gov/services/agdatacommons",
+    "api_endpoint": "https://data.nal.usda.gov/api/3/action/package_search",
+    "description": "Open-access agricultural repository covering soils, crops, climate, management practices, phenology, water quality, and agronomic trials.",
+    "agricultural_application": "Incorporates local field-trial measurements, soil-health research, and management practices into rotation models to match real farm constraints.",
+    "supported_parameters": [
+     "cover_crop_trials",
+     "tillage_impacts",
+     "soil_organic_matter_studies",
+     "yield_responses"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "web_soil_survey",
+    "name": "Web Soil Survey (WSS) / SSURGO / STATSGO2",
+    "agency": "USDA NRCS",
+    "category": "soil",
+    "spatial_resolution": "1:12,000 to 1:24,000 (Field-scale survey units)",
+    "temporal_cadence": "Annual SSURGO database refresh",
+    "official_url": "https://websoilsurvey.nrcs.usda.gov/app/",
+    "api_endpoint": "https://sdmdataaccess.nrcs.usda.gov/Tabular/post.rest",
+    "description": "Official USDA soil survey database providing soil series, horizons, texture classes, hydrologic groups, drainage classifications, and available water capacity.",
+    "agricultural_application": "Identifies soil organic matter gradients, texture, water infiltration, and compaction risk to optimize sustainable crop rotation choices.",
+    "supported_parameters": [
+     "muname",
+     "mukey",
+     "drainage_class",
+     "...[7 items]"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "cropscape_cdl",
+    "name": "Cropland Data Layer (CDL) CropScape",
+    "agency": "USDA NASS / George Mason University CSISS",
+    "category": "ecology",
+    "spatial_resolution": "30 m raster",
+    "temporal_cadence": "Annual cropland census (1997–present)",
+    "official_url": "https://nassgeodata.gmu.edu/CropScape/",
+    "api_endpoint": "https://nassgeodata.gmu.edu/axis2/services/CDLService/GetCDLValue",
+    "description": "High-resolution geo-referenced raster classifying specific crop varieties across the United States using satellite imagery and extensive ground truth.",
+    "agricultural_application": "Reconstructs historical crop rotations, verifies rotation diversity, determines multi-year planting frequencies, and detects regional cropping shifts.",
+    "supported_parameters": [
+     "crop_code",
+     "category_name",
+     "color_hex",
+     "confidence_level",
+     "historical_rotation"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "prism_climate",
+    "name": "PRISM High-Resolution Climate Data",
+    "agency": "Oregon State University PRISM Climate Group",
+    "category": "climate",
+    "spatial_resolution": "800 m (PRISM Normals) / 4 km (Daily observations)",
+    "temporal_cadence": "Daily / Monthly / 30-year Normals",
+    "official_url": "https://prism.oregonstate.edu/",
+    "api_endpoint": "https://services.nacse.org/prism/data/public/normals/4km",
+    "description": "Topographically-adjusted spatial climate grids integrating elevation, aspect, and coastal proximity with quality-controlled weather stations.",
+    "agricultural_application": "Provides terrain-sensitive temperature and precipitation baselines, frost recurrence probabilities, and extreme event thresholds for resilient rotations.",
+    "supported_parameters": [
+     "tmean",
+     "tmin",
+     "tmax",
+     "ppt",
+     "vpdmin",
+     "vpdmax"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "naip_imagery",
+    "name": "National Agriculture Imagery Program (NAIP)",
+    "agency": "USDA Farm Production and Conservation (FPAC)",
+    "category": "satellite",
+    "spatial_resolution": "0.6 m to 1.0 m natural color & NIR",
+    "temporal_cadence": "2–3 year state acquisition cycle during peak growing season",
+    "official_url": "https://naip-usdaonline.hub.arcgis.com/",
+    "api_endpoint": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer",
+    "description": "Sub-meter aerial ortho-imagery flown during agricultural leaf-on conditions providing high-resolution ground context.",
+    "agricultural_application": "Visualizes sub-field variability, drain tile layouts, fence lines, terrace stability, and localized weed patches complementing satellite analysis.",
+    "supported_parameters": [
+     "Red",
+     "Green",
+     "Blue",
+     "Near_Infrared"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usgs_nlcd",
+    "name": "USGS National Land Cover Database (NLCD)",
+    "agency": "USGS EROS / MRLC Consortium",
+    "category": "ecology",
+    "spatial_resolution": "30 m cell resolution",
+    "temporal_cadence": "2–3 year release cycle (2001–present)",
+    "official_url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
+    "api_endpoint": "https://www.mrlc.gov/geoserver/mrlc_display/wms",
+    "description": "Consistent multi-epoch land-cover characterization (cultivated crops, pasture, forests, wetlands, impervious cover) across the United States.",
+    "agricultural_application": "Contextualizes fields within broader ecosystems, evaluates buffer strip connectivity, and tracks long-term land-use conversions.",
+    "supported_parameters": [
+     "land_cover_class",
+     "percent_tree_canopy",
+     "percent_impervious",
+     "land_cover_change"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "nldas_gldas",
+    "name": "NLDAS & GLDAS Land Data Assimilation Systems",
+    "agency": "NASA GSFC / NOAA NCEP",
+    "category": "climate",
+    "spatial_resolution": "0.125° (NLDAS) / 0.25° (GLDAS)",
+    "temporal_cadence": "Hourly to 3-hourly continuous time series",
+    "official_url": "https://www.earthdata.nasa.gov/",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=NLDAS_NOAH0125_H",
+    "description": "Uncoupled land surface model simulations (Noah, Catchment, VIC) driven by observed precipitation and radiation to estimate water and energy states.",
+    "agricultural_application": "Monitors root-zone soil moisture below surface layers, tracks surface runoff, and calculates cumulative soil freeze depth for winter rotations.",
+    "supported_parameters": [
+     "SoilM_0_10cm",
+     "SoilM_10_40cm",
+     "SoilM_40_100cm",
+     "Evap_total",
+     "Runoff_surface"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "fao_gaez",
+    "name": "FAO Global Agro-Ecological Zones (GAEZ v4)",
+    "agency": "UN FAO / IIASA",
+    "category": "economics",
+    "spatial_resolution": "5 arc-minute (~9 km) global grid",
+    "temporal_cadence": "Multi-decade agro-climatic assessment",
+    "official_url": "https://gaez.fao.org/",
+    "api_endpoint": "https://gaez.fao.org/api/",
+    "description": "Global agricultural resource assessment modeling land suitab...[163 chars]",
+    "agricultural_application": "Evaluates bio-physical suitability of alternative rotation crops, quantifies yield gap penalties, and assesses climate change vulnerability.",
+    "supported_parameters": [
+     "crop_suitability_index",
+     "attainable_yield_kg_ha",
+     "water_deficit_mm",
+     "crop_growth_cycle_days"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "cocorahs",
+    "name": "CoCoRaHS Community Precipitation Network",
+    "agency": "Colorado Climate Center / Community Observers",
+    "category": "water",
+    "spatial_resolution": "Point measurements from ~26,000 active volunteer stations",
+    "temporal_cadence": "Daily 07:00 local time readings",
+    "official_url": "https://www.cocorahs.org/Maps",
+    "api_endpoint": "https://www.cocorahs.org/export/exportreports.aspx",
+    "description": "Crowd-sourced network of volunteer weather observers using standard manual rain gauges to measure hyper-local precipitation, hail, and snow.",
+    "agricultural_application": "Validates satellite rainfall estimates (IMERG), captures localized high-intensity thunderstorms, and verifies hail events impacting field yield.",
+    "supported_parameters": [
+     "precipitation_inches",
+     "hail_diameter_mm",
+     "snow_depth_inches",
+     "station_id"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usgs_nwis",
+    "name": "USGS National Water Information System (NWIS)",
+    "agency": "USGS Water Resources Mission Area",
+    "category": "water",
+    "spatial_resolution": "Point gauge stations across US rivers and aquifers",
+    "temporal_cadence": "15-minute to hourly instantaneous values",
+    "official_url": "https://waterdata.usgs.gov/nwis",
+    "api_endpoint": "https://waterservices.usgs.gov/nwis/iv/?format=json",
+    "description": "Nationwide monitoring network tracking real-time surface streamflow, river stage height, reservoir levels, and groundwater table depths.",
+    "agricultural_application": "Assesses watershed irrigation water availability, detects localized groundwater depletion, and warns of flood and bank erosion hazards.",
+    "supported_parameters": [
+     "00060_discharge_cfs",
+     "00065_gage_height_ft",
+     "72019_groundwater_depth_ft",
+     "00010_water_temp_c"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usda_ams_market_news",
+    "name": "USDA AMS Market News Commodity Prices",
+    "agency": "USDA Agricultural Marketing Service (AMS)",
+    "category": "economics",
+    "spatial_resolution": "Elevator, terminal, and regional grain marketing zones",
+    "temporal_cadence": "Daily cash bids and weekly summary reports",
+    "official_url": "https://www.ams.usda.gov/market-news",
+    "api_endpoint": "https://marsapi.ams.usda.gov/services/v1.2/reports",
+    "description": "Official market reporting on commodity cash bids, basis levels, futures spreads, organic grain premiums, and transportation logistics.",
+    "agricultural_application": "Evaluates market viability, cash price spreads, and profitability margins when introducing alternative or cover crops into the rotation.",
+    "supported_parameters": [
+     "commodity_name",
+     "price_min",
+     "price_max",
+     "price_average",
+     "basis_cents",
+     "delivery_period"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usda_nass_quickstats",
+    "name": "USDA NASS QuickStats Agricultural Statistics",
+    "agency": "USDA National Agricultural Statistics Service",
+    "category": "economics",
+    "spatial_resolution": "County, agricultural district, and state aggregates",
+    "temporal_cadence": "Annual census and in-season monthly yield surveys",
+    "official_url": "https://quickstats.nass.usda.gov/",
+    "api_endpoint": "https://quickstats.nass.usda.gov/api/api_GET/",
+    "description": "Comprehensive repository of agricultural statistics covering crop acreage, production volume, harvested yield per acre, and input expenditures.",
+    "agricultural_application": "Calibrates field-level yield expectations against 20-year county averages, establishing baseline benchmarks for new rotation trials.",
+    "supported_parameters": [
+     "yield_bu_per_acre",
+     "planted_acres",
+     "harvested_acres",
+     "production_bu",
+     "county_name"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "openet",
+    "name": "OpenET Satellite Evapotranspiration",
+    "agency": "NASA / DRI / USGS / OpenET Consortium",
+    "category": "water",
+    "spatial_resolution": "30 m field scale",
+    "temporal_cadence": "Daily, monthly, and annual intervals",
+    "official_url": "https://openetdata.org/",
+    "api_endpoint": "https://api.openetdata.org/v1/raster/timeseries/point",
+    "description": "Operational field-scale evapotranspiration estimates generat...[178 chars]",
+    "agricultural_application": "Provides precise field water balances, quantifies actual crop water consumption, and guides deficit irrigation scheduling for rotation crops.",
+    "supported_parameters": [
+     "et_actual_mm",
+     "et_reference_mm",
+     "model_ensemble_mean",
+     "model_spread"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usfs_landfire",
+    "name": "USFS LANDFIRE Vegetation & Ecological Layers",
+    "agency": "USFS / USGS / Department of the Interior",
+    "category": "ecology",
+    "spatial_resolution": "30 m cell resolution",
+    "temporal_cadence": "Annual to bi-annual national updates",
+    "official_url": "https://www.landfire.gov/",
+    "api_endpoint": "https://landfire.cr.usgs.gov/arcgis/rest/services/Landfire/MapServer",
+    "description": "Comprehensive vegetation dynamics mapping Existing Vegetation Type (EVT), Canopy Cover, Height, and Ecological Biophysical Settings.",
+    "agricultural_application": "Assesses shelterbelt health, tree-crop interactions, windbreak buffers, and perennial landscape corridors that mitigate soil loss.",
+    "supported_parameters": [
+     "existing_veg_type",
+     "canopy_cover_percent",
+     "canopy_height_m",
+     "surface_fuel_model"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "gedi_lidar",
+    "name": "Global Ecosystem Dynamics Investigation (GEDI)",
+    "agency": "NASA / University of Maryland / ISS",
+    "category": "ecology",
+    "spatial_resolution": "25 m footprint along ground tracks (Between 51.6° N and S)",
+    "temporal_cadence": "ISS active mission sampling shots",
+    "official_url": "https://gedi.umd.edu/data",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=GEDI04_A",
+    "description": "Full-waveform spaceborne lidar measuring vertical canopy structure, canopy top height, and Aboveground Biomass Density (AGBD).",
+    "agricultural_application": "Quantifies biomass accumulation in agroforestry shelterbelts, perimeter woodlots, and perennial hedgerows surrounding cultivated fields.",
+    "supported_parameters": [
+     "agbd_mg_ha",
+     "canopy_top_height_m",
+     "pai_plant_area_index",
+     "rh100"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "copernicus_sentinel2",
+    "name": "Copernicus Sentinel-2 Multispectral Imagery",
+    "agency": "European Space Agency (ESA) / Copernicus",
+    "category": "satellite",
+    "spatial_resolution": "10 m (B2, B3, B4, B8) / 20 m (Red-Edge, SWIR)",
+    "temporal_cadence": "5-day constellation revisit (Sentinel-2A + 2B)",
+    "official_url": "https://dataspace.copernicus.eu/",
+    "api_endpoint": "https://earth-search.aws.element84.com/v1/search",
+    "description": "13-band multispectral satellite constellation with dedicated red-edge and shortwave infrared bands tailored for agricultural vegetation and soil analysis.",
+    "agricultural_application": "High-resolution in-season NDVI, NDRE, bare-soil composite mapping, variable-rate nitrogen prescription zones, and crop uniformity scoring.",
+    "supported_parameters": [
+     "B02_Blue",
+     "B03_Green",
+     "B04_Red",
+     "...[9 items]"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "era5_reanalysis",
+    "name": "ERA5 ECMWF Global Climate Reanalysis",
+    "agency": "ECMWF / Copernicus Climate Change Service (C3S)",
+    "category": "climate",
+    "spatial_resolution": "0.25° (~31 km) atmosphere / 0.1° land surface",
+    "temporal_cadence": "Hourly continuous time series (1940–present)",
+    "official_url": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview",
+    "api_endpoint": "https://archive-api.open-meteo.com/v1/era5",
+    "description": "Fifth generation ECMWF global atmospheric reanalysis combining extensive historical observations with physics-based weather forecasting models.",
+    "agricultural_application": "Fills gaps where weather stations are absent, provides multi-decadal historical climate baselines, and models continuous temperature and precipitation.",
+    "supported_parameters": [
+     "temperature_2m",
+     "precipitation_sum",
+     "wind_speed_10m",
+     "soil_temperature_level_1",
+     "volumetric_soil_water_layer_1"
+    ],
+    "is_live_queryable": true
+   }
+  ]
+ },
+ {
+  "status": 200,
+  "method": "GET",
+  "url": "/nasa-challenge/catalog",
+  "body": [
+   {
+    "id": "smap",
+    "name": "Soil Moisture Active Passive (SMAP)",
+    "agency": "NASA JPL / GSFC",
+    "category": "soil",
+    "spatial_resolution": "9 km (Enhanced L3) / 36 km (Standard L3)",
+    "temporal_cadence": "2–3 days global revisit",
+    "official_url": "https://www.earthdata.nasa.gov/data/platforms/space-based-platforms/smap",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=SPL3SMP_E",
+    "description": "SMAP provides global measurements of surface soil moisture (top 5 cm) and freeze/thaw state using L-band microwave radiometry.",
+    "agricultural_application": "Identifies drought stress, root zone infiltration potential, water availability, and early crop-stress signals for crop rotation and irrigation timing.",
+    "supported_parameters": [
+     "soil_moisture_am",
+     "soil_moisture_pm",
+     "retrieval_qual_flag",
+     "surface_temperature",
+     "freeze_thaw_fraction"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "gpm_imerg",
+    "name": "Global Precipitation Measurement (GPM) & IMERG",
+    "agency": "NASA / JAXA",
+    "category": "climate",
+    "spatial_resolution": "0.1° (~10 km) gridded",
+    "temporal_cadence": "30-minute / Daily accumulation",
+    "official_url": "https://gpm.nasa.gov/data",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=GPM_3IMERGDF",
+    "description": "Integrated Multi-satellitE Retrievals for GPM (IMERG) provid...[165 chars]",
+    "agricultural_application": "Assesses rainfall reliability, extreme-storm frequency, erosion risk, water input to soils, and seasonal water balance for rotation crop selection.",
+    "supported_parameters": [
+     "precipitationCal",
+     "precipitationUncal",
+     "probabilityLiquidPrecipitation",
+     "precipitationQualityIndex"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "landsat_modis_viirs",
+    "name": "Landsat & MODIS / VIIRS Vegetation Indices",
+    "agency": "USGS / NASA LP DAAC",
+    "category": "satellite",
+    "spatial_resolution": "30 m (Landsat) / 250 m–1000 m (MODIS/VIIRS)",
+    "temporal_cadence": "8-day / 16-day composites (Daily revisit for VIIRS)",
+    "official_url": "https://lpdaac.usgs.gov/products/",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD13Q1",
+    "description": "Corrected surface reflectance, Normalized Difference Vegetat...[164 chars]",
+    "agricultural_application": "Maps crop vigor, tracks seasonal transitions, detects high-stress periods, and visually compares multi-year rotation performance.",
+    "supported_parameters": [
+     "NDVI",
+     "EVI",
+     "sur_refl_b01",
+     "sur_refl_b02",
+     "pixel_reliability"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "nasa_power",
+    "name": "NASA POWER Agroclimatology & Meteorology",
+    "agency": "NASA Langley Research Center",
+    "category": "climate",
+    "spatial_resolution": "0.5° × 0.5° global grid",
+    "temporal_cadence": "Daily / Hourly observations and climatology",
+    "official_url": "https://power.larc.nasa.gov/",
+    "api_endpoint": "https://power.larc.nasa.gov/api/temporal/daily/point",
+    "description": "Accessible solar irradiance, meteorological, and climatology datasets synthesized from GEOS-5 atmospheric assimilation models and satellite observations.",
+    "agricultural_application": "Estimates crop water use, growing degree-days (GDD), frost risk, solar radiation accumulation, and climate suitability for potential rotation crops.",
+    "supported_parameters": [
+     "T2M",
+     "T2M_MAX",
+     "T2M_MIN",
+     "...[7 items]"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "srtm",
+    "name": "Shuttle Radar Topography Mission (SRTM) DEM",
+    "agency": "NASA / USGS EROS / NGA",
+    "category": "topography",
+    "spatial_resolution": "1 arc-second (~30 m) global",
+    "temporal_cadence": "Baseline global elevation mission",
+    "official_url": "https://www.earthdata.nasa.gov/data/instruments/srtm",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=SRTMGL1",
+    "description": "High-resolution digital elevation model (DEM) captured by spaceborne radar interferometry during Endeavour mission STS-99.",
+    "agricultural_application": "Analyzes field slope, surface runoff, soil erosion risk, water pooling depressions, and terrain-driven stress conditions for soil conservation crops.",
+    "supported_parameters": [
+     "elevation_m",
+     "slope_degrees",
+     "aspect",
+     "terrain_ruggedness"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "ecostress",
+    "name": "ECOSTRESS Land-Surface Temperature & ET",
+    "agency": "NASA JPL / ISS",
+    "category": "satellite",
+    "spatial_resolution": "70 m thermal infrared",
+    "temporal_cadence": "Precessing ISS orbit (revisits every 1–5 days across diurnal cycle)",
+    "official_url": "https://ecostress.jpl.nasa.gov/data",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=ECO2LSTE",
+    "description": "Thermal infrared radiometer mounted on the International Space Station measuring Land Surface Temperature (LST) and Evapotranspiration (ET).",
+    "agricultural_application": "Detects hotspots of plant thermal stress, shallow-root water vulnerability, crop-water demand, and intra-field microclimate variations before visible damage.",
+    "supported_parameters": [
+     "LST",
+     "ET_daily",
+     "Evaporative_Stress_Index",
+     "Water_Use_Efficiency"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usda_ag_data_commons",
+    "name": "USDA Ag Data Commons",
+    "agency": "USDA National Agricultural Library",
+    "category": "economics",
+    "spatial_resolution": "Point, field, and regional research datasets",
+    "temporal_cadence": "Continuously curated agricultural repository",
+    "official_url": "https://www.nal.usda.gov/services/agdatacommons",
+    "api_endpoint": "https://data.nal.usda.gov/api/3/action/package_search",
+    "description": "Open-access agricultural repository covering soils, crops, climate, management practices, phenology, water quality, and agronomic trials.",
+    "agricultural_application": "Incorporates local field-trial measurements, soil-health research, and management practices into rotation models to match real farm constraints.",
+    "supported_parameters": [
+     "cover_crop_trials",
+     "tillage_impacts",
+     "soil_organic_matter_studies",
+     "yield_responses"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "web_soil_survey",
+    "name": "Web Soil Survey (WSS) / SSURGO / STATSGO2",
+    "agency": "USDA NRCS",
+    "category": "soil",
+    "spatial_resolution": "1:12,000 to 1:24,000 (Field-scale survey units)",
+    "temporal_cadence": "Annual SSURGO database refresh",
+    "official_url": "https://websoilsurvey.nrcs.usda.gov/app/",
+    "api_endpoint": "https://sdmdataaccess.nrcs.usda.gov/Tabular/post.rest",
+    "description": "Official USDA soil survey database providing soil series, horizons, texture classes, hydrologic groups, drainage classifications, and available water capacity.",
+    "agricultural_application": "Identifies soil organic matter gradients, texture, water infiltration, and compaction risk to optimize sustainable crop rotation choices.",
+    "supported_parameters": [
+     "muname",
+     "mukey",
+     "drainage_class",
+     "...[7 items]"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "cropscape_cdl",
+    "name": "Cropland Data Layer (CDL) CropScape",
+    "agency": "USDA NASS / George Mason University CSISS",
+    "category": "ecology",
+    "spatial_resolution": "30 m raster",
+    "temporal_cadence": "Annual cropland census (1997–present)",
+    "official_url": "https://nassgeodata.gmu.edu/CropScape/",
+    "api_endpoint": "https://nassgeodata.gmu.edu/axis2/services/CDLService/GetCDLValue",
+    "description": "High-resolution geo-referenced raster classifying specific crop varieties across the United States using satellite imagery and extensive ground truth.",
+    "agricultural_application": "Reconstructs historical crop rotations, verifies rotation diversity, determines multi-year planting frequencies, and detects regional cropping shifts.",
+    "supported_parameters": [
+     "crop_code",
+     "category_name",
+     "color_hex",
+     "confidence_level",
+     "historical_rotation"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "prism_climate",
+    "name": "PRISM High-Resolution Climate Data",
+    "agency": "Oregon State University PRISM Climate Group",
+    "category": "climate",
+    "spatial_resolution": "800 m (PRISM Normals) / 4 km (Daily observations)",
+    "temporal_cadence": "Daily / Monthly / 30-year Normals",
+    "official_url": "https://prism.oregonstate.edu/",
+    "api_endpoint": "https://services.nacse.org/prism/data/public/normals/4km",
+    "description": "Topographically-adjusted spatial climate grids integrating elevation, aspect, and coastal proximity with quality-controlled weather stations.",
+    "agricultural_application": "Provides terrain-sensitive temperature and precipitation baselines, frost recurrence probabilities, and extreme event thresholds for resilient rotations.",
+    "supported_parameters": [
+     "tmean",
+     "tmin",
+     "tmax",
+     "ppt",
+     "vpdmin",
+     "vpdmax"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "naip_imagery",
+    "name": "National Agriculture Imagery Program (NAIP)",
+    "agency": "USDA Farm Production and Conservation (FPAC)",
+    "category": "satellite",
+    "spatial_resolution": "0.6 m to 1.0 m natural color & NIR",
+    "temporal_cadence": "2–3 year state acquisition cycle during peak growing season",
+    "official_url": "https://naip-usdaonline.hub.arcgis.com/",
+    "api_endpoint": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer",
+    "description": "Sub-meter aerial ortho-imagery flown during agricultural leaf-on conditions providing high-resolution ground context.",
+    "agricultural_application": "Visualizes sub-field variability, drain tile layouts, fence lines, terrace stability, and localized weed patches complementing satellite analysis.",
+    "supported_parameters": [
+     "Red",
+     "Green",
+     "Blue",
+     "Near_Infrared"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usgs_nlcd",
+    "name": "USGS National Land Cover Database (NLCD)",
+    "agency": "USGS EROS / MRLC Consortium",
+    "category": "ecology",
+    "spatial_resolution": "30 m cell resolution",
+    "temporal_cadence": "2–3 year release cycle (2001–present)",
+    "official_url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
+    "api_endpoint": "https://www.mrlc.gov/geoserver/mrlc_display/wms",
+    "description": "Consistent multi-epoch land-cover characterization (cultivated crops, pasture, forests, wetlands, impervious cover) across the United States.",
+    "agricultural_application": "Contextualizes fields within broader ecosystems, evaluates buffer strip connectivity, and tracks long-term land-use conversions.",
+    "supported_parameters": [
+     "land_cover_class",
+     "percent_tree_canopy",
+     "percent_impervious",
+     "land_cover_change"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "nldas_gldas",
+    "name": "NLDAS & GLDAS Land Data Assimilation Systems",
+    "agency": "NASA GSFC / NOAA NCEP",
+    "category": "climate",
+    "spatial_resolution": "0.125° (NLDAS) / 0.25° (GLDAS)",
+    "temporal_cadence": "Hourly to 3-hourly continuous time series",
+    "official_url": "https://www.earthdata.nasa.gov/",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=NLDAS_NOAH0125_H",
+    "description": "Uncoupled land surface model simulations (Noah, Catchment, VIC) driven by observed precipitation and radiation to estimate water and energy states.",
+    "agricultural_application": "Monitors root-zone soil moisture below surface layers, tracks surface runoff, and calculates cumulative soil freeze depth for winter rotations.",
+    "supported_parameters": [
+     "SoilM_0_10cm",
+     "SoilM_10_40cm",
+     "SoilM_40_100cm",
+     "Evap_total",
+     "Runoff_surface"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "fao_gaez",
+    "name": "FAO Global Agro-Ecological Zones (GAEZ v4)",
+    "agency": "UN FAO / IIASA",
+    "category": "economics",
+    "spatial_resolution": "5 arc-minute (~9 km) global grid",
+    "temporal_cadence": "Multi-decade agro-climatic assessment",
+    "official_url": "https://gaez.fao.org/",
+    "api_endpoint": "https://gaez.fao.org/api/",
+    "description": "Global agricultural resource assessment modeling land suitab...[163 chars]",
+    "agricultural_application": "Evaluates bio-physical suitability of alternative rotation crops, quantifies yield gap penalties, and assesses climate change vulnerability.",
+    "supported_parameters": [
+     "crop_suitability_index",
+     "attainable_yield_kg_ha",
+     "water_deficit_mm",
+     "crop_growth_cycle_days"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "cocorahs",
+    "name": "CoCoRaHS Community Precipitation Network",
+    "agency": "Colorado Climate Center / Community Observers",
+    "category": "water",
+    "spatial_resolution": "Point measurements from ~26,000 active volunteer stations",
+    "temporal_cadence": "Daily 07:00 local time readings",
+    "official_url": "https://www.cocorahs.org/Maps",
+    "api_endpoint": "https://www.cocorahs.org/export/exportreports.aspx",
+    "description": "Crowd-sourced network of volunteer weather observers using standard manual rain gauges to measure hyper-local precipitation, hail, and snow.",
+    "agricultural_application": "Validates satellite rainfall estimates (IMERG), captures localized high-intensity thunderstorms, and verifies hail events impacting field yield.",
+    "supported_parameters": [
+     "precipitation_inches",
+     "hail_diameter_mm",
+     "snow_depth_inches",
+     "station_id"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usgs_nwis",
+    "name": "USGS National Water Information System (NWIS)",
+    "agency": "USGS Water Resources Mission Area",
+    "category": "water",
+    "spatial_resolution": "Point gauge stations across US rivers and aquifers",
+    "temporal_cadence": "15-minute to hourly instantaneous values",
+    "official_url": "https://waterdata.usgs.gov/nwis",
+    "api_endpoint": "https://waterservices.usgs.gov/nwis/iv/?format=json",
+    "description": "Nationwide monitoring network tracking real-time surface streamflow, river stage height, reservoir levels, and groundwater table depths.",
+    "agricultural_application": "Assesses watershed irrigation water availability, detects localized groundwater depletion, and warns of flood and bank erosion hazards.",
+    "supported_parameters": [
+     "00060_discharge_cfs",
+     "00065_gage_height_ft",
+     "72019_groundwater_depth_ft",
+     "00010_water_temp_c"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usda_ams_market_news",
+    "name": "USDA AMS Market News Commodity Prices",
+    "agency": "USDA Agricultural Marketing Service (AMS)",
+    "category": "economics",
+    "spatial_resolution": "Elevator, terminal, and regional grain marketing zones",
+    "temporal_cadence": "Daily cash bids and weekly summary reports",
+    "official_url": "https://www.ams.usda.gov/market-news",
+    "api_endpoint": "https://marsapi.ams.usda.gov/services/v1.2/reports",
+    "description": "Official market reporting on commodity cash bids, basis levels, futures spreads, organic grain premiums, and transportation logistics.",
+    "agricultural_application": "Evaluates market viability, cash price spreads, and profitability margins when introducing alternative or cover crops into the rotation.",
+    "supported_parameters": [
+     "commodity_name",
+     "price_min",
+     "price_max",
+     "price_average",
+     "basis_cents",
+     "delivery_period"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usda_nass_quickstats",
+    "name": "USDA NASS QuickStats Agricultural Statistics",
+    "agency": "USDA National Agricultural Statistics Service",
+    "category": "economics",
+    "spatial_resolution": "County, agricultural district, and state aggregates",
+    "temporal_cadence": "Annual census and in-season monthly yield surveys",
+    "official_url": "https://quickstats.nass.usda.gov/",
+    "api_endpoint": "https://quickstats.nass.usda.gov/api/api_GET/",
+    "description": "Comprehensive repository of agricultural statistics covering crop acreage, production volume, harvested yield per acre, and input expenditures.",
+    "agricultural_application": "Calibrates field-level yield expectations against 20-year county averages, establishing baseline benchmarks for new rotation trials.",
+    "supported_parameters": [
+     "yield_bu_per_acre",
+     "planted_acres",
+     "harvested_acres",
+     "production_bu",
+     "county_name"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "openet",
+    "name": "OpenET Satellite Evapotranspiration",
+    "agency": "NASA / DRI / USGS / OpenET Consortium",
+    "category": "water",
+    "spatial_resolution": "30 m field scale",
+    "temporal_cadence": "Daily, monthly, and annual intervals",
+    "official_url": "https://openetdata.org/",
+    "api_endpoint": "https://api.openetdata.org/v1/raster/timeseries/point",
+    "description": "Operational field-scale evapotranspiration estimates generat...[178 chars]",
+    "agricultural_application": "Provides precise field water balances, quantifies actual crop water consumption, and guides deficit irrigation scheduling for rotation crops.",
+    "supported_parameters": [
+     "et_actual_mm",
+     "et_reference_mm",
+     "model_ensemble_mean",
+     "model_spread"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "usfs_landfire",
+    "name": "USFS LANDFIRE Vegetation & Ecological Layers",
+    "agency": "USFS / USGS / Department of the Interior",
+    "category": "ecology",
+    "spatial_resolution": "30 m cell resolution",
+    "temporal_cadence": "Annual to bi-annual national updates",
+    "official_url": "https://www.landfire.gov/",
+    "api_endpoint": "https://landfire.cr.usgs.gov/arcgis/rest/services/Landfire/MapServer",
+    "description": "Comprehensive vegetation dynamics mapping Existing Vegetation Type (EVT), Canopy Cover, Height, and Ecological Biophysical Settings.",
+    "agricultural_application": "Assesses shelterbelt health, tree-crop interactions, windbreak buffers, and perennial landscape corridors that mitigate soil loss.",
+    "supported_parameters": [
+     "existing_veg_type",
+     "canopy_cover_percent",
+     "canopy_height_m",
+     "surface_fuel_model"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "gedi_lidar",
+    "name": "Global Ecosystem Dynamics Investigation (GEDI)",
+    "agency": "NASA / University of Maryland / ISS",
+    "category": "ecology",
+    "spatial_resolution": "25 m footprint along ground tracks (Between 51.6° N and S)",
+    "temporal_cadence": "ISS active mission sampling shots",
+    "official_url": "https://gedi.umd.edu/data",
+    "api_endpoint": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=GEDI04_A",
+    "description": "Full-waveform spaceborne lidar measuring vertical canopy structure, canopy top height, and Aboveground Biomass Density (AGBD).",
+    "agricultural_application": "Quantifies biomass accumulation in agroforestry shelterbelts, perimeter woodlots, and perennial hedgerows surrounding cultivated fields.",
+    "supported_parameters": [
+     "agbd_mg_ha",
+     "canopy_top_height_m",
+     "pai_plant_area_index",
+     "rh100"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "copernicus_sentinel2",
+    "name": "Copernicus Sentinel-2 Multispectral Imagery",
+    "agency": "European Space Agency (ESA) / Copernicus",
+    "category": "satellite",
+    "spatial_resolution": "10 m (B2, B3, B4, B8) / 20 m (Red-Edge, SWIR)",
+    "temporal_cadence": "5-day constellation revisit (Sentinel-2A + 2B)",
+    "official_url": "https://dataspace.copernicus.eu/",
+    "api_endpoint": "https://earth-search.aws.element84.com/v1/search",
+    "description": "13-band multispectral satellite constellation with dedicated red-edge and shortwave infrared bands tailored for agricultural vegetation and soil analysis.",
+    "agricultural_application": "High-resolution in-season NDVI, NDRE, bare-soil composite mapping, variable-rate nitrogen prescription zones, and crop uniformity scoring.",
+    "supported_parameters": [
+     "B02_Blue",
+     "B03_Green",
+     "B04_Red",
+     "...[9 items]"
+    ],
+    "is_live_queryable": true
+   },
+   {
+    "id": "era5_reanalysis",
+    "name": "ERA5 ECMWF Global Climate Reanalysis",
+    "agency": "ECMWF / Copernicus Climate Change Service (C3S)",
+    "category": "climate",
+    "spatial_resolution": "0.25° (~31 km) atmosphere / 0.1° land surface",
+    "temporal_cadence": "Hourly continuous time series (1940–present)",
+    "official_url": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview",
+    "api_endpoint": "https://archive-api.open-meteo.com/v1/era5",
+    "description": "Fifth generation ECMWF global atmospheric reanalysis combining extensive historical observations with physics-based weather forecasting models.",
+    "agricultural_application": "Fills gaps where weather stations are absent, provides multi-decadal historical climate baselines, and models continuous temperature and precipitation.",
+    "supported_parameters": [
+     "temperature_2m",
+     "precipitation_sum",
+     "wind_speed_10m",
+     "soil_temperature_level_1",
+     "volumetric_soil_water_layer_1"
+    ],
+    "is_live_queryable": true
+   }
+  ]
+ }
+]

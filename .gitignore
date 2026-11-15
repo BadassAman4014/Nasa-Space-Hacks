@@ -31,3 +31,9 @@ backend/data/dfbk.zip
 *.example
 *.example
 backend/.env.example
+
+# Local browser session used for reference-site research (contains login cookies)
+scratch/onesoil_profile/
+
+# Crop planner local database (farmer inputs, cached POWER weather)
+backend/app/data/crop_planner.db*

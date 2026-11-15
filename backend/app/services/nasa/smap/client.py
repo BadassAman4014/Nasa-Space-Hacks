@@ -96,53 +96,35 @@ class SmapClient:
         end_date: str,
     ) -> list[dict[str, Any]]:
         """
-        Query open NASA satellite data API for daily surface volumetric soil moisture (m³/m³)
-        covering the field centroid. Serves as open source fallback when Earthdata DAAC credentials
-        are not provided by user.
+        Real SMAP L3 Enhanced (SPL3SMP_E.006) surface soil moisture for the 9 km cell
+        containing the point, extracted by NASA AppEEARS. Only retrievals flagged
+        "recommended quality" are returned. If AppEEARS has not finished yet, a task is
+        queued and whatever is already cached is returned (possibly nothing).
         """
-        # NASA POWER daily soil moisture (derived from SMAP/MERRA-2)
-        url = "https://power.larc.nasa.gov/api/temporal/daily/point"
-        start_fmt = start_date.replace("-", "")
-        end_fmt = end_date.replace("-", "")
-        params = {
-            "parameters": "GWETTOP", # Surface soil wetness / moisture (fraction 0-1)
-            "community": "AG",
-            "longitude": lon,
-            "latitude": lat,
-            "start": start_fmt,
-            "end": end_fmt,
-            "format": "JSON",
-        }
-        try:
-            r = requests.get(url, params=params, timeout=12)
-            if r.status_code == 200:
-                data = r.json()
-                gwettop = data.get("properties", {}).get("parameter", {}).get("GWETTOP", {})
-                obs_list = []
-                for d_str, val in sorted(gwettop.items()):
-                    if val is None or val < -900: # -999 fill value
-                        continue
-                    dt_obj = datetime.strptime(d_str, "%Y%m%d")
-                    iso_date = dt_obj.strftime("%Y-%m-%d")
-                    # Volumetric water content m3/m3 ~ GWETTOP * porosity (porosity ~0.45 in Sandy Loam)
-                    sm_m3_m3 = round(float(val) * 0.42, 4)
-                    obs_list.append({
-                        "observation_date": iso_date,
-                        "period_start": f"{iso_date}T00:00:00Z",
-                        "period_end": f"{iso_date}T23:59:59Z",
-                        "mean_value": sm_m3_m3,
-                        "minimum_value": max(0.01, round(sm_m3_m3 - 0.02, 4)),
-                        "maximum_value": round(sm_m3_m3 + 0.02, 4),
-                        "unit": "m³/m³",
-                        "valid_pixel_count": 1,
-                        "coverage_percentage": 100.0,
-                        "quality_status": "good",
-                        "source_granule": f"NASA_SMAP_DAILY_{iso_date}",
-                    })
-                return obs_list
-        except Exception:
-            pass
-        return []
+        from app.services.nasa.real import series
+
+        series.ensure_point_data(lat, lon, start_date, end_date)
+        by_day: dict[str, list[dict[str, Any]]] = {}
+        for row in series.smap_measured(lat, lon, start_date, end_date):
+            if row["used"]:
+                by_day.setdefault(row["date"], []).append(row)
+        obs_list = []
+        for iso_date, passes in sorted(by_day.items()):
+            values = [p["value_m3m3"] for p in passes]
+            obs_list.append({
+                "observation_date": iso_date,
+                "period_start": f"{iso_date}T00:00:00Z",
+                "period_end": f"{iso_date}T23:59:59Z",
+                "mean_value": round(sum(values) / len(values), 4),
+                "minimum_value": min(values),
+                "maximum_value": max(values),
+                "unit": "m³/m³",
+                "valid_pixel_count": len(values),
+                "coverage_percentage": 100.0,
+                "quality_status": "recommended",
+                "source_granule": passes[0]["source_ref"] + " (" + ", ".join(p["pass"] for p in passes) + ")",
+            })
+        return obs_list
 
 smap_client = SmapClient()
 

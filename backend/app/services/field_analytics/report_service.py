@@ -122,34 +122,10 @@ class FieldReportService:
             try:
                 raw_extracted = sentinel_service.build_time_series(field_id, poly_geom)
             except RasterUnavailable as exc:
-                raw_extracted = sentinel_service.generate_canonical_scenes(field_id, poly_geom)
-                raw_extracted = [sentinel_service.compute_observation(field_id, poly_geom, s) for s in raw_extracted]
+                raw_extracted = []
                 unavailable_note = str(exc)
             analytics_repo.save_observations(field_id, raw_extracted)
             total_in_db = analytics_repo.count_observations(field_id)
-        else:
-            # Heal existing records that have null preview images or empty metrics
-            existing_sample = analytics_repo.get_observations(field_id, limit=20)
-            if any(not o.get("ndvi_preview_url") or not o.get("rgb_preview_url") or not o.get("mean_ndvi") or o.get("mean_ndvi") == 0.0 for o in existing_sample):
-                all_unhealed = analytics_repo.get_observations(field_id, limit=None)
-                healed_list = []
-                for o in all_unhealed:
-                    if not o.get("ndvi_preview_url") or not o.get("rgb_preview_url") or not o.get("mean_ndvi") or o.get("mean_ndvi") == 0.0:
-                        healed = sentinel_service.synthesize_field_observation(
-                            field_id,
-                            field["geometry"],
-                            {
-                                "scene_id": o.get("scene_id"),
-                                "acquisition_date": o.get("acquisition_date"),
-                                "cloud_cover_percent": float(o.get("cloud_cover_percent", o.get("cloud_cover", 2.0)) or 2.0),
-                            },
-                            render_previews=True
-                        )
-                        healed["id"] = o["id"]
-                        healed_list.append(healed)
-                if healed_list:
-                    analytics_repo.save_observations(field_id, healed_list)
-
         # Retrieve the requested batch (default newest first: order="desc")
         obs_batch = analytics_repo.get_observations(
             field_id,

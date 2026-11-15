@@ -1,40 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   ArrowLeft,
-  X,
-  Download,
-  RefreshCw,
-  Sparkles,
   MapPin,
   Layers,
   CheckCircle2,
-  FileSpreadsheet,
-  FlaskConical,
-  UploadCloud,
-  MoreVertical,
-  Activity,
-  FileText,
-  BarChart3,
-  Database,
   ChevronDown,
-  Check
 } from 'lucide-react';
 import { FieldStatusSummary } from '../../services/fieldAnalyticsApi';
 import { SavedField } from '../../services/boundariesApi';
 import { useI18n } from '../../i18n';
-import { LanguageSwitcher } from '../common/LanguageSwitcher';
 
-export type WorkspaceTab = 'status' | 'report' | 'prescription' | 'data' | 'yield';
+export type WorkspaceTab = 'map' | 'health' | 'status' | 'data';
 
 interface FieldHeaderProps {
   summary: FieldStatusSummary;
   activeTab: WorkspaceTab;
   setActiveTab: (tab: WorkspaceTab) => void;
-  onExport: () => void;
-  onRefresh: () => void;
   onClose: () => void;
-  refreshing: boolean;
-  notify?: (msg: string) => void;
   fields?: SavedField[];
   onSelectField?: (fieldId: string) => void;
 }
@@ -43,16 +25,11 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
   summary,
   activeTab,
   setActiveTab,
-  onExport,
-  onRefresh,
   onClose,
-  refreshing,
-  notify = () => {},
   fields = [],
   onSelectField,
 }) => {
   const { t, formatHectares } = useI18n();
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [fieldDropdownOpen, setFieldDropdownOpen] = useState(false);
   const fieldDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -72,9 +49,9 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
   }, [fieldDropdownOpen]);
 
   return (
-    <header className="bg-[#f1f4f2]/90 backdrop-blur-md px-6 md:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30 transition-all">
+    <header className="bg-[#f1f4f2]/90 backdrop-blur-md px-6 md:px-8 py-4 flex flex-col md:flex-row md:flex-wrap md:items-center justify-between gap-4 sticky top-0 z-30 transition-all">
       {/* Left: Back button & Field Title/Subtitle */}
-      <div className="flex items-center gap-3.5">
+      <div className="flex items-center gap-3.5 min-w-[260px] shrink-0">
         <button
           onClick={onClose}
           className="p-2 rounded-xl text-gray-600 hover:text-gray-900 bg-white/80 hover:bg-white transition flex items-center justify-center border border-black/[0.06] shadow-xs cursor-pointer"
@@ -191,6 +168,28 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
 
       {/* Middle: 5 Navigation Tabs (OneSoil Architecture) */}
       <div className="flex items-center bg-slate-200/50 p-1 rounded-2xl border border-black/[0.04] flex-shrink-0">
+        {/* Field Map */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('map')}
+          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
+            activeTab === 'map' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Field Map
+        </button>
+
+        {/* Field Health Trend */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('health')}
+          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
+            activeTab === 'health' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Field Health
+        </button>
+
         {/* Tab 1: Status */}
         <button
           type="button"
@@ -202,33 +201,6 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
           }`}
         >
           {t('analytics.statusTab')}
-        </button>
-
-        {/* Tab 2: Field Report */}
-        <button
-          type="button"
-          onClick={() => setActiveTab('report')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap flex items-center gap-1 cursor-pointer ${
-            activeTab === 'report'
-              ? 'bg-white text-gray-900 shadow-xs'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          <Sparkles size={12} className="text-emerald-600" />
-          {t('analytics.reportTab')}
-        </button>
-
-        {/* Tab 3: Prescription Maps */}
-        <button
-          type="button"
-          onClick={() => setActiveTab('prescription')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
-            activeTab === 'prescription'
-              ? 'bg-white text-gray-900 shadow-xs'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t('analytics.prescriptionTab')}
         </button>
 
         {/* Tab 4: Data +23 */}
@@ -247,120 +219,6 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
           </span>
         </button>
 
-        {/* Tab 5: Yield Analysis */}
-        <button
-          type="button"
-          onClick={() => setActiveTab('yield')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
-            activeTab === 'yield'
-              ? 'bg-white text-gray-900 shadow-xs'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t('analytics.yieldTab')}
-        </button>
-      </div>
-
-      {/* Right: Quick Action Buttons (OneSoil Yield Style) */}
-      <div className="flex items-center gap-1.5 flex-shrink-0 relative">
-        <LanguageSwitcher variant="pill" className="mr-1" />
-        {/* Prescription map action */}
-        <button
-          onClick={() => setActiveTab('prescription')}
-          className="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition hidden xl:flex items-center gap-1.5 cursor-pointer"
-          title="Create variable-rate prescription"
-        >
-          <FileSpreadsheet size={14} className="text-emerald-600" />
-          <span>Prescription map</span>
-        </button>
-
-        {/* Soil sampling map action */}
-        <button
-          onClick={() => notify('Soil Sampling Map Planner: 1.0 ha sample grid points generated.')}
-          className="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition hidden xl:flex items-center gap-1.5 cursor-pointer"
-          title="Agrochemical soil sampling points"
-        >
-          <FlaskConical size={14} className="text-amber-600" />
-          <span>Soil sampling map</span>
-        </button>
-
-        {/* Upload data action */}
-        <button
-          onClick={() => notify('Ingest data: Select Harvester Yield Shapefile, ISO-XML, or GeoTIFF.')}
-          className="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition hidden md:flex items-center gap-1.5 cursor-pointer"
-          title="Upload harvester, drone, or tractor logs"
-        >
-          <UploadCloud size={14} className="text-blue-600" />
-          <span>Upload data</span>
-        </button>
-
-        {/* Refresh button */}
-        <button
-          onClick={onRefresh}
-          disabled={refreshing}
-          className="p-2 rounded-xl text-gray-500 hover:text-gray-900 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition disabled:opacity-50 cursor-pointer"
-          title="Refresh satellite analysis"
-        >
-          <RefreshCw size={15} className={refreshing ? 'animate-spin text-emerald-600' : ''} />
-        </button>
-
-        {/* 3-dot overflow menu */}
-        <div className="relative">
-          <button
-            onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-            className="p-2 rounded-xl text-gray-500 hover:text-gray-900 bg-white/80 hover:bg-white border border-black/[0.05] shadow-xs transition cursor-pointer"
-            title="More actions"
-          >
-            <MoreVertical size={16} />
-          </button>
-
-          {moreMenuOpen && (
-            <div className="absolute right-0 top-10 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-1.5 z-50 text-xs text-gray-800 space-y-0.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setMoreMenuOpen(false);
-                  onExport();
-                }}
-                className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
-              >
-                <Download size={14} className="text-gray-500" />
-                <span>Export Field Report PDF</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMoreMenuOpen(false);
-                  setActiveTab('prescription');
-                }}
-                className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
-              >
-                <FileSpreadsheet size={14} className="text-gray-500" />
-                <span>Generate Prescription</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMoreMenuOpen(false);
-                  setActiveTab('data');
-                }}
-                className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
-              >
-                <Database size={14} className="text-gray-500" />
-                <span>Browse All 12 Layers</span>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Close Button (X) */}
-        <button
-          onClick={onClose}
-          className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition ml-1"
-          title="Close window"
-        >
-          <X size={18} />
-        </button>
       </div>
     </header>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 import {
   fieldAnalyticsApi,
   FieldStatusSummary,
@@ -10,17 +10,17 @@ import {
 } from '../../services/fieldAnalyticsApi';
 import { FieldHeader, WorkspaceTab } from './FieldHeader';
 import { StatusTab } from './StatusTab';
-import { FieldReportTab } from './FieldReportTab';
-import { PrescriptionMapsTab } from './PrescriptionMapsTab';
 import { DataCatalogTab } from './DataCatalogTab';
-import { YieldAnalysisTab } from './YieldAnalysisTab';
 import { boundariesApi, type SavedField } from '../../services/boundariesApi';
+import { FieldMapTab } from './health/FieldMapTab';
+import { FieldHealthTab } from './health/FieldHealthTab';
 
 interface FieldAnalyticsWorkspaceProps {
   fieldId: string;
   onClose: () => void;
   notify: (msg: string) => void;
   onSelectField?: (id: string) => void;
+  onNavigate?: (page: string) => void;
 }
 
 export interface ProgressiveBatchProgress {
@@ -34,10 +34,11 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
   onClose,
   notify,
   onSelectField,
+  onNavigate,
 }) => {
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('status');
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>('map');
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [summary, setSummary] = useState<FieldStatusSummary | null>(null);
@@ -197,34 +198,6 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
     }
   };
 
-  const handleToggleObservation = async (obsId: string, isIncluded: boolean) => {
-    try {
-      const updatedRep = await fieldAnalyticsApi.toggleObservation(fieldId, obsId, isIncluded);
-      setFullReport(updatedRep);
-      notify(`Observation ${isIncluded ? 'included in' : 'excluded from'} productivity analysis`);
-    } catch (err: any) {
-      notify(`Failed to toggle observation: ${err.message}`);
-    }
-  };
-
-  const handleRebuildAnalysis = async () => {
-    setRefreshing(true);
-    try {
-      const rep = await fieldAnalyticsApi.getFullReport(fieldId, true);
-      setFullReport(rep);
-      notify('Productivity zones and stability metrics recalculated.');
-    } catch (err: any) {
-      notify(`Failed to rebuild analysis: ${err.message}`);
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  const handleExport = () => {
-    window.print();
-    notify('Print / PDF export dialogue launched.');
-  };
-
   if (loading) {
     return (
       <div className="h-full w-full bg-[#f8fafc] flex flex-col items-center justify-center p-8 space-y-4">
@@ -276,17 +249,24 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
         summary={summary}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onExport={handleExport}
-        onRefresh={() => loadAllData(true)}
         onClose={onClose}
-        refreshing={refreshing}
-        notify={notify}
         fields={availableFields}
         onSelectField={onSelectField}
       />
 
       {/* Main Tab Content */}
       <main className="flex-1 px-6 md:px-8 pb-10 pt-2">
+        {activeTab === 'map' && (
+          <FieldMapTab
+            fieldId={fieldId}
+            onSelectField={onSelectField}
+            onOpenHealth={() => setActiveTab('health')}
+            onNavigate={onNavigate}
+          />
+        )}
+
+        {activeTab === 'health' && <FieldHealthTab fieldId={fieldId} notify={notify} />}
+
         {activeTab === 'status' && (
           <StatusTab
             summary={summary}
@@ -300,23 +280,6 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
           />
         )}
 
-        {activeTab === 'report' && fullReport && (
-          <FieldReportTab
-            report={fullReport}
-            onToggleObservation={handleToggleObservation}
-            onRebuildAnalysis={handleRebuildAnalysis}
-            rebuilding={refreshing}
-          />
-        )}
-
-        {activeTab === 'prescription' && (
-          <PrescriptionMapsTab
-            summary={summary}
-            fullReport={fullReport}
-            notify={notify}
-          />
-        )}
-
         {activeTab === 'data' && (
           <DataCatalogTab
             summary={summary}
@@ -326,13 +289,6 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
           />
         )}
 
-        {activeTab === 'yield' && (
-          <YieldAnalysisTab
-            summary={summary}
-            fullReport={fullReport}
-            notify={notify}
-          />
-        )}
       </main>
     </div>
   );

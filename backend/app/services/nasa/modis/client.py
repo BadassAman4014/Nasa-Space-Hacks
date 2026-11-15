@@ -95,55 +95,32 @@ class ModisClient:
         end_date: str,
     ) -> list[dict[str, Any]]:
         """
-        Retrieve 16-day MODIS NDVI/EVI composite estimates covering the field coordinates.
-        Calculates 16-day step composites within the date range.
+        Real MODIS MOD13Q1.061 16-day NDVI at 250 m for the pixel containing the point,
+        extracted by NASA AppEEARS together with the SMAP request. Composites with
+        pixel reliability worse than "marginal" are dropped.
         """
-        # Calculate 16-day composite timestamps
-        dt_start = datetime.strptime(start_date, "%Y-%m-%d")
-        dt_end = datetime.strptime(end_date, "%Y-%m-%d")
+        from app.services.nasa.real import series
 
+        series.ensure_point_data(lat, lon, start_date, end_date)
         composites = []
-        curr = dt_start
-        step = 16
-
-        # Phenological baseline for Brandenburg temperate agriculture:
-        # Winter (Dec-Feb): ~0.25 - 0.35, Spring greenup (Apr-May): ~0.55 - 0.75,
-        # Summer peak (Jun-Jul): ~0.70 - 0.85, Harvest/Autumn (Aug-Oct): ~0.35 - 0.50
-        while curr <= dt_end:
-            day_of_year = curr.timetuple().tm_yday
-            # Seasonal curve
-            rad = 2 * 3.14159 * (day_of_year - 80) / 365.0
-            base_ndvi = 0.52 + 0.28 * max(-0.8, min(1.0, float(np.sin(rad))))
-            ndvi_val = round(max(0.15, min(0.92, base_ndvi)), 4)
-            evi_val = round(max(0.10, min(0.75, ndvi_val * 0.72)), 4)
-
-            iso_date = curr.strftime("%Y-%m-%d")
-            from datetime import timedelta
-            period_end_dt = min(dt_end, curr + timedelta(days=step - 1))
-            period_end_iso = period_end_dt.strftime("%Y-%m-%d")
-
+        for row in series.modis_ndvi(lat, lon, start_date, end_date):
+            if not row["used"]:
+                continue
+            iso_date = row["date"]
             composites.append({
                 "observation_date": iso_date,
                 "period_start": f"{iso_date}T00:00:00Z",
-                "period_end": f"{period_end_iso}T23:59:59Z",
-                "mean_value": ndvi_val,
-                "minimum_value": max(0.1, round(ndvi_val - 0.04, 4)),
-                "maximum_value": min(0.95, round(ndvi_val + 0.04, 4)),
+                "period_end": f"{iso_date}T23:59:59Z",
+                "mean_value": row["ndvi"],
+                "minimum_value": row["ndvi"],
+                "maximum_value": row["ndvi"],
                 "unit": "index (-0.2 to 1.0)",
-                "valid_pixel_count": 4,
+                "valid_pixel_count": 1,
                 "coverage_percentage": 100.0,
-                "quality_status": "good",
-                "source_granule": f"MOD13Q1.A{curr.year}{day_of_year:03d}.h18v03.061",
-                "metadata": {
-                    "evi_mean": evi_val,
-                    "composite_day_of_year": day_of_year,
-                    "product": "MOD13Q1.061",
-                    "tile": "h18v03",
-                },
+                "quality_status": "good" if row["reliability"] == 0 else "marginal",
+                "source_granule": row["source_ref"],
+                "metadata": {"product": "MOD13Q1.061", "pixel_reliability": row["reliability"]},
             })
-
-            curr += timedelta(days=step)
-
         return composites
 
 modis_client = ModisClient()

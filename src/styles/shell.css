@@ -14,3 +14,6 @@
   .workspace { height:auto; overflow:visible; }
   .page-content--bleed { overflow:visible; }
 }
+
+/* Pages that are not full-bleed (Crop Planner, Environment, Reports ...) scroll inside the workspace. dashboard.css sets .workspace to overflow:hidden, so the page content must scroll itself. */
+.page-content:not(.page-content--bleed) { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }

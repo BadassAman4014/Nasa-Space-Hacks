@@ -94,50 +94,34 @@ class GpmClient:
         end_date: str,
     ) -> list[dict[str, Any]]:
         """
-        Query open NASA satellite API for daily accumulated precipitation (mm)
-        covering the field centroid.
+        Real GPM IMERG Late Run daily precipitation (GPM_3IMERGDL.07) for the 0.1° cell
+        containing the point, read as a one-cell subset from NASA cloud OPeNDAP.
         """
-        url = "https://power.larc.nasa.gov/api/temporal/daily/point"
-        start_fmt = start_date.replace("-", "")
-        end_fmt = end_date.replace("-", "")
-        params = {
-            "parameters": "PRECTOTCORR", # Precipitation Corrected (mm/day) from GPM/MERRA-2
-            "community": "AG",
-            "longitude": lon,
-            "latitude": lat,
-            "start": start_fmt,
-            "end": end_fmt,
-            "format": "JSON",
-        }
+        from app.services.nasa.real.imerg import ImergUnavailable, daily_precipitation
+
         try:
-            r = requests.get(url, params=params, timeout=12)
-            if r.status_code == 200:
-                data = r.json()
-                precip = data.get("properties", {}).get("parameter", {}).get("PRECTOTCORR", {})
-                obs_list = []
-                for d_str, val in sorted(precip.items()):
-                    if val is None or val < -900: # -999 fill value
-                        continue
-                    dt_obj = datetime.strptime(d_str, "%Y%m%d")
-                    iso_date = dt_obj.strftime("%Y-%m-%d")
-                    val_mm = max(0.0, round(float(val), 2))
-                    obs_list.append({
-                        "observation_date": iso_date,
-                        "period_start": f"{iso_date}T00:00:00Z",
-                        "period_end": f"{iso_date}T23:59:59Z",
-                        "mean_value": val_mm,
-                        "minimum_value": val_mm,
-                        "maximum_value": val_mm,
-                        "unit": "mm",
-                        "valid_pixel_count": 1,
-                        "coverage_percentage": 100.0,
-                        "quality_status": "good",
-                        "source_granule": f"GPM_3IMERGDF_DAILY_{iso_date}",
-                    })
-                return obs_list
-        except Exception:
-            pass
-        return []
+            series = daily_precipitation(lat, lon, start_date, end_date)
+        except ImergUnavailable:
+            return []
+        obs_list = []
+        for d in series["days"]:
+            if d["precip_mm"] is None:
+                continue
+            iso_date = d["date"]
+            obs_list.append({
+                "observation_date": iso_date,
+                "period_start": f"{iso_date}T00:00:00Z",
+                "period_end": f"{iso_date}T23:59:59Z",
+                "mean_value": d["precip_mm"],
+                "minimum_value": d["precip_mm"],
+                "maximum_value": d["precip_mm"],
+                "unit": "mm",
+                "valid_pixel_count": 1,
+                "coverage_percentage": 100.0,
+                "quality_status": "satellite estimate (IMERG Late, not gauge-corrected)",
+                "source_granule": d["granule"],
+            })
+        return obs_list
 
 gpm_client = GpmClient()
 
