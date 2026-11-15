@@ -1,3 +1,4 @@
+import { baseUrl } from '../../services/apiClient';
 import type {
   FieldOption,
   FieldContextData,
@@ -7,7 +8,7 @@ import type {
   FieldCategory,
 } from './types';
 
-const API_BASE = '/api/ai-assistant';
+const API_BASE = `${baseUrl}/ai-assistant`;
 
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const urls = [
@@ -98,7 +99,7 @@ export const aiAssistantApi = {
     formData.append('audio', audioBlob, 'speech.webm');
     formData.append('language', language);
 
-    const urls = [`${API_BASE}/voice`, `/api/ai-assistant/voice`];
+    const urls = [`${API_BASE}/voice`];
     for (const url of urls) {
       try {
         const res = await fetch(url, {

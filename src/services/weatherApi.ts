@@ -1,3 +1,5 @@
+import { baseUrl } from './apiClient';
+
 export interface VirtualStation {
   field_id: string;
   field_name: string;
@@ -203,7 +205,7 @@ export interface AvailableField {
   geometry?: any;
 }
 
-const API_BASE = '/api/weather';
+const API_BASE = `${baseUrl}/weather`;
 
 export async function fetchVirtualStations(): Promise<VirtualStation[]> {
   const res = await fetch(`${API_BASE}/stations`);
