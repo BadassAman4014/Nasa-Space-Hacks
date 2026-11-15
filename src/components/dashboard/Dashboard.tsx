@@ -924,7 +924,7 @@ export function MapViewV2({
     return fields.find((field) => field.id === selectedFieldId) || null;
   }, [fields, selectedFieldId]);
   const initialMapCenter = useMemo<[number, number]>(
-    () => calculateGeometryCentroid(selected?.geometry || fields[0]?.geometry) || [0, 0],
+    () => calculateGeometryCentroid(selected?.geometry || fields[0]?.geometry) || [52.4125, 12.5316],
     [fields, selected]
   );
   const desktopLeftPadding = typeof window !== 'undefined'
@@ -1016,7 +1016,7 @@ export function MapViewV2({
       <MapContainer
         ref={setMap}
         center={initialMapCenter}
-        zoom={12}
+        zoom={fields.length > 0 ? 12 : 8.5}
         zoomSnap={0.5}
         minZoom={8}
         maxZoom={18}
