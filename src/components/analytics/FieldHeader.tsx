@@ -11,7 +11,7 @@ import { FieldStatusSummary } from '../../services/fieldAnalyticsApi';
 import { SavedField } from '../../services/boundariesApi';
 import { useI18n } from '../../i18n';
 
-export type WorkspaceTab = 'map' | 'health' | 'status' | 'data';
+export type WorkspaceTab = 'map' | 'health' | 'water' | 'status' | 'data';
 
 interface FieldHeaderProps {
   summary: FieldStatusSummary;
@@ -200,6 +200,16 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
           }`}
         >
           {t('fieldAnalytics.tabs.health')}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('water')}
+          className={`border-b-2 px-5 py-3 text-sm font-bold transition whitespace-nowrap cursor-pointer ${
+            activeTab === 'water' ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Water
         </button>
 
         {/* Status */}

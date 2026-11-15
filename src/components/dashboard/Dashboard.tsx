@@ -25,8 +25,10 @@ import { MapSearchBar } from '../common/MapSearchBar';
 import { MapLegend } from '../common/MapLegend';
 import { useI18n } from '../../i18n';
 import { calculateGeometryCentroid, type SearchResult } from '../../services/geocodingService';
-import { fetchAllFieldsWeather, fetchPointWeather, type FieldWeatherSummary, type PointWeather } from '../../services/weatherApi';
+import { fetchAllFieldsWeather, fetchFieldWeather, type FieldWeatherData, type FieldWeatherSummary } from '../../services/weatherApi';
 import { createVirtualStationDivIcon } from '../weather/VirtualWeatherStationMarker';
+import { environmentApi } from '../../services/environmentApi';
+import { fieldHealthApi } from '../../services/fieldHealthApi';
 
 type PageKey =
   | 'dashboard'
@@ -229,6 +231,7 @@ export function DashboardV2(props: {
               onBack={() => setPanelView('list')}
               onOpenAnalytics={() => props.navigate('analytics', selectedField.id)}
               onViewProfile={() => { sessionStorage.setItem('farmily_analytics_tab', 'health'); props.navigate('analytics', selectedField.id); }}
+              onViewWaterData={() => { sessionStorage.setItem('farmily_analytics_tab', 'water'); props.navigate('analytics', selectedField.id); }}
               notify={props.notify}
             />
           ) : null}
@@ -795,36 +798,63 @@ function DashboardPanelSkeleton() {
   return <div className="space-y-3" aria-label={t('fieldAnalytics.dashboardPanel.loadingFields')}>{[0, 1, 2].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-slate-100" />)}</div>;
 }
 
-function DashboardFieldSummary({ field, onBack, onOpenAnalytics, onViewProfile, notify }: { field: SavedField; onBack: () => void; onOpenAnalytics: () => void; onViewProfile: () => void; notify: (message: string) => void }) {
+function DashboardFieldSummary({ field, onBack, onOpenAnalytics, onViewProfile, onViewWaterData, notify }: { field: SavedField; onBack: () => void; onOpenAnalytics: () => void; onViewProfile: () => void; onViewWaterData: () => void; notify: (message: string) => void }) {
   const { formatHectares, t } = useI18n();
   return (
     <section className="space-y-4">
       <button onClick={onBack} className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-emerald-700"><ArrowLeft size={17} />{t('dashboard.yourFarmFields')}</button>
       <div><h2 className="text-xl font-extrabold text-slate-950">{field.name}</h2><p className="mt-1 text-sm text-slate-600">{formatHectares(field.area_hectares)} · {field.current_crop || t('dashboard.noCropAssigned')}</p></div>
+      <DashboardWaterSummary fieldId={field.id} onOpen={onViewWaterData} />
       <FieldSoilCard fieldId={field.id} fieldName={field.name} fieldAreaHa={field.area_hectares} notify={notify} variant="compact" onOpenAnalytics={onOpenAnalytics} onViewProfile={onViewProfile} />
     </section>
   );
 }
 
+function DashboardWaterSummary({ fieldId, onOpen }: { fieldId: string; onOpen: () => void }) {
+  const { formatNumber } = useI18n();
+  const [summary, setSummary] = useState<{ rain: number | null; status: string | null } | null>(null);
+  useEffect(() => {
+    let active = true;
+    const end = new Date();
+    const start = new Date(end);
+    start.setDate(start.getDate() - 90);
+    Promise.all([
+      environmentApi.getFieldEnvironmental(fieldId, { start_date: start.toISOString().slice(0, 10), end_date: end.toISOString().slice(0, 10) }),
+      fieldHealthApi.getTrend(fieldId),
+    ]).then(([data, trend]) => {
+      if (!active) return;
+      const rain = data.gpm?.observations.reduce((total, item) => total + Math.max(0, item.mean_value), 0) ?? null;
+      const smap = data.smap?.observations;
+      const latest = smap?.[smap.length - 1]?.mean_value;
+      const normal = trend.moisture_trend.available ? trend.moisture_trend.usual_range : null;
+      const status = typeof latest === 'number' && normal ? latest < normal.p10 ? 'Dry' : latest > normal.p90 ? 'Wet' : 'OK' : null;
+      setSummary({ rain: typeof rain === 'number' && data.gpm?.observations.length ? rain : null, status });
+    }).catch(() => active && setSummary({ rain: null, status: null }));
+    return () => { active = false; };
+  }, [fieldId]);
+  return <section className="rounded-xl border border-sky-100 bg-sky-50/60 p-3">
+    <div className="grid grid-cols-2 gap-2"><div className="rounded-lg bg-white p-2.5"><span className="block text-[10px] font-bold uppercase tracking-wide text-slate-500">Rain · 90 days</span><strong className="mt-1 block text-base text-slate-950">{summary?.rain != null ? `${formatNumber(summary.rain, { maximumFractionDigits: 1 })} mm` : '—'}</strong></div><div className="rounded-lg bg-white p-2.5"><span className="block text-[10px] font-bold uppercase tracking-wide text-slate-500">Soil water</span><strong className="mt-1 block text-base text-slate-950">{summary?.status || 'No reading'}</strong></div></div>
+    <button onClick={onOpen} className="mt-2 w-full text-left text-xs font-extrabold text-emerald-800 underline underline-offset-2">View water data →</button>
+  </section>;
+}
+
 function FieldWeatherChip({ field, onOpenWeather }: { field: SavedField | null; onOpenWeather: () => void }) {
   const { formatNumber, t } = useI18n();
-  const [weather, setWeather] = useState<PointWeather | null>(null);
+  const [weather, setWeather] = useState<FieldWeatherData | null>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     if (!field) return;
-    const center = calculateGeometryCentroid(field.geometry);
-    if (!center) return;
     let active = true;
     setWeather(null);
     setFailed(false);
-    fetchPointWeather(center[0], center[1]).then((result) => active && setWeather(result)).catch(() => active && setFailed(true));
+    fetchFieldWeather(field.id).then((result) => active && setWeather(result)).catch(() => active && setFailed(true));
     return () => { active = false; };
   }, [field]);
   if (!field) return null;
   return (
     <button onClick={onOpenWeather} className="mt-2 flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-left hover:border-emerald-300" aria-label={t('fieldAnalytics.dashboardPanel.weatherAt', { field: field.name })}>
-      <span className="min-w-0"><span className="block truncate text-xs font-bold text-slate-800">{t('fieldAnalytics.dashboardPanel.weatherAt', { field: field.name })}</span><span className="block truncate text-[11px] text-slate-500">{failed ? t('fieldAnalytics.dashboardPanel.unavailable') : weather ? weather.condition : t('fieldAnalytics.dashboardPanel.loading')}</span></span>
-      <span className="shrink-0 text-right"><span className="block text-sm font-extrabold text-slate-950">{weather ? `${formatNumber(weather.temperature_c, { maximumFractionDigits: 0 })}°C` : '—'}</span><span className="text-[10px] font-bold text-emerald-700">{t('dashboard.forecastBtn')} →</span></span>
+      <span className="min-w-0"><span className="block truncate text-xs font-bold text-slate-800">{t('fieldAnalytics.dashboardPanel.weatherAt', { field: field.name })}</span><span className="block truncate text-[11px] text-slate-500">{failed ? t('fieldAnalytics.dashboardPanel.unavailable') : weather ? weather.current.condition : t('fieldAnalytics.dashboardPanel.loading')}</span></span>
+      <span className="shrink-0 text-right"><span className="block text-sm font-extrabold text-slate-950">{weather ? `${formatNumber(weather.current.temperature_c, { maximumFractionDigits: 0 })}°C` : '—'}</span><span className="text-[10px] font-bold text-emerald-700">{t('dashboard.forecastBtn')} →</span></span>
     </button>
   );
 }

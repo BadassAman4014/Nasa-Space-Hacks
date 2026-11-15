@@ -26,13 +26,16 @@ import {
 } from 'lucide-react';
 import {
   fetchAllFieldsWeather,
+  fetchAvailableFields,
   fetchFieldWeather,
   addVirtualStation,
   deleteVirtualStation,
   clearAllVirtualStations,
   type FieldWeatherSummary,
+  type AvailableField,
   type FieldWeatherData,
   type DailyForecastPoint,
+  type HourlyForecastPoint,
   type MonthlyOutlookPoint,
   type MonthlyDayTrend,
   type DwdAlerts,
@@ -45,21 +48,17 @@ import { useI18n } from '../../i18n';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 
 // Official DWD warnings for the selected field (Germany only)
-function DwdAlertsPanel({ alerts }: { alerts: DwdAlerts }) {
+function DwdAlertsPanel({ alerts, onRetry }: { alerts: DwdAlerts; onRetry: () => void }) {
   const fmt = (iso: string | null) =>
     iso ? new Date(iso).toLocaleString(undefined, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
   if (!alerts.available) {
-    return alerts.reason ? (
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-semibold text-slate-500">
-        DWD warnings: {alerts.reason}
-      </div>
-    ) : null;
+    return <div className="flex items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900"><span>Warnings temporarily unavailable</span><button onClick={onRetry} className="font-bold underline underline-offset-2">Retry</button></div>;
   }
   if (alerts.alerts.length === 0) {
     return (
       <div className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">
         <CheckCircle2 size={14} className="text-emerald-600" />
-        <span>No active DWD warnings for {alerts.region}</span>
+        <span>No weather warnings</span>
       </div>
     );
   }
@@ -175,6 +174,28 @@ function BarSparkline({
   );
 }
 
+function WeatherIcon({ icon }: { icon: string }) {
+  if (icon.includes('rain')) return <CloudRain size={36} className="text-sky-600" />;
+  if (icon.includes('sun')) return <Sun size={36} className="text-amber-500" />;
+  if (icon.includes('partly')) return <CloudSun size={36} className="text-amber-500" />;
+  return <Cloud size={36} className="text-slate-500" />;
+}
+
+function WeatherMetricChart({ hourly, daily, range, metric }: { hourly: HourlyForecastPoint[]; daily: DailyForecastPoint[]; range: '24h' | '7d'; metric: 'temperature' | 'rain' | 'wind' }) {
+  const points = range === '24h'
+    ? hourly.slice(0, 24).map((item) => ({ label: item.label, value: metric === 'temperature' ? item.temperature_c : metric === 'rain' ? item.precipitation_mm : item.wind_speed_ms }))
+    : daily.slice(0, 7).map((item) => ({ label: item.day_name, value: metric === 'temperature' ? (item.temp_min_c + item.temp_max_c) / 2 : metric === 'rain' ? item.precipitation_mm : item.wind_speed_ms ?? 0 }));
+  if (!points.length) return <div className="mt-3 grid h-32 place-items-center rounded-lg bg-slate-50 text-xs text-slate-500">Forecast unavailable</div>;
+  const max = Math.max(1, ...points.map((point) => point.value));
+  const min = Math.min(0, ...points.map((point) => point.value));
+  const rangeValue = Math.max(1, max - min);
+  const x = (i: number) => 34 + i * (312 / Math.max(1, points.length - 1));
+  const y = (v: number) => 108 - ((v - min) / rangeValue) * 76;
+  const path = points.map((point, i) => `${i ? 'L' : 'M'} ${x(i)} ${y(point.value)}`).join(' ');
+  const unit = metric === 'temperature' ? '°C' : metric === 'rain' ? 'mm' : 'm/s';
+  return <div className="mt-3"><svg viewBox="0 0 360 145" role="img" aria-label={`${metric} forecast`} className="h-36 w-full"><line x1="34" y1="32" x2="346" y2="32" stroke="#e2e8f0" /><line x1="34" y1="70" x2="346" y2="70" stroke="#e2e8f0" /><line x1="34" y1="108" x2="346" y2="108" stroke="#cbd5e1" /><text x="29" y="36" textAnchor="end" fontSize="9" fill="#64748b">{max.toFixed(0)} {unit}</text><text x="29" y="112" textAnchor="end" fontSize="9" fill="#64748b">{min.toFixed(0)} {unit}</text><path d={path} fill="none" stroke={metric === 'rain' ? '#0284c7' : metric === 'wind' ? '#7c3aed' : '#d97706'} strokeWidth="2.5" />{points.map((point, i) => <g key={`${point.label}-${i}`}><circle cx={x(i)} cy={y(point.value)} r="3" fill="#fff" stroke={metric === 'rain' ? '#0284c7' : metric === 'wind' ? '#7c3aed' : '#d97706'} strokeWidth="2"><title>{`${point.label}: ${point.value.toFixed(1)} ${unit}`}</title></circle>{(i === 0 || i === points.length - 1 || i === Math.floor(points.length / 2)) && <text x={x(i)} y="130" textAnchor="middle" fontSize="9" fill="#64748b">{point.label}</text>}</g>)}</svg><p className="text-right text-[10px] font-semibold text-slate-500">{metric === 'temperature' ? 'Temperature' : metric === 'rain' ? 'Rainfall' : 'Wind speed'} · {unit}</p></div>;
+}
+
 export function WeatherView({
   fields,
   selectedFieldId,
@@ -188,7 +209,9 @@ export function WeatherView({
   onSelectField: (fieldId: string) => void;
   onNavigateFieldAnalytics?: (fieldId: string) => void;
 }) {
+  const { formatDate } = useI18n();
   const [fieldsSummary, setFieldsSummary] = useState<FieldWeatherSummary[]>([]);
+  const [weatherFields, setWeatherFields] = useState<AvailableField[]>([]);
   const [fieldWeather, setFieldWeather] = useState<FieldWeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -200,6 +223,8 @@ export function WeatherView({
   // Weather Card Tabs: 'daily' | 'weekly' | 'monthly' (No duplicate dropdown)
   const [forecastTab, setForecastTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [isCardMinimized, setIsCardMinimized] = useState<boolean>(true);
+  const [demoRange, setDemoRange] = useState<'24h' | '7d'>('24h');
+  const [demoMetric, setDemoMetric] = useState<'temperature' | 'rain' | 'wind'>('temperature');
 
   // Popups & Modals
   const [is3DExpanded, setIs3DExpanded] = useState<boolean>(false);
@@ -210,7 +235,12 @@ export function WeatherView({
   const loadSummaries = useCallback(async () => {
     try {
       setRefreshing(true);
-      setFieldsSummary(await fetchAllFieldsWeather().catch(() => [] as FieldWeatherSummary[]));
+      const [summaries, available] = await Promise.all([
+        fetchAllFieldsWeather().catch(() => [] as FieldWeatherSummary[]),
+        fetchAvailableFields().catch(() => [] as AvailableField[]),
+      ]);
+      setFieldsSummary(summaries);
+      setWeatherFields(available);
     } catch (err) {
       console.error('Failed to load fields weather:', err);
     } finally {
@@ -236,9 +266,8 @@ export function WeatherView({
           setFieldWeather(data);
         }
       })
-      .catch((err) => {
-        console.error(`Failed to load weather for field ${selectedFieldId}:`, err);
-        if (isCurrent) setWeatherError(err instanceof Error ? err.message : 'Weather data unavailable');
+      .catch(() => {
+        if (isCurrent) setWeatherError('Weather data is temporarily unavailable');
       })
       .finally(() => {
         if (isCurrent) setLoading(false);
@@ -258,19 +287,22 @@ export function WeatherView({
     field_id: field.id,
     field_name: field.name,
     farm_name: field.farm_name || '',
-    has_station: fieldsSummary.some((summary) => summary.field_id === field.id),
+    has_station: weatherFields.find((item) => item.field_id === field.id)?.has_station ?? false,
     geometry: field.geometry,
-  })), [fields, fieldsSummary]);
+  })), [fields, weatherFields]);
 
   // Active selected field from the shared App state.
   const currentAvailableField = useMemo(() => {
     return availableFields.find((field) => field.field_id === selectedFieldId) || null;
   }, [availableFields, selectedFieldId]);
+  const selectedSavedField = useMemo(() => fields.find((field) => field.id === selectedFieldId) || null, [fields, selectedFieldId]);
 
   // Whether current selected field has an active virtual station
   const hasStation = useMemo(() => {
-    return fieldsSummary.some((s) => s.field_id === selectedFieldId);
-  }, [fieldsSummary, selectedFieldId]);
+    return fieldWeather?.virtual_station.is_active ?? weatherFields.find((field) => field.field_id === selectedFieldId)?.has_station ?? false;
+  }, [fieldWeather, selectedFieldId, weatherFields]);
+
+  const weatherUpdatedAt = fieldWeather?.current.timestamp || fieldWeather?.current.observation_time;
 
   // Center position for map
   const mapCenter: [number, number] = useMemo(() => {
@@ -303,6 +335,19 @@ export function WeatherView({
       setActiveStationPopup(null);
     } catch (e) {
       console.error('Failed to delete virtual station:', e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const refreshSelectedWeather = async () => {
+    setRefreshing(true);
+    try {
+      const [weather] = await Promise.all([fetchFieldWeather(selectedFieldId), loadSummaries()]);
+      setFieldWeather(weather);
+      setWeatherError(null);
+    } catch {
+      setWeatherError('Weather data unavailable');
     } finally {
       setRefreshing(false);
     }
@@ -373,9 +418,9 @@ export function WeatherView({
   const spanMid = hourly12.length > 2 ? hourly12[Math.floor(hourly12.length / 2)].label : '';
   const spanEnd = hourly12.length > 1 ? hourly12[hourly12.length - 1].label : '';
   return (
-    <div className="relative w-full h-full min-h-0 flex-1 overflow-hidden bg-[#F3F4F2] font-sans select-none flex flex-col">
+    <div className="relative w-full h-full min-h-0 flex-1 overflow-hidden bg-[#F3F4F2] font-sans select-none">
       {/* 1. TOP FLOATING BAR (Clean, Single Field Selector Capsule) */}
-      <div className="absolute top-3 left-3 right-20 z-[500] flex flex-wrap items-center gap-2 sm:top-4 sm:left-4 sm:right-32 sm:gap-3">
+      <div className="absolute top-3 left-3 right-20 z-[500] flex flex-wrap items-center gap-2 sm:top-4 sm:left-4 sm:right-32 sm:gap-3 md:hidden">
         {/* Field Selector Pill - Clean, with integrated selection, no duplicate dropdown */}
         <div className="relative bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl shadow-lg px-4 py-2 flex items-center gap-3 group hover:border-[#1fa35b] transition-all">
           <div className="w-6 h-6 rounded-lg bg-[#1fa35b]/15 text-[#1fa35b] flex items-center justify-center font-extrabold text-xs">
@@ -437,7 +482,7 @@ export function WeatherView({
       </div>
 
       {/* 2. TOP RIGHT FLOATING LAYER SWITCHER (Satellite, NDVI, Weather) */}
-      <div className="absolute top-4 right-4 z-[500] flex flex-col gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/90 shadow-lg">
+      <div className="absolute left-4 top-4 z-[500] flex flex-row gap-1.5 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-lg backdrop-blur-md md:left-[420px]">
         <button
           onClick={() => setActiveLayer('satellite')}
           className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${activeLayer === 'satellite'
@@ -473,7 +518,7 @@ export function WeatherView({
       </div>
 
       {/* 3. VERTICAL LEGENDS (Light Theme) */}
-      <div className="absolute left-4 top-28 z-[500] flex flex-col gap-3 pointer-events-none">
+      <div className="pointer-events-none absolute left-4 top-28 z-[500] flex flex-col gap-3 md:left-[420px] md:top-20">
         {/* NDVI Bar */}
         {activeLayer === 'ndvi' && (
           <div className="bg-white/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/90 shadow-lg flex flex-col items-center pointer-events-auto">
@@ -513,8 +558,25 @@ export function WeatherView({
         )}
       </div>
 
+      <aside className="absolute bottom-4 left-4 top-4 z-[600] hidden w-[360px] flex-col overflow-visible rounded-2xl border border-slate-200 bg-white shadow-xl md:flex">
+        <header className="sticky top-0 z-10 border-b border-slate-100 bg-white p-5">
+          <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wide text-emerald-800">Weather at {currentAvailableField?.field_name || 'Field'}</p><details className="group relative mt-1"><summary className="flex cursor-pointer list-none items-center gap-2 text-xl font-extrabold text-slate-950">{currentAvailableField?.field_name || 'Select field'} <ChevronDown size={16} className="text-slate-500" /></summary><div className="absolute left-0 top-9 z-20 w-64 rounded-xl border border-slate-200 bg-white p-1 shadow-xl">{availableFields.map((field) => { const saved = fields.find((item) => item.id === field.field_id); return <button key={field.field_id} onClick={() => { onSelectField(field.field_id); const station = fieldsSummary.find((item) => item.field_id === field.field_id); setActiveStationPopup(station || null); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-emerald-50">{field.field_name} · {saved?.current_crop || 'Season not set'} · {field.has_station ? 'Station active' : 'By field coordinates'}</button>; })}</div></details><div className="mt-1 flex flex-wrap items-center gap-1.5"><span className="inline-flex rounded-full bg-slate-50 px-2 py-1 text-[11px] font-bold text-slate-600">{hasStation ? 'Station active' : 'By field coordinates'}</span><span className="inline-flex rounded-full bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-500">{selectedSavedField?.current_crop || 'Season not set'}</span></div></div><button onClick={refreshSelectedWeather} disabled={refreshing} aria-label="Refresh weather" title="Refresh weather" className="rounded-lg border border-slate-200 p-2 text-slate-700 hover:border-emerald-300"><RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} /></button></div>
+          <p className="mt-3 text-xs text-slate-500">Updated {weatherUpdatedAt ? formatDate(weatherUpdatedAt, { dateStyle: 'medium', timeStyle: 'short' }) : '—'} · Modelled for your field’s location</p>
+        </header>
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+          {fieldWeather ? <>
+            <section className="rounded-xl border border-slate-200 bg-slate-50 p-4"><h2 className="text-sm font-extrabold text-slate-950">Now</h2><div className="mt-3 flex items-center gap-3"><WeatherIcon icon={fieldWeather.current.icon} /><div><strong className="text-4xl font-extrabold text-slate-950">{Math.round(fieldWeather.current.temperature_c)}°C</strong><p className="text-sm font-semibold text-slate-600">{fieldWeather.current.condition} · Feels like {fieldWeather.current.feels_like_c == null ? '—' : `${Math.round(fieldWeather.current.feels_like_c)}°C`}</p></div></div><div className="mt-3 grid grid-cols-3 divide-x divide-slate-200 text-xs"><div className="pr-2"><strong className="block">{Math.round(fieldWeather.current.wind_speed_ms)} m/s {fieldWeather.current.wind_compass}</strong><span className="text-slate-500">Wind</span></div><div className="px-2"><strong className="block">{Math.round(fieldWeather.current.humidity_percent)}%</strong><span className="text-slate-500">Humidity</span></div><div className="pl-2"><strong className="block">{fieldWeather.current.precipitation_mm} mm</strong><span className="text-slate-500">Rain</span></div></div><p className="mt-3 border-t border-slate-200 pt-3 text-xs font-semibold text-slate-700">{fieldWeather.current.condition}, light wind - good for field work</p></section>
+            <section className="rounded-xl border border-slate-200 p-4"><div className="flex items-center justify-between"><h2 className="text-sm font-extrabold text-slate-950">Spraying windows</h2><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${currentSprayStatus === 'safe' ? 'bg-emerald-50 text-emerald-800' : currentSprayStatus === 'caution' ? 'bg-amber-50 text-amber-800' : 'bg-red-50 text-red-800'}`}>{currentSprayStatus === 'safe' ? 'Good' : currentSprayStatus === 'caution' ? 'Moderate caution' : "Don't spray"}</span></div><p className="mt-2 text-sm font-bold text-slate-800">{sprayingSlots.some((slot) => slot.status === 'safe') ? `Best time to spray: ${sprayingSlots.find((slot) => slot.status === 'safe')?.label}–${[...sprayingSlots].reverse().find((slot) => slot.status === 'safe')?.label}` : 'No suitable spray window in the next 24 hours'}</p><div className="mt-3 flex gap-1">{sprayingSlots.map((slot) => <div key={slot.label} title={`${slot.label}: wind ${slot.wind_speed} m/s, rain ${slot.rain_mm} mm`} className={`min-w-0 flex-1 rounded-lg p-2 text-center ${slot.status === 'safe' ? 'bg-emerald-100' : slot.status === 'caution' ? 'bg-amber-100' : 'bg-red-100'}`}><span className="block truncate text-[10px] font-bold">{slot.label}</span><span className="block text-[9px] text-slate-600">{slot.wind_speed} m/s</span><span className="block text-[9px] text-slate-600">{slot.rain_mm} mm</span></div>)}</div><div className="mt-2 flex gap-3 text-[10px] font-semibold text-slate-500"><span>🟢 Good</span><span>🟡 Caution</span><span>🔴 Don’t spray</span><span title="Wind limit 6 m/s; rain limits 0.4 mm/hr">ⓘ Rules</span></div></section>
+            <section className="rounded-xl border border-slate-200 p-4"><div className="flex items-center justify-between gap-2"><h2 className="text-sm font-extrabold text-slate-950">Next {demoRange === '24h' ? '24 hours' : '7 days'}</h2><div className="flex rounded-lg bg-slate-100 p-0.5">{(['24h', '7d'] as const).map((value) => <button key={value} onClick={() => setDemoRange(value)} className={`rounded-md px-2 py-1 text-[10px] font-bold ${demoRange === value ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'}`}>{value}</button>)}</div></div><div className="mt-2 flex gap-1">{(['temperature', 'rain', 'wind'] as const).map((value) => <button key={value} onClick={() => setDemoMetric(value)} className={`rounded-lg px-2 py-1.5 text-[10px] font-bold capitalize ${demoMetric === value ? 'bg-emerald-700 text-white' : 'bg-slate-50 text-slate-600'}`}>{value}</button>)}</div><WeatherMetricChart hourly={fieldWeather.forecast_hourly} daily={fieldWeather.forecast_daily || []} range={demoRange} metric={demoMetric} /></section>
+            <details className="rounded-xl border border-slate-200 p-4"><summary className="cursor-pointer text-sm font-extrabold text-slate-800">More details</summary><div className="mt-3 grid grid-cols-3 gap-2 text-xs"><span>Cloud cover <strong className="block">{fieldWeather.current.cloud_cover_percent}%</strong></span><span>Humidity <strong className="block">{fieldWeather.current.humidity_percent}%</strong></span><span>Dew point <strong className="block">{fieldWeather.current.dew_point_c == null ? '—' : `${Math.round(fieldWeather.current.dew_point_c)}°C`}</strong></span></div></details>
+            <section className="space-y-2"><h2 className="text-sm font-extrabold text-slate-950">Weather warnings</h2>{fieldWeather.alerts ? <DwdAlertsPanel alerts={fieldWeather.alerts} onRetry={refreshSelectedWeather} /> : <p className="rounded-xl bg-emerald-50 p-3 text-xs font-semibold text-emerald-800">No weather warnings</p>}</section>
+            <p className="border-t border-slate-100 pt-3 text-[11px] text-slate-500">Source: Open-Meteo · Updated {weatherUpdatedAt ? formatDate(weatherUpdatedAt, { dateStyle: 'medium', timeStyle: 'short' }) : '—'}</p>
+          </> : loading ? <div className="h-64 animate-pulse rounded-xl bg-slate-100" /> : <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">Weather is temporarily unavailable. <button onClick={refreshSelectedWeather} className="font-bold text-emerald-800 underline">Retry</button></div>}
+        </div>
+      </aside>
+
       {/* 4. LEAFLET FULLSCREEN SATELLITE MAP */}
-      <div className="relative flex-1 w-full h-full min-h-0 bg-[#e2e8f0]">
+      <div className="absolute inset-0 h-full min-h-0 bg-[#e2e8f0] md:left-[400px]">
         <MapContainer
           center={mapCenter}
           zoom={15}
@@ -523,6 +585,7 @@ export function WeatherView({
           style={{ background: '#cbd5e1' }}
         >
           <MapController center={mapCenter} zoom={15} />
+          {fieldWeather?.current && <Marker position={mapCenter} interactive={false} icon={L.divIcon({ className: '', iconSize: [118, 34], iconAnchor: [59, 17], html: `<div style="white-space:nowrap;border:1px solid #cbd5e1;border-radius:12px;background:white;padding:7px 10px;font:700 12px sans-serif;box-shadow:0 4px 12px #0f172a22">${Math.round(fieldWeather.current.temperature_c)}°C · ${fieldWeather.current.condition}</div>` })} />}
 
           {/* Satellite Base Layer */}
           <TileLayer
@@ -670,7 +733,7 @@ export function WeatherView({
       )}
 
       {/* 6. COMPREHENSIVE WEATHER FORECAST & TELEMETRY CARD (Daily / Weekly / Monthly) */}
-      <div className="absolute bottom-2 left-1/2 z-[500] w-[calc(100%-1rem)] max-w-5xl -translate-x-1/2 transform transition-all sm:bottom-4 sm:w-[94%]">
+      <div className="absolute bottom-2 left-1/2 z-[500] w-[calc(100%-1rem)] max-w-5xl -translate-x-1/2 transform transition-all sm:bottom-4 sm:w-[94%] md:hidden">
         <div className="flex max-h-[72vh] flex-col gap-2 overflow-y-auto rounded-2xl border border-slate-200/90 bg-white/95 p-2.5 shadow-2xl backdrop-blur-md transition-all sm:rounded-3xl sm:p-3">
           {/* Top Bar of the Card */}
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -788,7 +851,7 @@ export function WeatherView({
                       <span>Live weather is currently unavailable ({weatherError}). No placeholder values are shown.</span>
                     </div>
                   )}
-                  {fieldWeather?.alerts && <DwdAlertsPanel alerts={fieldWeather.alerts} />}
+                  {fieldWeather?.alerts && <DwdAlertsPanel alerts={fieldWeather.alerts} onRetry={refreshSelectedWeather} />}
                   {/* 1. DAILY VIEW: 6 TELEMETRY METRIC CARDS WITH STEP CHARTS (Screenshot 2) */}
                   {forecastTab === 'daily' && (
                     <div className="flex flex-col gap-4">

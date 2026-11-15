@@ -15,6 +15,7 @@ import { type SavedField } from '../../services/boundariesApi';
 import { FieldMapTab } from './health/FieldMapTab';
 import { FieldHealthTab } from './health/FieldHealthTab';
 import { CropNitrogenDrawer } from './health/CropNitrogenDrawer';
+import { WaterTab } from './WaterTab';
 
 interface FieldAnalyticsWorkspaceProps {
   fieldId: string;
@@ -45,7 +46,7 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
     const queryTab = new URLSearchParams(window.location.search).get('tab');
     const requested = queryTab === 'risk' ? 'map' : sessionStorage.getItem('farmily_analytics_tab') || queryTab;
     sessionStorage.removeItem('farmily_analytics_tab');
-    return requested === 'health' || requested === 'status' || requested === 'data' ? requested : 'map';
+    return requested === 'health' || requested === 'water' || requested === 'status' || requested === 'data' ? requested : 'map';
   });
   const initialMapLayer = window.location.pathname.replace(/\/$/, '') === '/risk' || new URLSearchParams(window.location.search).get('tab') === 'risk' ? 'risk' : 'water';
   const [loading, setLoading] = useState(true);
@@ -269,12 +270,15 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
             fieldId={fieldId}
             onSelectField={onSelectField}
             onOpenHealth={() => setActiveTab('health')}
+            onOpenWater={() => setActiveTab('water')}
             onOpenInputs={() => setInputsOpen(true)}
             initialLayer={initialMapLayer}
           />
         )}
 
         {activeTab === 'health' && <FieldHealthTab fieldId={fieldId} notify={notify} />}
+
+        {activeTab === 'water' && <WaterTab fieldId={fieldId} fieldName={summary.name} notify={notify} />}
 
         {activeTab === 'status' && (
           <StatusTab

@@ -56,12 +56,14 @@ function outsideMask(geometry: any) {
 export function FieldMapTab({
   fieldId,
   onSelectField,
+  onOpenWater,
   onOpenInputs,
   initialLayer = 'water',
 }: {
   fieldId: string;
   onSelectField?: (id: string) => void;
   onOpenHealth: () => void;
+  onOpenWater: () => void;
   onOpenInputs: () => void;
   initialLayer?: MapLayer;
 }) {
@@ -135,7 +137,7 @@ export function FieldMapTab({
       {error && <UnavailableNote data={{ reason: error }} />}
       {!loading && card && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:gap-6" aria-label="Field indicators">
-          <KpiCards card={card} activeLayer={activeLayer} onActivate={activateLayer} onOpenInputs={onOpenInputs} formatNumber={formatNumber} t={t} />
+          <KpiCards card={card} activeLayer={activeLayer} onActivate={activateLayer} onOpenWater={onOpenWater} onOpenInputs={onOpenInputs} formatNumber={formatNumber} t={t} />
         </div>
       )}
 
@@ -207,14 +209,14 @@ function KpiCard({ label, value, detail, source, icon, tone, active, onClick, in
   );
 }
 
-function KpiCards({ card, activeLayer, onActivate, onOpenInputs, formatNumber, t }: { card: FieldCard; activeLayer: MapLayer; onActivate: (layer: MapLayer) => void; onOpenInputs: () => void; formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string; t: (key: string, params?: Record<string, string | number>) => string }) {
+function KpiCards({ card, activeLayer, onActivate, onOpenWater, onOpenInputs, formatNumber, t }: { card: FieldCard; activeLayer: MapLayer; onActivate: (layer: MapLayer) => void; onOpenWater: () => void; onOpenInputs: () => void; formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string; t: (key: string, params?: Record<string, string | number>) => string }) {
   const moisture: any = card.moisture;
   const rain: any = card.rain;
   const soil: any = card.soil_health;
   const nitrogen = card.nitrogen;
   return <>
-    <KpiCard label={t('fieldAnalytics.kpi.moisture')} value={moisture.available ? (moisture.class === 'red' ? t('fieldAnalytics.kpi.low') : moisture.class === 'yellow' ? t('fieldAnalytics.kpi.medium') : t('fieldAnalytics.kpi.ok')) : '—'} detail={moisture.available ? (moisture.class === 'red' ? t('fieldAnalytics.kpi.dry') : moisture.class === 'yellow' ? t('fieldAnalytics.kpi.slightlyDry') : t('fieldAnalytics.kpi.usualMoisture')) : moisture.reason} source={moisture.provenance} icon={<Droplets size={17} />} tone={moisture.available ? moisture.class : 'grey'} active={activeLayer === 'water'} onClick={() => onActivate('water')} info={moisture.available ? <><InfoRow k={t('fieldAnalytics.kpi.rootZone')}>{formatNumber(moisture.rootzone_m3m3, { maximumFractionDigits: 2 })} m³/m³</InfoRow><InfoRow k={t('fieldAnalytics.kpi.source')}>{moisture.source}</InfoRow></> : moisture.reason} />
-    <KpiCard label={t('fieldAnalytics.kpi.rain')} value={rain.available ? (rain.days_since_rain ?? '>365') : '—'} detail={rain.available ? t('fieldAnalytics.kpi.rainRecent', { amount: formatNumber(rain.rain_7d_mm, { maximumFractionDigits: 1 }) }) : rain.reason} source={rain.provenance} icon={<CloudRain size={17} />} tone={rain.available && rain.days_since_rain > 14 ? 'yellow' : rain.available ? 'blue' : 'grey'} active={activeLayer === 'nutrientLoss'} onClick={() => onActivate('nutrientLoss')} info={rain.available ? <><InfoRow k={t('fieldAnalytics.kpi.value')}>{rain.days_since_rain} {t('fieldAnalytics.kpi.days')}</InfoRow><InfoRow k={t('fieldAnalytics.kpi.source')}>{rain.source}</InfoRow></> : rain.reason} />
+    <KpiCard label={t('fieldAnalytics.kpi.moisture')} value={moisture.available ? (moisture.class === 'red' ? t('fieldAnalytics.kpi.low') : moisture.class === 'yellow' ? t('fieldAnalytics.kpi.medium') : t('fieldAnalytics.kpi.ok')) : '—'} detail={moisture.available ? (moisture.class === 'red' ? t('fieldAnalytics.kpi.dry') : moisture.class === 'yellow' ? t('fieldAnalytics.kpi.slightlyDry') : t('fieldAnalytics.kpi.usualMoisture')) : moisture.reason} source={moisture.provenance} icon={<Droplets size={17} />} tone={moisture.available ? moisture.class : 'grey'} active={activeLayer === 'water'} onClick={() => onActivate('water')} info={moisture.available ? <><InfoRow k={t('fieldAnalytics.kpi.rootZone')}>{formatNumber(moisture.rootzone_m3m3, { maximumFractionDigits: 2 })} m³/m³</InfoRow><InfoRow k={t('fieldAnalytics.kpi.source')}>{moisture.source}</InfoRow></> : moisture.reason} action={<button onClick={onOpenWater} className="text-xs font-bold text-emerald-800 underline underline-offset-2">See water details →</button>} />
+    <KpiCard label={t('fieldAnalytics.kpi.rain')} value={rain.available ? (rain.days_since_rain ?? '>365') : '—'} detail={rain.available ? t('fieldAnalytics.kpi.rainRecent', { amount: formatNumber(rain.rain_7d_mm, { maximumFractionDigits: 1 }) }) : rain.reason} source={rain.provenance} icon={<CloudRain size={17} />} tone={rain.available && rain.days_since_rain > 14 ? 'yellow' : rain.available ? 'blue' : 'grey'} active={activeLayer === 'nutrientLoss'} onClick={() => onActivate('nutrientLoss')} info={rain.available ? <><InfoRow k={t('fieldAnalytics.kpi.value')}>{rain.days_since_rain} {t('fieldAnalytics.kpi.days')}</InfoRow><InfoRow k={t('fieldAnalytics.kpi.source')}>{rain.source}</InfoRow></> : rain.reason} action={<button onClick={onOpenWater} className="text-xs font-bold text-emerald-800 underline underline-offset-2">See water details →</button>} />
     <KpiCard label={t('fieldAnalytics.kpi.health')} value={soil.available ? `${formatNumber(soil.score)}/100` : '—'} detail={soil.available ? `${soil.label} · ${t('fieldAnalytics.health.weakest', { factor: soil.weakest.replace(/ \(.*\)/, '').toLowerCase() })}` : soil.reason} source={soil.provenance} icon={<HeartPulse size={17} />} tone={soil.available ? (soil.score >= 80 ? 'green' : soil.score >= 60 ? 'yellow' : 'red') : 'grey'} active={activeLayer === 'risk'} onClick={() => onActivate('risk')} info={soil.available ? <><InfoRow k="Method">{soil.method}</InfoRow><InfoRow k="Source">{soil.source}</InfoRow></> : soil.reason} />
     <KpiCard label={t('fieldAnalytics.kpi.nitrogen')} value={nitrogen.available ? formatNumber(nitrogen.remaining_kg_n_ha ?? nitrogen.estimate_kg_n_ha ?? 0) : '—'} detail={nitrogen.available ? t('fieldAnalytics.kpi.nitrogenRemaining') : nitrogen.reason || t('fieldAnalytics.kpi.unavailable')} source={nitrogen.available ? 'derived' : 'farmer_input'} icon={<Sprout size={17} />} tone={nitrogen.available ? 'blue' : 'grey'} active={activeLayer === 'nitrogen'} onClick={() => onActivate('nitrogen')} info={<p>{t('fieldAnalytics.kpi.nitrogenEstimate')}</p>} action={!nitrogen.available ? <button onClick={onOpenInputs} className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-700">{t('fieldAnalytics.kpi.addCrop')}</button> : undefined} />
   </>;

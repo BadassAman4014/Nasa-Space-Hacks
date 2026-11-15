@@ -6,6 +6,7 @@ import { fieldHealthApi, type ActionCard, type HealthTrend, type MoistureTrend, 
 import { useI18n } from '../../../i18n';
 import { FieldSoilCard } from '../../dashboard/FieldSoilCard';
 import { Info, InfoRow, LineChart, SourceTag, UnavailableNote } from './HealthUi';
+import { environmentApi, type ModisFieldReport } from '../../../services/environmentApi';
 
 export function FieldHealthTab({ fieldId, notify }: { fieldId: string; notify: (message: string) => void }) {
   const { t } = useI18n();
@@ -35,7 +36,7 @@ export function FieldHealthTab({ fieldId, notify }: { fieldId: string; notify: (
       <section>
         <h2 className="mb-4 text-xl font-extrabold text-slate-950">{t('fieldAnalytics.health.changing')}</h2>
         <div className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-2">
-          <Vegetation value={data.vegetation_trend} />
+          <Vegetation fieldId={fieldId} value={data.vegetation_trend} />
           <Moisture value={data.moisture_trend} />
         </div>
       </section>
@@ -157,16 +158,34 @@ function Card({ title, source, right, children }: { title: string; source?: stri
   return <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex items-start justify-between gap-4"><h2 className="text-xl font-extrabold text-slate-950">{title}</h2><div className="flex items-center gap-2">{right}<SourceTag p={source} /></div></div>{children}</section>;
 }
 
-function Vegetation({ value }: { value: VegetationTrend | { available: false; reason: string } }) {
+function Vegetation({ fieldId, value }: { fieldId: string; value: VegetationTrend | { available: false; reason: string } }) {
   const { t, formatNumber } = useI18n();
   const [years, setYears] = useState<1 | 3>(3);
+  const [modis, setModis] = useState<ModisFieldReport | null>(null);
+  useEffect(() => {
+    const end = new Date();
+    const start = new Date(end);
+    start.setFullYear(start.getFullYear() - 3);
+    let active = true;
+    environmentApi.getFieldEnvironmental(fieldId, { dataset: 'modis_vegetation', start_date: start.toISOString().slice(0, 10), end_date: end.toISOString().slice(0, 10) })
+      .then((response) => active && setModis(response.modis || null))
+      .catch(() => active && setModis(null));
+    return () => { active = false; };
+  }, [fieldId]);
   if (!value.available) return <Card title={t('fieldAnalytics.health.greenness')}><UnavailableNote data={value} /></Card>;
   const trend = value.trend;
   const latest = value.series.reduce((max, point) => Math.max(max, new Date(point.date).getTime()), 0);
   const cutoff = latest - years * 365 * 24 * 60 * 60 * 1000;
   const series = value.series.filter((point) => new Date(point.date).getTime() >= cutoff);
   const title = t('fieldAnalytics.health.greenness').replace(/,\s*(?:last|letzte)\s+3\s+(?:years|Jahre)/i, '');
-  return <Card title={title} source="satellite_estimate" right={<><RangeSelector options={[1, 3]} selected={years} format={(n) => `${n}Y`} onChange={setYears} label={title} />{trend.available && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800"><ArrowRight size={13} />{t(`fieldAnalytics.healthCopy.${trend.status}`)}</span>}<Info label="About plant greenness"><InfoRow k="Measure">{t('fieldAnalytics.health.technicalNdvi')}</InfoRow></Info></>}><div className="min-h-56"><LineChart yMin={0} yMax={1} series={[{ name: 'NDVI', colour: '#168653', points: series.map((point) => ({ x: point.date, y: point.mean_ndvi })) }]} /></div><div className="mt-3 flex flex-wrap gap-2">{value.season_peaks.map((peak) => <span key={peak.season} className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">{peak.season}: {formatNumber(peak.peak_ndvi, { maximumFractionDigits: 2 })}</span>)}</div></Card>;
+  const latestHealth = [...value.series].sort((a, b) => b.date.localeCompare(a.date))[0];
+  const modisDate = modis?.latest_composite_date ? new Date(modis.latest_composite_date).getTime() : null;
+  const healthDate = latestHealth ? new Date(latestHealth.date).getTime() : null;
+  const seasonAligned = modisDate != null && healthDate != null && Math.abs(modisDate - healthDate) <= 45 * 86400000;
+  const conflicting = seasonAligned && modis?.latest_ndvi != null && latestHealth && Math.abs(modis.latest_ndvi - latestHealth.mean_ndvi) >= 0.35;
+  const modisLabel = modis?.latest_ndvi == null ? '' : modis.latest_ndvi < 0.2 ? 'Bare / very low cover' : modis.latest_ndvi < 0.4 ? 'Low vegetative cover' : modis.latest_ndvi < 0.6 ? 'Moderate vegetative cover' : 'High vegetative cover';
+  const latestLabel = latestHealth ? latestHealth.mean_ndvi < 0.2 ? 'Bare / very low cover' : latestHealth.mean_ndvi < 0.4 ? 'Low vegetative cover' : latestHealth.mean_ndvi < 0.6 ? 'Moderate vegetative cover' : 'High vegetative cover' : '';
+  return <Card title={title} source="observed" right={<><RangeSelector options={[1, 3]} selected={years} format={(n) => `${n}Y`} onChange={setYears} label={title} />{trend.available && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800"><ArrowRight size={13} />{t(`fieldAnalytics.healthCopy.${trend.status}`)}</span>}<Info label="About plant greenness"><InfoRow k="Measure">Sentinel-2 NDVI, field mean</InfoRow><InfoRow k="Source">{value.source}</InfoRow><InfoRow k="Seasonal method">Highest value in April–July per year; trend is calculated across annual peaks.</InfoRow><InfoRow k="MODIS product">NASA MOD13Q1.061 (250 m, 16-day composite)</InfoRow></Info></>}><div className="min-h-56"><LineChart yMin={0} yMax={1} series={[{ name: 'NDVI', colour: '#168653', points: series.map((point) => ({ x: point.date, y: point.mean_ndvi })) }]} /></div><div className="mt-3 flex flex-wrap gap-2">{value.season_peaks.map((peak) => <span key={peak.season} className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">{peak.season}: {formatNumber(peak.peak_ndvi, { maximumFractionDigits: 2 })}</span>)}</div>{modis?.latest_ndvi != null && <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2 text-xs"><span><strong>MODIS NDVI {formatNumber(modis.latest_ndvi, { maximumFractionDigits: 2 })}</strong> · {modisLabel}{modis.latest_evi != null && <> · EVI {formatNumber(modis.latest_evi, { maximumFractionDigits: 2 })}</>}</span><span className="shrink-0 text-slate-500">{modis.latest_composite_date || ''}</span></div>}{modis?.latest_ndvi == null && <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900"><strong>Latest Sentinel-2 NDVI {latestHealth ? formatNumber(latestHealth.mean_ndvi, { maximumFractionDigits: 2 }) : '—'} · {latestLabel}</strong>{latestHealth ? ` (${latestHealth.date}). ` : ' ' }No valid MODIS NDVI/EVI composite is available for this field. The 2026 value near 0.77 is its April–July Sentinel-2 seasonal peak, not a current MODIS reading; a cross-sensor consistency check is not possible with the current MODIS data.</p>}{conflicting && <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">Satellite estimates differ on similar dates; compare product and field pixel coverage before interpreting.</p>}</Card>;
 }
 
 function Moisture({ value }: { value: MoistureTrend | { available: false; reason: string } }) {
