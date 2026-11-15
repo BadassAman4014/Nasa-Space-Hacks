@@ -22,7 +22,7 @@ services:
         value: gemini-3.5-flash
       # CORS settings - update with your Vercel domain after deployment
       - key: CORS_ORIGINS
-        value: http://localhost:5173  # Will update after Vercel deploy
+        value: https://app-smoky-tau-52.vercel.app,http://localhost:5173
     healthCheckPath: /health
     autoDeploy: true
 

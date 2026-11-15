@@ -33,33 +33,19 @@ This project uses a split architecture:
    - Render will build and deploy automatically
    - Note the backend URL (e.g., `https://nasa-space-hacks-backend.onrender.com`)
 
-### 2. Frontend Deployment (Vercel)
+### 2. Frontend Deployment (Vercel) - ✅ COMPLETED
 
-#### Prerequisites:
-- Vercel account (https://vercel.com)
-- Backend URL from Render deployment
+**Your Vercel URL**: `https://app-smoky-tau-52.vercel.app`
 
-#### Steps:
-1. **Push code to GitHub**
-2. **Connect to Vercel**:
-   - Go to Vercel dashboard
-   - Click "Add New..." → "Project"
-   - Import your GitHub repository
-   - Vercel will detect `vercel.json` automatically
+#### Next Steps:
+1. **Set Environment Variables in Vercel**:
+   - Go to Vercel dashboard → Project Settings → Environment Variables
+   - Add: `VITE_API_BASE_URL` = `https://nasa-space-hacks-backend.onrender.com/api`
+   - Add: `VITE_PUBLIC_API_URL` = `https://nasa-space-hacks-backend.onrender.com/api`
 
-3. **Set Environment Variables in Vercel**:
-   - `VITE_API_BASE_URL` - Your Render backend URL (e.g., `https://nasa-space-hacks-backend.onrender.com/api`)
-   - `VITE_PUBLIC_API_URL` - Same as above (fallback)
-
-4. **Deploy**:
-   - Vercel will build and deploy automatically
-   - Note the frontend URL (e.g., `https://nasa-space-hacks.vercel.app`)
-
-5. **Update Backend CORS**:
-   - Go back to Render dashboard
-   - Update `CORS_ORIGINS` to include your Vercel URL
-   - Format: `https://nasa-space-hacks.vercel.app,http://localhost:5173`
-   - Redeploy backend
+2. **Redeploy Frontend**:
+   - After setting variables, trigger a redeploy
+   - Or push any change to GitHub to trigger auto-deploy
 
 ### 3. Testing the Deployment
 
