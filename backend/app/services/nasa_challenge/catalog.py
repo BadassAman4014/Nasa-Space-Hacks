@@ -97,7 +97,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Open-access agricultural repository covering soils, crops, climate, management practices, phenology, water quality, and agronomic trials.",
         agricultural_application="Incorporates local field-trial measurements, soil-health research, and management practices into rotation models to match real farm constraints.",
         supported_parameters=["cover_crop_trials", "tillage_impacts", "soil_organic_matter_studies", "yield_responses"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "web_soil_survey": ChallengeDatasetInfo(
         id="web_soil_survey",
@@ -139,7 +139,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Topographically-adjusted spatial climate grids integrating elevation, aspect, and coastal proximity with quality-controlled weather stations.",
         agricultural_application="Provides terrain-sensitive temperature and precipitation baselines, frost recurrence probabilities, and extreme event thresholds for resilient rotations.",
         supported_parameters=["tmean", "tmin", "tmax", "ppt", "vpdmin", "vpdmax"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "naip_imagery": ChallengeDatasetInfo(
         id="naip_imagery",
@@ -153,7 +153,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Sub-meter aerial ortho-imagery flown during agricultural leaf-on conditions providing high-resolution ground context.",
         agricultural_application="Visualizes sub-field variability, drain tile layouts, fence lines, terrace stability, and localized weed patches complementing satellite analysis.",
         supported_parameters=["Red", "Green", "Blue", "Near_Infrared"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "usgs_nlcd": ChallengeDatasetInfo(
         id="usgs_nlcd",
@@ -167,7 +167,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Consistent multi-epoch land-cover characterization (cultivated crops, pasture, forests, wetlands, impervious cover) across the United States.",
         agricultural_application="Contextualizes fields within broader ecosystems, evaluates buffer strip connectivity, and tracks long-term land-use conversions.",
         supported_parameters=["land_cover_class", "percent_tree_canopy", "percent_impervious", "land_cover_change"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "nldas_gldas": ChallengeDatasetInfo(
         id="nldas_gldas",
@@ -195,7 +195,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Global agricultural resource assessment modeling land suitability, agro-climatic yield potentials, and crop water requirements under rainfed and irrigated regimes.",
         agricultural_application="Evaluates bio-physical suitability of alternative rotation crops, quantifies yield gap penalties, and assesses climate change vulnerability.",
         supported_parameters=["crop_suitability_index", "attainable_yield_kg_ha", "water_deficit_mm", "crop_growth_cycle_days"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "cocorahs": ChallengeDatasetInfo(
         id="cocorahs",
@@ -209,7 +209,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Crowd-sourced network of volunteer weather observers using standard manual rain gauges to measure hyper-local precipitation, hail, and snow.",
         agricultural_application="Validates satellite rainfall estimates (IMERG), captures localized high-intensity thunderstorms, and verifies hail events impacting field yield.",
         supported_parameters=["precipitation_inches", "hail_diameter_mm", "snow_depth_inches", "station_id"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "usgs_nwis": ChallengeDatasetInfo(
         id="usgs_nwis",
@@ -237,7 +237,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Official market reporting on commodity cash bids, basis levels, futures spreads, organic grain premiums, and transportation logistics.",
         agricultural_application="Evaluates market viability, cash price spreads, and profitability margins when introducing alternative or cover crops into the rotation.",
         supported_parameters=["commodity_name", "price_min", "price_max", "price_average", "basis_cents", "delivery_period"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "usda_nass_quickstats": ChallengeDatasetInfo(
         id="usda_nass_quickstats",
@@ -251,7 +251,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Comprehensive repository of agricultural statistics covering crop acreage, production volume, harvested yield per acre, and input expenditures.",
         agricultural_application="Calibrates field-level yield expectations against 20-year county averages, establishing baseline benchmarks for new rotation trials.",
         supported_parameters=["yield_bu_per_acre", "planted_acres", "harvested_acres", "production_bu", "county_name"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "openet": ChallengeDatasetInfo(
         id="openet",
@@ -265,7 +265,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Operational field-scale evapotranspiration estimates generated by an ensemble of 6 well-established satellite thermal models (disALEXI, eeMETRIC, SSEBop, SIMS, PT-JPL, geeSEBAL).",
         agricultural_application="Provides precise field water balances, quantifies actual crop water consumption, and guides deficit irrigation scheduling for rotation crops.",
         supported_parameters=["et_actual_mm", "et_reference_mm", "model_ensemble_mean", "model_spread"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "usfs_landfire": ChallengeDatasetInfo(
         id="usfs_landfire",
@@ -279,7 +279,7 @@ NASA_CHALLENGE_CATALOG: dict[str, ChallengeDatasetInfo] = {
         description="Comprehensive vegetation dynamics mapping Existing Vegetation Type (EVT), Canopy Cover, Height, and Ecological Biophysical Settings.",
         agricultural_application="Assesses shelterbelt health, tree-crop interactions, windbreak buffers, and perennial landscape corridors that mitigate soil loss.",
         supported_parameters=["existing_veg_type", "canopy_cover_percent", "canopy_height_m", "surface_fuel_model"],
-        is_live_queryable=True,
+        is_live_queryable=False,
     ),
     "gedi_lidar": ChallengeDatasetInfo(
         id="gedi_lidar",

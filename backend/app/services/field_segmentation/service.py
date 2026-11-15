@@ -175,8 +175,8 @@ class AIFieldDetectionService:
                 bbox=req.bbox,
                 min_confidence=req.min_confidence,
                 min_area_ha=req.min_field_area_ha,
-                imagery_date=scene_meta.get("imagery_date", "2024-08-28"),
-                sensor=scene_meta.get("sensor", "Sentinel-2 L2A"),
+                imagery_date=scene_meta["imagery_date"],
+                sensor=scene_meta["sensor"],
                 geographic_region=region_name,
             )
 

@@ -400,7 +400,7 @@ export function WeatherView({
               </span>
               <ChevronDown size={14} className="text-slate-500 group-hover:text-[#1fa35b] transition-colors" />
             </div>
-            <span className="text-[11px] text-slate-500 font-medium">Season 2026</span>
+            <span className="text-[11px] text-slate-500 font-medium">Season {new Date().getFullYear()}</span>
           </div>
 
           {/* Native invisible overlay for instant field switching */}
@@ -707,7 +707,7 @@ export function WeatherView({
                   </span>
                 </div>
                 <span className="text-[11px] text-slate-500 font-semibold">
-                  {currentAvailableField?.farm_name || 'My Farm'} • Season 2026
+                  {currentAvailableField?.farm_name || 'My Farm'} • Season {new Date().getFullYear()}
                 </span>
               </div>
             </div>

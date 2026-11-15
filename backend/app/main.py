@@ -4,12 +4,11 @@ from dotenv import load_dotenv
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-# Load .env from backend/ or project root (with .env.example fallback)
+# Load runtime secrets from .env files only. Example files are documentation
+# and must never become credential sources.
 _backend_dir = Path(__file__).resolve().parent.parent
 load_dotenv(_backend_dir / ".env")
 load_dotenv(_backend_dir.parent / ".env")
-load_dotenv(_backend_dir / ".env.example")
-load_dotenv(_backend_dir.parent / ".env.example")
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

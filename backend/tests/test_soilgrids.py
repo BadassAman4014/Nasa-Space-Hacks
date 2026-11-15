@@ -199,6 +199,11 @@ class TestSoilGridsIntegration(unittest.TestCase):
             SoilMeasurement(property_name="silt", depth_interval="0-5cm", mean_value=23.0, minimum_value=20.0, maximum_value=25.0, unit="%", valid_pixel_count=10, coverage_percentage=100.0),
             SoilMeasurement(property_name="silt", depth_interval="5-15cm", mean_value=25.0, minimum_value=22.0, maximum_value=28.0, unit="%", valid_pixel_count=10, coverage_percentage=100.0),
             SoilMeasurement(property_name="silt", depth_interval="15-30cm", mean_value=27.0, minimum_value=25.0, maximum_value=30.0, unit="%", valid_pixel_count=10, coverage_percentage=100.0),
+            # Remaining required properties; production summaries must never fill these.
+            SoilMeasurement(property_name="soc", depth_interval="0-5cm", mean_value=18.0, minimum_value=17.0, maximum_value=19.0, unit="g/kg", valid_pixel_count=10, coverage_percentage=100.0),
+            SoilMeasurement(property_name="bdod", depth_interval="0-5cm", mean_value=1.4, minimum_value=1.3, maximum_value=1.5, unit="g/cm3", valid_pixel_count=10, coverage_percentage=100.0),
+            SoilMeasurement(property_name="cec", depth_interval="0-5cm", mean_value=120.0, minimum_value=110.0, maximum_value=130.0, unit="mmol(c)/kg", valid_pixel_count=10, coverage_percentage=100.0),
+            SoilMeasurement(property_name="nitrogen", depth_interval="0-5cm", mean_value=1.8, minimum_value=1.7, maximum_value=1.9, unit="g/kg", valid_pixel_count=10, coverage_percentage=100.0),
         ]
 
         topsoil = SoilStatisticsProcessor.compute_topsoil_summary(measurements, field_area_ha=25.0, is_subpixel=False)
@@ -211,12 +216,25 @@ class TestSoilGridsIntegration(unittest.TestCase):
     def test_small_subpixel_field_limitation(self):
         """Fields smaller than 250m resolution (6.25 ha) must explicitly report limitation."""
         measurements = [
-            SoilMeasurement(property_name="phh2o", depth_interval="0-5cm", mean_value=6.0, minimum_value=6.0, maximum_value=6.0, unit="pH", valid_pixel_count=1, coverage_percentage=100.0),
+            SoilMeasurement(property_name=name, depth_interval="0-5cm", mean_value=value, minimum_value=value, maximum_value=value, unit=unit, valid_pixel_count=1, coverage_percentage=100.0)
+            for name, value, unit in (
+                ("phh2o", 6.0, "pH"), ("soc", 18.0, "g/kg"),
+                ("clay", 15.0, "%"), ("sand", 60.0, "%"), ("silt", 25.0, "%"),
+                ("bdod", 1.4, "g/cm3"), ("cec", 120.0, "mmol(c)/kg"),
+                ("nitrogen", 1.8, "g/kg"),
+            )
         ]
         topsoil = SoilStatisticsProcessor.compute_topsoil_summary(measurements, field_area_ha=2.5, is_subpixel=True)
         self.assertIsNotNone(topsoil)
         self.assertTrue(topsoil.is_subpixel)
         self.assertIn("smaller than the 250m raster resolution", topsoil.resolution_limitation)
+
+    def test_incomplete_topsoil_has_no_fabricated_defaults(self):
+        measurements = [
+            SoilMeasurement(property_name="phh2o", depth_interval="0-5cm", mean_value=6.0, minimum_value=6.0, maximum_value=6.0, unit="pH", valid_pixel_count=1, coverage_percentage=100.0),
+        ]
+        topsoil = SoilStatisticsProcessor.compute_topsoil_summary(measurements, field_area_ha=2.5, is_subpixel=True)
+        self.assertIsNone(topsoil)
 
     def test_database_persistence_and_reload(self):
         """Test database storage and retrieval across repository instance reloads."""

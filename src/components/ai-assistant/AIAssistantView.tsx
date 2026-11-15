@@ -7,10 +7,7 @@ import {
   Plus,
   History,
   Info,
-  CheckCircle2,
   Trash2,
-  ExternalLink,
-  ChevronDown,
 } from 'lucide-react';
 import { DeterministicWorkflow } from './DeterministicWorkflow';
 import { AgriculturalLoadingCard } from './AgriculturalLoadingCard';
@@ -39,10 +36,9 @@ interface AIAssistantViewProps {
 
 export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
   notify,
-  navigate,
   initialFieldId,
 }) => {
-  const { t, language, formatHectares } = useI18n();
+  const { t, language } = useI18n();
   // State for workflow and selection
   const [step, setStep] = useState<WorkflowStep>('select-field');
   const [fields, setFields] = useState<FieldOption[]>([]);
@@ -83,35 +79,9 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
           }
         }
       } catch (err) {
-        console.warn('Failed to load fields from API, using fallback list:', err);
-        setFields([
-          {
-            id: 'field-3a860dfdb7',
-            name: 'Farm 1',
-            farm_name: 'Cottbus Farm',
-            area_ha: 18.74,
-            crop_name: null,
-            status: 'verified',
-          },
-          {
-            id: 'all',
-            name: 'All Fields (Comparative)',
-            farm_name: 'All registered acreage',
-            area_ha: 18.74,
-            crop_name: 'Multi-field overview',
-            status: 'system',
-            is_special: true,
-          },
-          {
-            id: 'general',
-            name: 'General Farming Question',
-            farm_name: 'Regional Brandenburg Agronomy',
-            area_ha: 0,
-            crop_name: null,
-            status: 'system',
-            is_special: true,
-          },
-        ]);
+        console.warn('Failed to load fields from API:', err);
+        setFields([]);
+        notify?.('Saved fields could not be loaded. No fallback fields were added.');
       } finally {
         setIsLoadingFields(false);
       }
@@ -119,7 +89,7 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
 
     loadFields();
     loadConversations();
-  }, [initialFieldId]);
+  }, [initialFieldId, notify]);
 
   // Load conversation summaries
   const loadConversations = async () => {
@@ -156,15 +126,9 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
       const ctx = await aiAssistantApi.getFieldContext(selectedField.id, category);
       setFieldContext(ctx);
     } catch (err) {
-      console.warn('Context retrieval failed, proceeding with client defaults:', err);
-      setFieldContext({
-        field_id: selectedField.id,
-        field_name: selectedField.name,
-        farm_name: selectedField.farm_name,
-        area_ha: selectedField.area_ha,
-        crop_name: selectedField.crop_name,
-        category,
-      });
+      console.warn('Context retrieval failed:', err);
+      setFieldContext(null);
+      notify?.('Field context could not be loaded. No fallback measurements were used.');
     }
   };
 
@@ -172,115 +136,12 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
   const handleLoadingFinished = async () => {
     setStep('ready');
 
-    // Create grounding welcome message tailored to field and category
-    const fieldName = selectedField?.name || (language === 'de' ? 'Schlag 1' : 'Farm 1');
-    const areaHa = selectedField?.area_ha || 18.74;
-    const sd = (fieldContext as any)?.structured_data;
-    const soil = fieldContext?.soilgrids || (sd ? {
-      ph_h2o: sd.ph || 6.42,
-      soc_g_kg: sd.organic_carbon_pct ? Number((sd.organic_carbon_pct * 10).toFixed(1)) : 19.4,
-      texture_class: sd.texture || (language === 'de' ? 'Sandiger Lehm' : 'Sandy Loam'),
-      total_nitrogen_g_kg: sd.total_nitrogen_g_kg || 3.23,
-      c_n_ratio: 6.0,
-      sand_percent: sd.sand_pct || 75.5,
-      silt_percent: 16.6,
-      clay_percent: 7.8,
-      bulk_density_g_cm3: 1.46,
-      cec_mmol_kg: sd.cec || 240.1,
-      source: 'ISRIC SoilGrids v2.0',
-      depth: '0-30cm',
-    } : null);
-
-    const isDe = language === 'de';
-    let initialSummary = '';
-    if (selectedCategory === 'fertilizer') {
-      if (isDe) {
-        initialSummary =
-          `### Verifizierte Boden- & Dünge-Intelligenz: ${fieldName}\n\n` +
-          `Ich habe das Bodenprofil und die Raumdaten für **${fieldName}** (${areaHa} ha, ${selectedField?.farm_name || 'Betrieb Cottbus'}) abgerufen.\n\n` +
-          `| Parameter | Messwert | Agronomische Einstufung |\n` +
-          `|---|---|---|\n` +
-          `| **Oberboden pH** | \`${soil?.ph_h2o || 6.42}\` | Optimal für Getreide & Raps |\n` +
-          `| **Humusgehalt (SOC)** | \`${soil?.soc_g_kg || 19.4} g/kg\` | ~1,94% Humus, stetiges N-Nachlieferpotenzial |\n` +
-          `| **Bodenart** | \`${soil?.texture_class || 'Sandiger Lehm'}\` | 75,5% Sand, 16,6% Schluff, 7,8% Ton |\n` +
-          `| **Gesamtstickstoff (N)** | \`${soil?.total_nitrogen_g_kg || 3.23} g/kg\` | Organisch gebundener Stickstoffvorrat |\n` +
-          `| **C:N-Verhältnis** | \`${soil?.c_n_ratio || 6.0}\` | Zügige Nährstoffmineralisation |\n\n` +
-          `Gemäß **deutscher Düngeverordnung (DüV)** liegt die Obergrenze für organischen Stickstoff bei **170 kg N/ha/Jahr** mit vorgeschriebenen Teilgaben auf leichten Sandböden.\n\n` +
-          `Welche Fruchtart oder welches Düngeszenario möchten Sie planen?`;
-      } else {
-        initialSummary =
-          `### Verified Field & Soil Intelligence: ${fieldName}\n\n` +
-          `I have retrieved the ground-truth soil profile and spatial boundaries for **${fieldName}** (${areaHa} ha, ${selectedField?.farm_name || 'Cottbus Farm'}).\n\n` +
-          `| Parameter | Value | Agronomic Classification |\n` +
-          `|---|---|---|\n` +
-          `| **Topsoil pH** | \`${soil?.ph_h2o || 6.42}\` | Optimal for cereals & brassicas |\n` +
-          `| **Soil Organic Carbon (SOC)** | \`${soil?.soc_g_kg || 19.4} g/kg\` | ~1.94% humus, baseline N reserve |\n` +
-          `| **Soil Texture Class** | \`${soil?.texture_class || 'Sandy Loam'}\` | 75.5% Sand, 16.6% Silt, 7.8% Clay |\n` +
-          `| **Total Nitrogen (N)** | \`${soil?.total_nitrogen_g_kg || 3.23} g/kg\` | Steady-state mineralizable N |\n` +
-          `| **C:N Ratio** | \`${soil?.c_n_ratio || 6.0}\` | Rapid organic turnover |\n\n` +
-          `Under **German DüV (Düngeverordnung)** regulations, organic nitrogen is capped at **170 kg N/ha/year** with mandatory split applications on light sandy loam.\n\n` +
-          `What crop or fertilization scenario would you like to plan?`;
-      }
-    } else if (selectedCategory === 'soil') {
-      if (isDe) {
-        initialSummary =
-          `### ISRIC SoilGrids v2.0 Bodenprofil für ${fieldName}\n\n` +
-          `Hier ist das verifizierte Bodenprofil aus ISRIC SoilGrids (250m Auflösung):\n\n` +
-          `- **Bodenart:** \`${soil?.texture_class || 'Sandiger Lehm'}\` (Sand: ${soil?.sand_percent || 75.5}%, Schluff: ${soil?.silt_percent || 16.6}%, Ton: ${soil?.clay_percent || 7.8}%)\n` +
-          `- **Bodenreaktion (pH in H₂O):** \`${soil?.ph_h2o || 6.42}\` (Schwach sauer bis neutral; uneingeschränkte Nährstoffverfügbarkeit)\n` +
-          `- **Lagerungsdichte:** \`${soil?.bulk_density_g_cm3 || 1.46} g/cm³\` (Gute Durchwurzelbarkeit, geringe Verdichtungsneigung)\n` +
-          `- **Kationenaustauschkapazität (KAK):** \`${soil?.cec_mmol_kg || 240.1} mmol(c)/kg\` (Mittlere Nährstoffpufferung)\n` +
-          `- **Organischer Kohlenstoff (SOC):** \`${soil?.soc_g_kg || 19.4} g/kg\`\n\n` +
-          `Wie kann ich Sie bei Bodenverbesserung, Kalkung oder Humusaufbau unterstützen?`;
-      } else {
-        initialSummary =
-          `### ISRIC SoilGrids v2.0 Profile for ${fieldName}\n\n` +
-          `Here is the verified soil profile extracted from ISRIC SoilGrids 250m resolution:\n\n` +
-          `- **Soil Texture:** \`${soil?.texture_class || 'Sandy Loam'}\` (Sand: ${soil?.sand_percent || 75.5}%, Silt: ${soil?.silt_percent || 16.6}%, Clay: ${soil?.clay_percent || 7.8}%)\n` +
-          `- **Reaction (pH in H₂O):** \`${soil?.ph_h2o || 6.42}\` (Slightly acidic to neutral; nutrient availability is unrestricted)\n` +
-          `- **Bulk Density:** \`${soil?.bulk_density_g_cm3 || 1.46} g/cm³\` (Good root penetration, low compaction)\n` +
-          `- **Cation Exchange Capacity (CEC):** \`${soil?.cec_mmol_kg || 240.1} mmol(c)/kg\` (Moderate nutrient buffer capacity)\n` +
-          `- **Organic Carbon:** \`${soil?.soc_g_kg || 19.4} g/kg\`\n\n` +
-          `How can I assist you with your soil management, liming, or organic matter enhancement?`;
-      }
-    } else if (selectedCategory === 'field') {
-      if (isDe) {
-        initialSummary =
-          `### Schlagkontur & Satellitenübersicht: ${fieldName}\n\n` +
-          `Zusammenfassung für **${fieldName}**:\n\n` +
-          `- **Registrierte Betriebsfläche:** \`${areaHa} Hektar\`\n` +
-          `- **Standort:** ${selectedField?.farm_name || 'Betrieb Cottbus'}, Potsdam-Mittelmark, Brandenburg\n` +
-          `- **Aktueller Sentinel-2 NDVI:** \`0.51\` (Gute Bestandesdichte, vitale Blattmasse)\n` +
-          `- **Offizieller Katasterabgleich:** DFBK-verifiziertes Feldpolygon\n\n` +
-          `Fragen Sie mich nach Zonenaufteilung, Satellitenpassagen oder Geländerelief und Entwässerung!`;
-      } else {
-        initialSummary =
-          `### Field Boundary & Satellite Overview: ${fieldName}\n\n` +
-          `Intelligence summary for **${fieldName}**:\n\n` +
-          `- **Total Registered Area:** \`${areaHa} hectares\`\n` +
-          `- **Location:** ${selectedField?.farm_name || 'Cottbus Farm'}, Potsdam-Mittelmark, Brandenburg\n` +
-          `- **Latest Sentinel-2 NDVI:** \`0.51\` (Moderate-high canopy density, +164.8% delta vs previous)\n` +
-          `- **Official Land Register:** DFBK Verified Polygon\n\n` +
-          `Ask me anything about parcel zoning, satellite observations, or elevation and drainage patterns!`;
-      }
-    } else {
-      if (isDe) {
-        initialSummary =
-          `### Kulturmanagement & Pflanzenschutz-Beratung: ${fieldName}\n\n` +
-          `Ich unterstütze Sie bei Sortenwahl, Bestandesführung und Pflanzengesundheit auf **${fieldName}** (${areaHa} ha, Sandiger Lehm).\n\n` +
-          `- Sie können nach Eignung für Winterroggen, Winterweizen, Mais oder Sonnenblumen fragen.\n` +
-          `- **Blattfoto anhängen:** Nutzen Sie das Kamerasymbol für eine automatisierte Krankheits- und Schadbildanalyse.\n\n` +
-          `Welche Kultur oder Fragestellung möchten Sie heute bearbeiten?`;
-      } else {
-        initialSummary =
-          `### Crop Management & Disease Advisory: ${fieldName}\n\n` +
-          `I am ready to assist with crop selection, growth monitoring, and plant health on **${fieldName}** (${areaHa} ha, Sandy Loam).\n\n` +
-          `- You can ask about crop suitability (e.g. Winter Rye, Winter Wheat, Maize, Sunflowers).\n` +
-          `- **Attach a plant leaf photo** anytime using the camera icon to run automated disease and pathogen detection.\n\n` +
-          `Which crop or concern are you focusing on today?`;
-      }
-    }
-
+    // Display only the context returned by the backend. If retrieval failed,
+    // state that directly instead of constructing field measurements locally.
+    const initialSummary = fieldContext?.context_text ||
+      (language === 'de'
+        ? 'Die Felddaten konnten nicht geladen werden. Es wurden keine Ersatzmesswerte verwendet.'
+        : 'Field data could not be loaded. No fallback measurements were used.');
     const welcomeMsg: ChatMessage = {
       id: 'welcome-' + Date.now(),
       role: 'assistant',
@@ -384,9 +245,9 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to get Gemini response:', err);
-      const rawDetail = err?.message || '';
+      const rawDetail = err instanceof Error ? err.message : '';
       const isConnectionIssue = rawDetail.includes('Failed to fetch') || rawDetail.includes('NetworkError') || rawDetail.includes('404');
       const friendlyDetail = isConnectionIssue
         ? 'Backend service is reconnecting. Please ensure the backend server is running and retry.'
@@ -397,7 +258,7 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
         role: 'assistant',
         content: `**Advisory Notice**: ${friendlyDetail}`,
         timestamp: new Date().toISOString(),
-        model: 'Offline Fallback',
+        model: 'Unavailable',
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
@@ -460,17 +321,10 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
     try {
       const data = await aiAssistantApi.getConversation(convId);
       setConversationId(data.conversation.id);
-      setSelectedField(
-        data.conversation.field_id
-          ? {
-              id: data.conversation.field_id,
-              name: data.conversation.field_name || 'Farm Field',
-              farm_name: 'Registered Farm',
-              area_ha: 18.74,
-              status: 'verified',
-            }
-          : null
-      );
+      const conversationField = data.conversation.field_id
+        ? fields.find((field) => field.id === data.conversation.field_id) || null
+        : null;
+      setSelectedField(conversationField);
       setSelectedCategory(data.conversation.category || 'fertilizer');
       setMessages(data.messages);
       setStep('ready');

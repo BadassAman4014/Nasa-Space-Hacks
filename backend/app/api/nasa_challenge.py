@@ -119,7 +119,8 @@ def query_saved_field_dataset(
         field_id=field_id,
         dataset_ids=[dataset_id],
         start_date=start_date,
-        end_date=end_date
+        end_date=end_date,
+        year=year,
     )
     if dataset_id not in res.results:
         raise HTTPException(status_code=500, detail=f"Failed to query {dataset_id} for field {field_id}")

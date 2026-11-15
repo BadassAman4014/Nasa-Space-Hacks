@@ -120,23 +120,33 @@ class SoilStatisticsProcessor:
                 by_prop[m.property_name][m.depth_interval] = m.mean_value
                 pixel_count = max(pixel_count, m.valid_pixel_count)
 
-        def weighted_avg(prop: str, default: float = 0.0) -> float:
-            if prop not in by_prop:
-                return default
+        required_properties = {
+            "phh2o", "soc", "clay", "sand", "silt", "bdod", "cec", "nitrogen"
+        }
+        if not required_properties.issubset(by_prop):
+            # A complete TopsoilSummary cannot truthfully represent missing
+            # SoilGrids properties. The former fixed profile fallback is
+            # intentionally disabled; callers receive no summary instead.
+            return None
+
+        def weighted_avg(prop: str) -> Optional[float]:
             depth_vals = by_prop[prop]
             total_wt = sum(depth_weights[d] for d in depth_vals if d in depth_weights)
             if total_wt <= 0:
-                return default
+                return None
             return sum(depth_vals[d] * depth_weights[d] for d in depth_vals if d in depth_weights) / total_wt
 
-        ph = weighted_avg("phh2o", default=6.0)
-        soc_g_kg = weighted_avg("soc", default=15.0)
-        clay = weighted_avg("clay", default=15.0)
-        sand = weighted_avg("sand", default=60.0)
-        silt = weighted_avg("silt", default=25.0)
-        bdod = weighted_avg("bdod", default=1.45)
-        cec = weighted_avg("cec", default=12.0)
-        nitrogen = weighted_avg("nitrogen", default=1.2)
+        ph = weighted_avg("phh2o")
+        soc_g_kg = weighted_avg("soc")
+        clay = weighted_avg("clay")
+        sand = weighted_avg("sand")
+        silt = weighted_avg("silt")
+        bdod = weighted_avg("bdod")
+        cec = weighted_avg("cec")
+        nitrogen = weighted_avg("nitrogen")
+        if any(value is None for value in (ph, soc_g_kg, clay, sand, silt, bdod, cec, nitrogen)):
+            return None
+        assert all(value is not None for value in (ph, soc_g_kg, clay, sand, silt, bdod, cec, nitrogen))
 
         # Texture classification
         texture = get_usda_texture(sand, silt, clay)

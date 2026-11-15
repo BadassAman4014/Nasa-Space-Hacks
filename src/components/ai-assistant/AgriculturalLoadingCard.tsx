@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Sprout, Database, Activity, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import type { FieldCategory, FieldContextData } from './types';
 
@@ -25,7 +25,7 @@ export const AgriculturalLoadingCard: React.FC<AgriculturalLoadingCardProps> = (
   const [progress, setProgress] = useState(15);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const steps: StepItem[] = [
+  const steps: StepItem[] = useMemo(() => [
     {
       id: 1,
       label: `Retrieving field geometry & coordinates for ${fieldName}`,
@@ -54,7 +54,7 @@ export const AgriculturalLoadingCard: React.FC<AgriculturalLoadingCardProps> = (
       icon: ShieldCheck,
       doneAtPercent: 100,
     },
-  ];
+  ], [category, fieldName]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -83,20 +83,20 @@ export const AgriculturalLoadingCard: React.FC<AgriculturalLoadingCardProps> = (
     }
   }, [progress, steps]);
 
-  const sd = (contextData as any)?.structured_data;
-  const soil = contextData?.soilgrids || (sd ? {
-    ph_h2o: sd.ph || 6.42,
-    soc_g_kg: sd.organic_carbon_pct ? Number((sd.organic_carbon_pct * 10).toFixed(1)) : 19.4,
-    texture_class: sd.texture || 'Sandy Loam',
-    total_nitrogen_g_kg: sd.total_nitrogen_g_kg || 3.23,
-    c_n_ratio: 6.0,
-    sand_percent: sd.sand_pct || 75.5,
-    silt_percent: 16.6,
-    clay_percent: 7.8,
-    bulk_density_g_cm3: 1.46,
-    cec_mmol_kg: sd.cec || 240.1,
-    source: 'ISRIC SoilGrids v2.0',
-    depth: '0-30cm',
+  const soilData = contextData?.structured_data?.soil;
+  const soil = contextData?.soilgrids || (soilData ? {
+    ph_h2o: soilData.ph,
+    soc_g_kg: soilData.organic_carbon_g_kg,
+    texture_class: soilData.texture,
+    total_nitrogen_g_kg: soilData.total_nitrogen_g_kg,
+    c_n_ratio: soilData.c_n_ratio,
+    sand_percent: soilData.sand_pct,
+    silt_percent: soilData.silt_pct,
+    clay_percent: soilData.clay_pct,
+    bulk_density_g_cm3: soilData.bulk_density_g_cm3,
+    cec_mmol_kg: soilData.cec_mmol_kg,
+    source: soilData.source,
+    depth: soilData.depth,
   } : null);
 
   return (

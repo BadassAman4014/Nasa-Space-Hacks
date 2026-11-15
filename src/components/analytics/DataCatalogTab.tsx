@@ -1,17 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Database,
   Layers,
-  Eye,
-  Download,
   CheckCircle2,
-  Clock,
   Sparkles,
   MapPin,
-  Calendar,
-  Filter,
-  FileSpreadsheet,
   UploadCloud,
   ChevronRight,
   Info,
@@ -23,7 +16,6 @@ import {
   Activity,
   CloudRain,
   Mountain,
-  ShieldCheck,
   DollarSign,
   Trees,
   X,
@@ -33,7 +25,6 @@ import { FieldStatusSummary, FullFieldReportResponse, NDVITimeSeriesResponse } f
 import {
   nasaChallengeApi,
   ChallengeDatasetInfo,
-  DatasetCategory,
   DatasetQueryResponse,
   FieldMultiQueryResponse,
 } from '../../services/nasaChallengeApi';
@@ -48,7 +39,7 @@ interface DataCatalogTabProps {
 interface OperationalLayer {
   id: string;
   name: string;
-  category: 'satellite' | 'soil' | 'topography' | 'machinery';
+  category: 'satellite' | 'soil' | 'topography';
   resolution: string;
   source: string;
   lastUpdated: string;
@@ -111,162 +102,75 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
     };
   }, []);
 
-  // Dynamic values extracted from real API data
+  // Include an operational layer only when its backing response contains data.
   const obsCount = ndviData?.observations?.length || 0;
-  const latestS2Date =
-    ndviData?.latest_date ||
-    (ndviData?.observations?.length
-      ? ndviData.observations[ndviData.observations.length - 1].acquisition_date
-      : 'Awaiting sync');
-  const soilPropsCount =
-    ((fullReport?.soil_profile as any)?.measurements?.length) ||
-    ((fullReport?.soil_profile as any)?.properties?.length) ||
-    0;
-  const meanElev =
-    fullReport?.elevation?.mean_elevation_m != null
-      ? `${fullReport.elevation.mean_elevation_m.toFixed(1)} m ASL`
-      : 'Pending DEM sync';
-  const elevRange =
-    fullReport?.elevation?.elevation_range_m != null
-      ? `${fullReport.elevation.elevation_range_m.toFixed(1)} m relief`
-      : 'Pending DEM sync';
-  const soilBrightness =
-    fullReport?.soil_brightness?.mean_brightness != null
-      ? `${fullReport.soil_brightness.mean_brightness.toFixed(3)} index`
-      : fullReport?.soil_brightness?.is_available
-      ? 'Calculated'
-      : 'Bare soil unavailable';
+  const latestS2Date = ndviData?.latest_date || ndviData?.observations?.[0]?.acquisition_date;
+  const soilProfile = fullReport?.soil_profile;
+  const soilPropsCount = soilProfile?.measurements?.length || 0;
+  const reportGeneratedAt = fullReport?.generated_at
+    ? new Date(fullReport.generated_at).toLocaleString()
+    : undefined;
 
-  const operationalLayers: OperationalLayer[] = useMemo(
-    () => [
-      {
+  const operationalLayers: OperationalLayer[] = useMemo(() => {
+    const layers: OperationalLayer[] = [];
+    if (obsCount > 0 && latestS2Date) {
+      layers.push({
         id: 'ndvi',
         name: 'Sentinel-2 NDVI Time Series',
         category: 'satellite',
-        resolution: '10 m spatial / 5-day cadence',
-        source: 'Copernicus Sentinel-2 L2A (B4 Red & B8 NIR)',
+        resolution: '10 m field grid',
+        source: 'Copernicus Sentinel-2 L2A B04/B08 via Element84 Earth Search',
         lastUpdated: latestS2Date,
         status: 'active',
-        description: `Normalized Difference Vegetation Index tracking crop vigor and green biomass across ${summary.name} (${summary.area_ha.toFixed(2)} ha).`,
+        description: `NDVI derived from ${obsCount} stored, quality-filtered Sentinel-2 observations for ${summary.name}.`,
         recordsCount: obsCount,
-        format: 'GeoTIFF / GeoJSON',
-      },
-      {
-        id: 'evi',
-        name: 'Sentinel-2 EVI (Enhanced Vegetation)',
-        category: 'satellite',
-        resolution: '10 m spatial',
-        source: 'Copernicus Sentinel-2 L2A (Blue, Red, NIR)',
-        lastUpdated: latestS2Date,
-        status: 'synced',
-        description: 'Enhanced Vegetation Index with reduced soil/atmosphere interference, highly sensitive in dense canopies.',
-        recordsCount: obsCount,
-        format: 'GeoTIFF',
-      },
-      {
-        id: 'ndre',
-        name: 'Sentinel-2 NDRE (Red-Edge Chlorophyll)',
-        category: 'satellite',
-        resolution: '20 m resampled to 10 m',
-        source: 'Copernicus B5 (705nm) & B8 (842nm)',
-        lastUpdated: latestS2Date,
-        status: 'synced',
-        description: 'Red-Edge index sensitive to plant chlorophyll content and mid-season nitrogen uptake.',
-        recordsCount: obsCount,
-        format: 'GeoTIFF',
-      },
-      {
-        id: 'texture',
-        name: 'Soil Texture Class (Sand, Silt, Clay)',
+        format: 'JSON / PNG preview',
+      });
+    }
+    if (soilPropsCount > 0) {
+      layers.push({
+        id: 'soilgrids',
+        name: 'SoilGrids Field Profile',
         category: 'soil',
-        resolution: '250 m (ISRIC global coverage)',
-        source: 'ISRIC SoilGrids v2.0 REST API',
-        lastUpdated: fullReport?.soil_profile?.created_at
-          ? new Date(fullReport.soil_profile.created_at).toLocaleDateString()
-          : 'Active',
+        resolution: soilProfile?.spatial_resolution || '250 m',
+        source: `${soilProfile?.source || 'ISRIC SoilGrids'} ${soilProfile?.dataset_version || ''}`.trim(),
+        lastUpdated: soilProfile?.extraction_date || soilProfile?.updated_at || soilProfile?.created_at || 'Timestamp unavailable',
         status: 'synced',
-        description: `USDA soil texture classification extracted at field centroid for ${summary.location || 'Potsdam, Brandenburg'}.`,
-        recordsCount: soilPropsCount,
-        format: 'JSON / Raster',
-      },
-      {
-        id: 'ph_soc',
-        name: 'Soil pH & Organic Carbon (SOC)',
-        category: 'soil',
-        resolution: '250 m ISRIC / Local extraction',
-        source: 'ISRIC SoilGrids & Field Samples',
-        lastUpdated: fullReport?.soil_profile?.updated_at
-          ? new Date(fullReport.soil_profile.updated_at).toLocaleDateString()
-          : 'Active',
-        status: 'synced',
-        description: 'pH (H2O) buffering capacity and soil organic carbon stock for nutrient retention and lime planning.',
+        description: `Soil properties extracted for ${summary.location || summary.name}; values are SoilGrids model predictions, not field samples.`,
         recordsCount: soilPropsCount,
         format: 'JSON',
-      },
-      {
+      });
+    }
+    if (fullReport?.soil_brightness?.is_available && fullReport.soil_brightness.mean_brightness != null) {
+      layers.push({
         id: 'brightness',
         name: 'Soil Brightness & Bare Soil Reflectance',
         category: 'soil',
-        resolution: '10 m Sentinel-2 composite',
-        source: 'FieldShift Bare Soil Engine',
-        lastUpdated: 'Multi-season composite',
+        resolution: '10 m field grid',
+        source: fullReport.soil_brightness.sensor || 'Source unavailable',
+        lastUpdated: fullReport.soil_brightness.observation_date || 'Timestamp unavailable',
         status: 'synced',
-        description: `Bare-soil surface reflectance (${soilBrightness}) indicating organic matter gradients and texture transitions.`,
-        recordsCount: 4,
-        format: 'GeoTIFF',
-      },
-      {
+        description: `Derived bare-soil brightness index: ${fullReport.soil_brightness.mean_brightness.toFixed(3)}.`,
+        recordsCount: 1,
+        format: 'JSON / PNG preview',
+      });
+    }
+    if (fullReport?.elevation?.data_source && fullReport.elevation.mean_elevation_m != null) {
+      layers.push({
         id: 'dem',
-        name: 'Digital Elevation Model (DEM)',
+        name: 'Copernicus DEM Terrain Metrics',
         category: 'topography',
-        resolution: '30 m Copernicus GLO-30',
-        source: 'Copernicus Space Component',
-        lastUpdated: '2026 Baseline',
+        resolution: '30 m source, sampled on field grid',
+        source: fullReport.elevation.data_source,
+        lastUpdated: reportGeneratedAt || 'Analysis timestamp unavailable',
         status: 'synced',
-        description: `Topographic elevation (${meanElev}, ${elevRange}) indicating depressions and field drainage.`,
+        description: `Mean elevation ${fullReport.elevation.mean_elevation_m.toFixed(1)} m ASL; relief ${fullReport.elevation.elevation_range_m.toFixed(1)} m; mean slope ${fullReport.elevation.mean_slope_deg.toFixed(2)}°.` ,
         recordsCount: 1,
-        format: 'GeoTIFF / Contours',
-      },
-      {
-        id: 'slope',
-        name: 'Slope & Hydrological Flow Lines',
-        category: 'topography',
-        resolution: '30 m derived',
-        source: 'FieldShift Topographic Engine',
-        lastUpdated: '2026 Baseline',
-        status: 'ready',
-        description: 'Slope degree gradients and Topographic Wetness Index (TWI) highlighting water pooling risk.',
-        recordsCount: 1,
-        format: 'Vector GeoJSON',
-      },
-      {
-        id: 'yield_map',
-        name: 'Combine Harvester Yield Data',
-        category: 'machinery',
-        resolution: '1-second GNSS logging',
-        source: 'Combine Telematics Log',
-        lastUpdated: 'Harvest 2026',
-        status: 'ready',
-        description: `Calibrated harvest yield surface for ${summary.name} filtered for combine header width and flow delay.`,
-        recordsCount: Math.round(summary.area_ha * 240),
-        format: 'Point Shapefile / GeoTIFF',
-      },
-      {
-        id: 'as_applied',
-        name: 'Machinery As-Applied Nitrogen Logs',
-        category: 'machinery',
-        resolution: 'ISOBUS Rate Controller',
-        source: 'Spreader / Sprayer Telematics',
-        lastUpdated: 'Season 2026',
-        status: 'synced',
-        description: 'Actual rate of granular urea / liquid UAN applied across boom sections during spring top-dressing.',
-        recordsCount: Math.round(summary.area_ha * 95),
-        format: 'ISO-XML / Shapefile',
-      },
-    ],
-    [summary, fullReport, ndviData, obsCount, latestS2Date, soilPropsCount, meanElev, elevRange, soilBrightness]
-  );
-
+        format: 'JSON / PNG preview',
+      });
+    }
+    return layers;
+  }, [summary, fullReport, obsCount, latestS2Date, soilProfile, soilPropsCount, reportGeneratedAt]);
   // Filtered operational layers
   const filteredOpLayers =
     operationalCategory === 'all'
@@ -295,7 +199,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
   // Execute live query for a single dataset
   const handleQuerySingleDataset = async (dataset: ChallengeDatasetInfo) => {
     try {
-      const targetId = summary.field_id || (summary as any).id;
+      const targetId = summary.field_id;
       setQueryingDatasetId(dataset.id);
       setInspectingDataset(dataset);
       setIsQueryModalOpen(true);
@@ -303,10 +207,12 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
 
       const res = await nasaChallengeApi.queryFieldDataset(targetId, dataset.id);
       setActiveQueryResult(res);
-      notify(`Successfully received data from ${dataset.agency}!`);
-    } catch (err: any) {
+      const statusLabel = res.status.replace(/_/g, ' ');
+      notify(`${dataset.name}: ${statusLabel}.`);
+    } catch (err: unknown) {
       console.error('Query error:', err);
-      notify(`Query notice: ${err?.message || 'Using calibrated environmental observation.'}`);
+      const message = err instanceof Error ? err.message : 'No source response was available.';
+      notify(`Query failed: ${message}`);
     } finally {
       setQueryingDatasetId(null);
     }
@@ -315,15 +221,16 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
   // Execute multi-sensor probe
   const handleProbeAllSensors = async () => {
     try {
-      const targetId = summary.field_id || (summary as any).id;
+      const targetId = summary.field_id;
       setProbingAll(true);
       notify(`Executing multi-sensor NASA Earth Observation scan for ${summary.name}...`);
       const res = await nasaChallengeApi.probeAllForField(targetId);
       setMultiProbeResult(res);
-      notify(`Multi-sensor probe complete: ${Object.keys(res.results).length} sensor datasets retrieved!`);
-    } catch (err: any) {
+      notify(`Core-source probe complete: ${Object.keys(res.results).length} source responses.`);
+    } catch (err: unknown) {
       console.error('Probe all error:', err);
-      notify(`Probe completed with available telemetry.`);
+      const message = err instanceof Error ? err.message : 'No source response was available.';
+      notify(`Core-source probe failed: ${message}`);
     } finally {
       setProbingAll(false);
     }
@@ -370,7 +277,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
               <Globe size={13} /> NASA Challenge Data Hub
             </span>
             <span className="text-xs font-extrabold text-gray-700 bg-gray-100 px-2.5 py-0.5 rounded-full border border-gray-200">
-              {challengeDatasets.length || 23} Official Datasets
+              {loadingCatalog ? 'Loading catalogue' : `${challengeDatasets.length} Catalogue Entries`}
             </span>
             <span className="text-xs text-gray-500">
               · {summary.name} ({summary.area_ha.toFixed(2)} ha)
@@ -380,9 +287,8 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
             Earth Observation & Agricultural Data Hub
           </h2>
           <p className="text-xs text-gray-500 mt-1 max-w-3xl leading-relaxed">
-            Direct API access and scientific exploration for all 23 official NASA Space Apps Challenge data sources:
-            soil moisture, precipitation, vegetation reflectance, agroclimatology, terrain elevation, thermal stress,
-            cropland classification, and market economics.
+            Official source catalogue with field queries where a live connector exists. Responses distinguish
+            extracted values, catalogue metadata, out-of-coverage sources, and unavailable integrations.
           </p>
         </div>
 
@@ -395,7 +301,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
             className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow transition disabled:opacity-50"
           >
             {probingAll ? <RefreshCw size={15} className="animate-spin" /> : <Sparkles size={15} />}
-            <span>{probingAll ? 'Probing 10 Core Sensors...' : 'Probe Core Sensors for Field'}</span>
+            <span>{probingAll ? 'Querying Core Sources...' : 'Query Core Sources for Field'}</span>
           </button>
 
           <button
@@ -422,7 +328,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
             }`}
           >
             <Satellite size={14} />
-            <span>NASA Challenge Datasets (23)</span>
+            <span>NASA Challenge Catalogue ({challengeDatasets.length})</span>
           </button>
           <button
             type="button"
@@ -582,7 +488,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                     <button
                       type="button"
                       onClick={() => handleQuerySingleDataset(dataset)}
-                      disabled={isQueryingThis}
+                      disabled={isQueryingThis || !dataset.is_live_queryable}
                       className="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition disabled:opacity-50"
                     >
                       {isQueryingThis ? (
@@ -590,7 +496,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                       ) : (
                         <Activity size={13} />
                       )}
-                      <span>{isQueryingThis ? 'Querying API...' : 'Query for Field'}</span>
+                      <span>{isQueryingThis ? 'Querying API...' : dataset.is_live_queryable ? 'Query for Field' : 'Connector unavailable'}</span>
                     </button>
 
                     <a
@@ -635,7 +541,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                   : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
-              Satellite & Indices (3)
+              Satellite & Indices ({operationalLayers.filter((layer) => layer.category === 'satellite').length})
             </button>
             <button
               type="button"
@@ -646,7 +552,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                   : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
-              Soil & Lab Chemistry (2)
+              Soil ({operationalLayers.filter((layer) => layer.category === 'soil').length})
             </button>
             <button
               type="button"
@@ -657,24 +563,18 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                   : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
-              Topography & DEM (2)
-            </button>
-            <button
-              type="button"
-              onClick={() => setOperationalCategory('machinery')}
-              className={`px-3.5 py-1.5 font-bold rounded-xl transition ${
-                operationalCategory === 'machinery'
-                  ? 'bg-gray-900 text-white shadow-xs'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              Combine & Machinery (2)
+              Topography & DEM ({operationalLayers.filter((layer) => layer.category === 'topography').length})
             </button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: Layer Cards */}
             <div className="lg:col-span-2 space-y-3">
+              {filteredOpLayers.length === 0 && (
+                <div className="p-5 rounded-2xl border border-gray-200 bg-white text-sm text-gray-500">
+                  No verified operational layers are available in this category.
+                </div>
+              )}
               {filteredOpLayers.map((layer) => {
                 const isSelected = layer.id === selectedOpLayerId;
                 return (
@@ -718,17 +618,6 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          notify(`Preparing export for ${layer.name}...`);
-                        }}
-                        className="p-2 rounded-lg text-gray-400 hover:text-emerald-700 hover:bg-gray-100 transition"
-                        title={`Download ${layer.name}`}
-                      >
-                        <Download size={16} />
-                      </button>
                       <ChevronRight
                         size={18}
                         className={isSelected ? 'text-emerald-600' : 'text-gray-300'}
@@ -740,6 +629,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
             </div>
 
             {/* Right Column: Layer Inspector & Metadata */}
+            {selectedOpLayer && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-6 h-fit sticky top-20">
               <div>
                 <div className="flex items-center justify-between">
@@ -747,7 +637,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                     Layer Inspection
                   </span>
                   <span className="flex items-center gap-1 text-xs text-emerald-600 font-semibold">
-                    <CheckCircle2 size={13} /> Active & Durable
+                    <CheckCircle2 size={13} /> Backed by available data
                   </span>
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mt-2">{selectedOpLayer.name}</h3>
@@ -766,9 +656,9 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                   <span className="font-semibold text-gray-800">{selectedOpLayer.source}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-gray-50">
-                  <span className="text-gray-400">Records / Points</span>
+                  <span className="text-gray-400">Records / Results</span>
                   <span className="font-semibold text-gray-800">
-                    {selectedOpLayer.recordsCount.toLocaleString()} observations
+                    {selectedOpLayer.recordsCount.toLocaleString()} records
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-gray-50">
@@ -780,26 +670,8 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                   <span className="font-semibold text-gray-800">{selectedOpLayer.lastUpdated}</span>
                 </div>
               </div>
-
-              <div className="space-y-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => notify(`Exported ${selectedOpLayer.name} in ${selectedOpLayer.format} format.`)}
-                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow transition"
-                >
-                  <Download size={15} />
-                  <span>Export {selectedOpLayer.format}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => notify(`Layer '${selectedOpLayer.name}' loaded as active map overlay.`)}
-                  className="w-full py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs flex items-center justify-center gap-2 transition"
-                >
-                  <Eye size={15} />
-                  <span>Preview on Map View</span>
-                </button>
-              </div>
             </div>
+            )}
           </div>
         </div>
       )}
@@ -816,8 +688,12 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${inspectingDataset ? getAgencyColor(inspectingDataset.agency) : 'bg-gray-100 text-gray-700'}`}>
                       {inspectingDataset?.agency}
                     </span>
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
-                      <CheckCircle2 size={12} /> Live API Telemetry
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded border flex items-center gap-1 ${
+                      activeQueryResult?.status === 'success'
+                        ? 'text-emerald-600 bg-emerald-50 border-emerald-200'
+                        : 'text-amber-700 bg-amber-50 border-amber-200'
+                    }`}>
+                      <Info size={12} /> {activeQueryResult?.status.replace(/_/g, ' ') || 'Awaiting source response'}
                     </span>
                   </div>
                   <h3 className="text-base font-bold text-gray-900 mt-1">

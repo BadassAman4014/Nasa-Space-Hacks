@@ -47,11 +47,9 @@ CROP_BASE_TEMPERATURES: Dict[str, float] = {
 class WeatherService:
     NASA_POWER_DAILY_URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
 
-    def get_current_weather(self, lat: float, lon: float, station_name: str = "Potsdam Station (DWD 03987)") -> CurrentWeather:
-        """
-        Retrieves real current weather observation for the field coordinates.
-        Tries Open-Meteo current API; falls back gracefully to DWD Brandenburg baseline if offline.
-        """
+    def get_current_weather(self, lat: float, lon: float, station_name: Optional[str] = None) -> Optional[CurrentWeather]:
+        """Retrieve the current Open-Meteo values or report no observation."""
+        del station_name  # Kept for API compatibility; Open-Meteo supplies the point value.
         try:
             r = requests.get(
                 "https://api.open-meteo.com/v1/forecast",
@@ -60,28 +58,34 @@ class WeatherService:
                     "longitude": lon,
                     "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m",
                 },
-                timeout=3
+                timeout=3,
             )
-            if r.status_code == 200:
-                data = r.json().get("current", {})
-                w_code = data.get("weather_code", 0)
-                condition = self._weather_code_to_desc(w_code)
-                return CurrentWeather(
-                    temperature_c=round(float(data.get("temperature_2m", 18.4)), 1),
-                    feels_like_c=round(float(data.get("apparent_temperature", 18.0)), 1),
-                    precipitation_mm=round(float(data.get("precipitation", 0.0)), 1),
-                    wind_speed_kmh=round(float(data.get("wind_speed_10m", 12.5)), 1),
-                    humidity_percent=round(float(data.get("relative_humidity_2m", 65.0)), 1),
-                    condition=condition,
-                    is_forecast=False,
-                    observation_date=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-                    station_or_provider=f"Open-Meteo / WMO Station ({lat:.2f}°N, {lon:.2f}°E)"
-                )
-        except Exception:
-            pass
-
-        # No fabricated fallback: report that no live observation is available.
-        return None
+            r.raise_for_status()
+            data = r.json().get("current", {})
+            required = {
+                "temperature_2m",
+                "relative_humidity_2m",
+                "apparent_temperature",
+                "precipitation",
+                "weather_code",
+                "wind_speed_10m",
+                "time",
+            }
+            if not required.issubset(data) or any(data[key] is None for key in required):
+                return None
+            return CurrentWeather(
+                temperature_c=round(float(data["temperature_2m"]), 1),
+                feels_like_c=round(float(data["apparent_temperature"]), 1),
+                precipitation_mm=round(float(data["precipitation"]), 1),
+                wind_speed_kmh=round(float(data["wind_speed_10m"]), 1),
+                humidity_percent=round(float(data["relative_humidity_2m"]), 1),
+                condition=self._weather_code_to_desc(int(data["weather_code"])),
+                is_forecast=True,
+                observation_date=str(data["time"]),
+                station_or_provider=f"Open-Meteo forecast grid ({lat:.2f}°N, {lon:.2f}°E)",
+            )
+        except (requests.RequestException, TypeError, ValueError, KeyError):
+            return None
 
     def get_precipitation_series(
         self,
@@ -174,7 +178,14 @@ class WeatherService:
         Formula: GDD = max(0, ((Tmax + Tmin) / 2) - Tbase)
         """
         crop_clean = (crop or "").strip().lower()
-        t_base = base_temperature_c if base_temperature_c is not None else CROP_BASE_TEMPERATURES.get(crop_clean, 5.0)
+        if base_temperature_c is not None:
+            t_base = base_temperature_c
+        elif crop_clean in CROP_BASE_TEMPERATURES:
+            t_base = CROP_BASE_TEMPERATURES[crop_clean]
+        else:
+            raise WeatherDataUnavailable(
+                "A crop-specific or user-selected base temperature is required to calculate GDD."
+            )
 
         daily_gdd_list: List[DailyGDD] = []
         total_gdd = 0.0
@@ -229,7 +240,7 @@ class WeatherService:
 
         return GDDTimeSeriesResponse(
             field_id=field_id,
-            crop=crop or "Winter wheat",
+            crop=crop or "Unassigned",
             base_temperature_c=round(t_base, 1),
             start_date=start_date,
             end_date=end_date,
@@ -272,7 +283,6 @@ class WeatherService:
             80: "Rain showers",
             95: "Thunderstorm"
         }
-        return codes.get(code, "Partly cloudy")
+        return codes.get(code, f"Unknown weather code ({code})")
 
-import numpy as np
 weather_service = WeatherService()

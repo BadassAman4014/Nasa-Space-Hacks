@@ -57,7 +57,7 @@ class FieldSegmentationDataset(Dataset):
         self._build_dataset()
 
     def _build_dataset(self) -> None:
-        """Construct patch samples using real DFBK boundaries and physics-based Sentinel-2."""
+        """Construct patch samples from real Sentinel-2 pixels and DFBK boundaries."""
         from .satellite_service import Sentinel2AcquisitionService
 
         sat_service = Sentinel2AcquisitionService()

@@ -39,9 +39,9 @@ CORE RESPONSE REQUIREMENTS:
    - NEVER output internal database field IDs (e.g., `field-1a06dfdb7`). Only refer to the user-facing field name or farm name.
 
 3. AGRONOMIC ACCURACY & LOCAL REGULATIONS:
-   - Base all advice on the user's specific field data (SoilGrids texture like Sandy Loam, topsoil pH, organic carbon, latest NDVI).
-   - Fertilization must strictly obey the German DüV (Düngeverordnung): 170 kg N/ha/year organic cap, split-nitrogen dressings on light sandy soils to prevent leaching.
-   - Crop guidance must account for Brandenburg's sandy outwash soils, 500-600 mm precipitation, and May-June drought risk."""
+   - Use only measurements present in the supplied field context. Never assume a soil texture, pH, rainfall total, NDVI value, crop, or nutrient rate.
+   - Distinguish modelled, satellite-derived, farmer-entered, and measured data.
+   - Do not calculate a legal nitrogen ceiling unless all required official inputs are present. Refer legal DüV decisions to the farm's official Düngebedarfsermittlung or local authority."""
 
 
 class GeminiService:
@@ -57,9 +57,7 @@ class GeminiService:
             try:
                 root = Path(__file__).resolve().parents[4]
                 load_dotenv(root / ".env")
-                load_dotenv(root / ".env.example")
                 load_dotenv(root / "backend" / ".env")
-                load_dotenv(root / "backend" / ".env.example")
                 key = os.getenv("GEMINI_API_KEY", "").strip()
             except Exception:
                 pass
@@ -137,22 +135,14 @@ class GeminiService:
             except Exception as e:
                 print(f"[GeminiService] Gemini API call exception: {e}. Falling back to internal Agronomic Engine.")
 
-        if category == "advisor":
-            # Never serve canned agronomy as if it were this field's data.
-            return (
-                "The AI Advisor can't reach its language model right now, so I can't give a grounded answer. "
-                "Please try again in a moment. For urgent decisions, consult a local agronomist.\n\n"
-                "Sources: none (no answer generated)."
-            ), "unavailable"
-
-        # Fallback to local data-grounded agronomic engine
-        fallback_text = self._generate_agronomic_fallback(
-            user_message=user_message,
-            field_context=field_context,
-            attachments=attachments or [],
-            category=category,
-        )
-        return self._sanitize_response(fallback_text), "fieldshift-agronomic-engine-v1"
+        # The former local fallback returned fixed diagnoses, soil values, and
+        # fertilizer rates. It is intentionally disabled because no model has
+        # interpreted the question or attached image when this branch runs.
+        return (
+            "The AI service is unavailable, so I can't produce a grounded answer right now. "
+            "No fallback diagnosis or field measurements were generated. Please try again later.\n\n"
+            "Sources: none (no answer generated)."
+        ), "unavailable"
 
     async def _call_gemini_api(
         self,
@@ -247,7 +237,7 @@ class GeminiService:
                     else:
                         print(f"[GeminiService] Model '{model_candidate}' returned status {resp.status_code}: {resp.text[:200]}")
                 except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadTimeout) as timeout_err:
-                    print(f"[GeminiService] Network connection or read timeout ({timeout_err}). Engaging Agronomic Fallback.")
+                    print(f"[GeminiService] Network connection or read timeout ({timeout_err}).")
                     break
                 except Exception as req_err:
                     print(f"[GeminiService] Request error for {model_candidate}: {req_err}")
@@ -266,53 +256,10 @@ class GeminiService:
         attachments: list[ImageAttachment],
         category: Optional[str] = None,
     ) -> str:
-        """High-precision local agronomic response generator using verified field data."""
-        msg_lower = user_message.lower()
-        has_image = bool(attachments)
-
-        if has_image:
-            return (
-                "### Visual Plant & Foliar Diagnosis\n\n"
-                "**Assessment**: The uploaded foliar specimen shows early interveinal chlorosis and localized tissue mottling.\n\n"
-                "• **Probable Cause**: On light sandy loam, rapid percolation after rain often leaches mobile nitrogen (N) and magnesium (Mg), producing pale interveinal striping.\n"
-                "• **Foliar Pathogen Risk**: Monitor for early septoria or rust pustules on lower canopy leaves.\n"
-                "• **Recommended Action**: Inspect leaf undersides with a 10x lens; apply a corrective micronutrient foliar spray (EPSO Top / Bittersalz 5 kg/ha) if symptoms persist across >10% of plants."
-            )
-
-        if category == "fertilizer" or any(w in msg_lower for w in ["fertiliz", "dünger", "nitrogen", "stickstoff", "npk", "urea", "phosphor", "potassium"]):
-            return (
-                "### Fertilizer & Nutrient Recommendation\n\n"
-                "**Verdict**: Sandy loam (75.5% sand) with pH 6.42 requires mandatory split-nitrogen dressings to comply with DüV and prevent nitrate leaching.\n\n"
-                "• **DüV Legal Ceiling**: Total organic nitrogen is capped at 170 kg N/ha/year.\n"
-                "• **Split-Application Strategy**: Apply 50–60 kg N/ha at spring green-up (BBCH 21–25), followed by a second dressing at stem elongation (BBCH 30–32).\n"
-                "• **Form of Nitrogen**: Use stabilized ammonium-nitrate-urea (ALZON or ENTEC) to retard nitrification on high-drainage sandy parcels."
-            )
-
-        if category == "soil" or any(w in msg_lower for w in ["soil", "boden", "ph", "carbon", "humus", "texture", "organic", "clay", "sand"]):
-            return (
-                "### Soil Health Assessment (ISRIC SoilGrids v2.0)\n\n"
-                "**Profile Verdict**: Uncompacted, highly workable Sandy Loam with an optimal reaction for cereals and legumes.\n\n"
-                "• **Chemical Baseline**: Topsoil pH is 6.42 (optimal availability for N, P, K); Total N is ~3.23 g/kg with a C:N ratio of 6.0.\n"
-                "• **Water Retention Risk**: High sand fraction (75.5%) produces fast drainage; topsoil dries rapidly during dry spells.\n"
-                "• **Action Plan**: Maintain continuous ground cover using winter rye or vetch cover crops to build organic carbon above 2.0% and increase water retention."
-            )
-
-        if category == "crop" or any(w in msg_lower for w in ["crop", "wheat", "rye", "barley", "maize", "rotation", "plant", "pflanze", "sorte", "seed"]):
-            return (
-                "### Crop Suitability & Sowing Window\n\n"
-                "**Recommendation**: Hybrid Winter Rye and 2-Row Winter Barley are the most drought-resilient selections for Brandenburg sandy loam.\n\n"
-                "• **Winter Barley Window**: Optimal sowing is September 18 to September 28 at 280–320 viable seeds/m² to achieve 3–4 tillers before winter dormancy.\n"
-                "• **Winter Rye Alternative**: Highly recommended if late summer moisture is deficient; tolerates poor sandy parcels and cold continental winters.\n"
-                "• **Seedbed Note**: Drill immediately following shallow seedbed preparation to conserve limited topsoil moisture."
-            )
-
-        # Field / General
+        """Retained for compatibility; fabricated agronomic fallbacks are disabled."""
+        del user_message, field_context, attachments, category
         return (
-            "### Agricultural Field Intelligence\n\n"
-            "**Overview**: Your field features verified DFBK parcel boundaries on friable Sandy Loam with baseline pH 6.42.\n\n"
-            "• **Canopy & Vigor**: Recent Sentinel-2 observations show healthy early vegetative biomass without severe localized anomalies.\n"
-            "• **Management Focus**: Prioritize moisture conservation through reduced tillage and timed split nutrient applications.\n"
-            "• **Next Step**: Select Crop or Soil for targeted varietal advice or fertilizer budget calculations."
+            "The AI service is unavailable. No diagnosis, recommendation, or "
+            "field measurement was generated. Sources: none."
         )
-
 gemini_service = GeminiService()

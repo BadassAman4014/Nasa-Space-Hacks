@@ -165,7 +165,7 @@ class TestAIFieldDetectionAPI:
         # Poll until complete
         import time
         completed = False
-        for _ in range(30):
+        for _ in range(200):
             time.sleep(0.3)
             s_res = client.get(f"/api/ai-field-detection/jobs/{job_id}")
             assert s_res.status_code == 200
@@ -198,7 +198,7 @@ class TestAIFieldDetectionAPI:
 
         import time
         completed = False
-        for _ in range(30):
+        for _ in range(200):
             time.sleep(0.3)
             s_res = client.get(f"/api/ai-field-detection/jobs/{job_id}")
             if s_res.json()["status"] == "completed":

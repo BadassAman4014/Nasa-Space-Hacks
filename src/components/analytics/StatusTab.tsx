@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Calendar,
   CloudSun,
   Droplets,
   Thermometer,
@@ -13,10 +12,7 @@ import {
   TrendingUp,
   Info,
   Compass,
-  Check,
-  CheckCircle2,
   Eye,
-  Layers,
   RefreshCw,
   Cloud,
 } from 'lucide-react';
@@ -69,42 +65,12 @@ export const StatusTab: React.FC<StatusTabProps> = ({
   }, [observations]);
 
   const [selectedSeason, setSelectedSeason] = useState<string>('all');
-  const [imageryMode, setImageryMode] = useState<'rgb' | 'ndvi' | 'false_color'>('rgb');
   const [isEditingDate, setIsEditingDate] = useState(false);
   const [inputDate, setInputDate] = useState(summary.planting_date || '');
   const [savingDate, setSavingDate] = useState(false);
   const [ndviImgError, setNdviImgError] = useState(false);
   const [rgbImgError, setRgbImgError] = useState(false);
   const [activeModalImg, setActiveModalImg] = useState<{ title: string; url?: string | null; type: 'ndvi' | 'rgb' } | null>(null);
-
-  // Scaled SVG polygon points from field boundary geometry
-  const svgPolygonPoints = useMemo(() => {
-    if (!summary?.geometry || !summary.geometry.coordinates || !summary.geometry.coordinates[0]) {
-      return null;
-    }
-    const coords = summary.geometry.coordinates[0];
-    if (coords.length < 3) return null;
-
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    coords.forEach(([x, y]: [number, number]) => {
-      if (x < minX) minX = x;
-      if (x > maxX) maxX = x;
-      if (y < minY) minY = y;
-      if (y > maxY) maxY = y;
-    });
-
-    const rangeX = maxX - minX || 0.001;
-    const rangeY = maxY - minY || 0.001;
-    const pad = 24;
-    const w = 320 - pad * 2;
-    const h = 240 - pad * 2;
-
-    return coords.map(([x, y]: [number, number]) => {
-      const px = pad + ((x - minX) / rangeX) * w;
-      const py = pad + ((maxY - y) / rangeY) * h;
-      return `${px.toFixed(1)},${py.toFixed(1)}`;
-    }).join(' ');
-  }, [summary?.geometry]);
 
   // Filtered observations (newest first)
   const filteredObs = useMemo(() => {
@@ -292,32 +258,36 @@ export const StatusTab: React.FC<StatusTabProps> = ({
             </span>
           </div>
 
-          <div className="my-2 flex items-baseline justify-between">
-            <div>
-              <div className="text-3xl font-extrabold text-gray-900">
-                {summary.current_weather?.temperature_c ?? 18.4}°C
+          {summary.current_weather ? (
+            <div className="my-2 flex items-baseline justify-between">
+              <div>
+                <div className="text-3xl font-extrabold text-gray-900">
+                  {summary.current_weather.temperature_c}°C
+                </div>
+                <p className="text-xs font-medium text-gray-500">
+                  {summary.current_weather.condition} • {t('analyticsTabs.feelsLike', { temp: summary.current_weather.feels_like_c })}
+                </p>
               </div>
-              <p className="text-xs font-medium text-gray-500">
-                {summary.current_weather?.condition ?? 'Partly cloudy'} • {t('analyticsTabs.feelsLike', { temp: summary.current_weather?.feels_like_c ?? 18.0 })}
-              </p>
+              <div className="text-right text-xs text-gray-500 space-y-0.5">
+                <div className="flex items-center gap-1 justify-end">
+                  <Droplets size={12} className="text-blue-500" />
+                  <span>{t('analyticsTabs.rain', { amount: `${summary.current_weather.precipitation_mm} mm` })}</span>
+                </div>
+                <div className="flex items-center gap-1 justify-end">
+                  <Wind size={12} className="text-gray-400" />
+                  <span>{t('analyticsTabs.wind', { speed: `${summary.current_weather.wind_speed_kmh} km/h` })}</span>
+                </div>
+              </div>
             </div>
-            <div className="text-right text-xs text-gray-500 space-y-0.5">
-              <div className="flex items-center gap-1 justify-end">
-                <Droplets size={12} className="text-blue-500" />
-                <span>{t('analyticsTabs.rain', { amount: summary.current_weather?.precipitation_mm != null ? `${summary.current_weather.precipitation_mm} mm` : '—' })}</span>
-              </div>
-              <div className="flex items-center gap-1 justify-end">
-                <Wind size={12} className="text-gray-400" />
-                <span>{t('analyticsTabs.wind', { speed: summary.current_weather?.wind_speed_kmh != null ? `${summary.current_weather.wind_speed_kmh} km/h` : '—' })}</span>
-              </div>
-            </div>
-          </div>
+          ) : (
+            <div className="my-5 text-sm text-gray-500">Current weather is unavailable.</div>
+          )}
 
           <div className="pt-2 border-t border-black/[0.04] flex items-center justify-between text-xs text-gray-400">
             <span className="truncate max-w-[200px]">
-              {summary.current_weather?.station_or_provider || 'Weather station sync pending'}
+              {summary.current_weather?.station_or_provider || 'No source response'}
             </span>
-            <span>Live Observation</span>
+            <span>{summary.current_weather ? (summary.current_weather.is_forecast ? 'Current model value' : 'Observation') : 'Unavailable'}</span>
           </div>
         </div>
       </div>
@@ -409,14 +379,6 @@ export const StatusTab: React.FC<StatusTabProps> = ({
 
             {/* Map Frame */}
             <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-950 border border-gray-200 flex items-center justify-center shadow-inner group">
-              {/* Satellite basemap backdrop */}
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-65 filter contrast-125 brightness-95"
-                style={{
-                  backgroundImage: `radial-gradient(circle at center, rgba(15, 23, 42, 0.3) 0%, rgba(15, 23, 42, 0.8) 100%), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/5428/8856')`,
-                }}
-              />
-
               {currentObs?.ndvi_preview_url && !ndviImgError ? (
                 <img
                   src={currentObs.ndvi_preview_url}
@@ -424,28 +386,10 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                   className="w-full h-full object-contain filter drop-shadow-md z-10 relative transition-transform duration-300 group-hover:scale-[1.02]"
                   onError={() => setNdviImgError(true)}
                 />
-              ) : svgPolygonPoints ? (
-                <div className="w-full h-full z-10 relative flex items-center justify-center p-6">
-                  <svg viewBox="0 0 320 240" className="w-full h-full filter drop-shadow-2xl">
-                    <defs>
-                      <linearGradient id="ndviPolygonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#22c55e" stopOpacity="0.9" />
-                        <stop offset="50%" stopColor="#eab308" stopOpacity="0.9" />
-                        <stop offset="100%" stopColor="#f97316" stopOpacity="0.9" />
-                      </linearGradient>
-                    </defs>
-                    <polygon
-                      points={svgPolygonPoints}
-                      fill="url(#ndviPolygonGrad)"
-                      stroke="#ffffff"
-                      strokeWidth="2.5"
-                    />
-                  </svg>
-                </div>
               ) : (
-                <div className="z-10 flex flex-col items-center gap-2 text-white/80">
-                  <RefreshCw className="animate-spin text-emerald-400" size={18} />
-                  <span className="text-xs font-medium">Syncing field NDVI raster...</span>
+                <div className="z-10 flex flex-col items-center gap-2 text-white/80 px-6 text-center">
+                  <Info size={18} className="text-amber-300" />
+                  <span className="text-xs font-medium">No NDVI raster is available for this observation.</span>
                 </div>
               )}
 
@@ -506,69 +450,29 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                 </h4>
               </div>
 
-              {/* Composite Mode Selector */}
-              <div className="flex items-center gap-1 bg-gray-100 p-0.5 rounded-lg text-[11px] font-semibold">
-                <button
-                  onClick={() => setImageryMode('rgb')}
-                  className={`px-2 py-0.5 rounded transition ${imageryMode === 'rgb' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
-                    }`}
-                >
-                  {t('analyticsTabs.trueColorRgb')}
-                </button>
-                <button
-                  onClick={() => setImageryMode('false_color')}
-                  className={`px-2 py-0.5 rounded transition ${imageryMode === 'false_color' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
-                    }`}
-                >
-                  {t('analyticsTabs.falseColorNir')}
-                </button>
-              </div>
+              <span className="text-[11px] font-semibold text-gray-500">True-colour RGB</span>
             </div>
 
             {/* Satellite Image Frame */}
             <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-950 border border-gray-200 flex items-center justify-center shadow-inner group">
-              {/* Satellite basemap backdrop */}
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-70 filter contrast-125"
-                style={{
-                  backgroundImage: `radial-gradient(circle at center, rgba(15, 23, 42, 0.3) 0%, rgba(15, 23, 42, 0.7) 100%), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/5428/8856')`,
-                }}
-              />
-
               {currentObs?.rgb_preview_url && !rgbImgError ? (
                 <img
-                  src={
-                    imageryMode === 'false_color' && currentObs.ndvi_preview_url
-                      ? currentObs.ndvi_preview_url
-                      : currentObs.rgb_preview_url
-                  }
-                  alt="Satellite Observation"
-                  className={`w-full h-full object-contain filter drop-shadow-md z-10 relative transition-transform duration-300 group-hover:scale-[1.02] ${imageryMode === 'false_color' ? 'hue-rotate-90 contrast-125' : ''
-                    }`}
+                  src={currentObs.rgb_preview_url}
+                  alt="Sentinel-2 true-colour observation"
+                  className="w-full h-full object-contain filter drop-shadow-md z-10 relative transition-transform duration-300 group-hover:scale-[1.02]"
                   onError={() => setRgbImgError(true)}
                 />
-              ) : svgPolygonPoints ? (
-                <div className="w-full h-full z-10 relative flex items-center justify-center p-6">
-                  <svg viewBox="0 0 320 240" className="w-full h-full filter drop-shadow-2xl">
-                    <polygon
-                      points={svgPolygonPoints}
-                      fill="rgba(56, 189, 248, 0.25)"
-                      stroke="#38bdf8"
-                      strokeWidth="2.5"
-                    />
-                  </svg>
-                </div>
               ) : (
-                <div className="z-10 flex flex-col items-center gap-2 text-white/80">
-                  <RefreshCw className="animate-spin text-blue-400" size={18} />
-                  <span className="text-xs font-medium">Loading satellite scene...</span>
+                <div className="z-10 flex flex-col items-center gap-2 text-white/80 px-6 text-center">
+                  <Info size={18} className="text-amber-300" />
+                  <span className="text-xs font-medium">No true-colour raster is available for this observation.</span>
                 </div>
               )}
 
-              {/* OneSoil-style Header Badge: Satellite image, Nov 7, 2026 */}
+              {/* Observation date from the selected scene */}
               <div className="absolute top-3 left-3 z-20 flex items-center gap-2">
                 <div className="bg-black/75 backdrop-blur-md px-3 py-1 rounded-xl text-white text-[11px] font-semibold border border-white/10 shadow-lg">
-                  Satellite image, {currentObs?.acquisition_date ? new Date(currentObs.acquisition_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Nov 7, 2026'}
+                  Satellite image, {currentObs?.acquisition_date ? new Date(currentObs.acquisition_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'date unavailable'}
                 </div>
               </div>
 
@@ -576,8 +480,8 @@ export const StatusTab: React.FC<StatusTabProps> = ({
               <button
                 onClick={() =>
                   setActiveModalImg({
-                    title: `Satellite Scene (${imageryMode === 'false_color' ? 'NIR' : 'RGB'}) — ${currentObs?.acquisition_date ?? ''}`,
-                    url: imageryMode === 'false_color' && currentObs?.ndvi_preview_url ? currentObs.ndvi_preview_url : currentObs?.rgb_preview_url,
+                    title: `Satellite Scene (RGB) — ${currentObs?.acquisition_date ?? 'date unavailable'}`,
+                    url: currentObs?.rgb_preview_url,
                     type: 'rgb',
                   })
                 }
@@ -627,16 +531,9 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                     alt={activeModalImg.title}
                     className="w-full h-full object-contain filter drop-shadow-2xl"
                   />
-                ) : svgPolygonPoints ? (
-                  <svg viewBox="0 0 320 240" className="w-full h-full p-6">
-                    <polygon
-                      points={svgPolygonPoints}
-                      fill={activeModalImg.type === 'ndvi' ? '#22c55e' : 'rgba(56, 189, 248, 0.4)'}
-                      stroke="#ffffff"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                ) : null}
+                ) : (
+                  <span className="text-sm text-gray-400">Raster unavailable</span>
+                )}
               </div>
             </div>
           </div>
@@ -786,7 +683,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
               </div>
               <div className="text-right">
                 <span className="text-xl font-bold text-gray-900">
-                  {precipData?.total_accumulated_mm ?? 412} mm
+                  {precipData ? `${precipData.total_accumulated_mm} mm` : '—'}
                 </span>
                 <span className="text-[10px] text-gray-400 block">Season Total</span>
               </div>
@@ -823,9 +720,9 @@ export const StatusTab: React.FC<StatusTabProps> = ({
               </svg>
             </div>
             <div className="flex justify-between text-[10px] font-mono text-gray-400">
-              <span>{precipData?.start_date || 'Mar 1'}</span>
+              <span>{precipData?.start_date || 'Start unavailable'}</span>
               <span>Accumulated mm (Daily)</span>
-              <span>{precipData?.end_date || 'Oct 31'}</span>
+              <span>{precipData?.end_date || 'End unavailable'}</span>
             </div>
           </div>
 
@@ -862,12 +759,12 @@ export const StatusTab: React.FC<StatusTabProps> = ({
             <div className="flex items-baseline justify-between pt-1">
               <div>
                 <span className="text-2xl font-bold text-gray-900">
-                  {gddData?.total_accumulated_gdd ?? 1480}
+                  {gddData?.total_accumulated_gdd ?? '—'}
                 </span>{' '}
                 <span className="text-xs text-gray-500">°C·days</span>
               </div>
               <span className="text-xs font-medium text-gray-500">
-                {gddData?.valid_days ?? 245} seasonal days
+                {gddData ? `${gddData.valid_days} seasonal days` : 'Data unavailable'}
               </span>
             </div>
 

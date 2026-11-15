@@ -27,9 +27,27 @@ export interface SoilGridsData {
 
 export interface FieldContextData {
   field_id: string;
-  field_name: string;
-  farm_name: string;
-  area_ha: number;
+  field_name?: string;
+  farm_name?: string;
+  area_ha?: number;
+  context_text?: string;
+  structured_data?: {
+    soil?: {
+      ph: number;
+      organic_carbon_g_kg: number;
+      texture: string;
+      total_nitrogen_g_kg: number;
+      c_n_ratio?: number;
+      sand_pct: number;
+      silt_pct: number;
+      clay_pct: number;
+      bulk_density_g_cm3: number;
+      cec_mmol_kg: number;
+      source: string;
+      depth: string;
+    } | null;
+    [key: string]: unknown;
+  };
   crop_name?: string | null;
   crop_category?: string | null;
   coordinates?: [number, number];
