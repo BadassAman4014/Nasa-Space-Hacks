@@ -159,22 +159,38 @@ function Card({ title, source, right, children }: { title: string; source?: stri
 
 function Vegetation({ value }: { value: VegetationTrend | { available: false; reason: string } }) {
   const { t, formatNumber } = useI18n();
+  const [years, setYears] = useState<1 | 3>(3);
   if (!value.available) return <Card title={t('fieldAnalytics.health.greenness')}><UnavailableNote data={value} /></Card>;
   const trend = value.trend;
-  return <Card title={t('fieldAnalytics.health.greenness')} source="satellite_estimate" right={<><span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">3Y</span>{trend.available && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800"><ArrowRight size={13} />{trend.status}</span>}<Info label="About plant greenness"><InfoRow k="Measure">{t('fieldAnalytics.health.technicalNdvi')}</InfoRow></Info></>}><div className="min-h-56"><LineChart yMin={0} yMax={1} series={[{ name: 'NDVI', colour: '#168653', points: value.series.map((point) => ({ x: point.date, y: point.mean_ndvi })) }]} /></div><div className="mt-3 flex flex-wrap gap-2">{value.season_peaks.map((peak) => <span key={peak.season} className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">{peak.season}: {formatNumber(peak.peak_ndvi, { maximumFractionDigits: 2 })}</span>)}</div></Card>;
+  const latest = value.series.reduce((max, point) => Math.max(max, new Date(point.date).getTime()), 0);
+  const cutoff = latest - years * 365 * 24 * 60 * 60 * 1000;
+  const series = value.series.filter((point) => new Date(point.date).getTime() >= cutoff);
+  const title = t('fieldAnalytics.health.greenness').replace(/,\s*(?:last|letzte)\s+3\s+(?:years|Jahre)/i, '');
+  return <Card title={title} source="satellite_estimate" right={<><RangeSelector options={[1, 3]} selected={years} format={(n) => `${n}Y`} onChange={setYears} label={title} />{trend.available && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800"><ArrowRight size={13} />{t(`fieldAnalytics.healthCopy.${trend.status}`)}</span>}<Info label="About plant greenness"><InfoRow k="Measure">{t('fieldAnalytics.health.technicalNdvi')}</InfoRow></Info></>}><div className="min-h-56"><LineChart yMin={0} yMax={1} series={[{ name: 'NDVI', colour: '#168653', points: series.map((point) => ({ x: point.date, y: point.mean_ndvi })) }]} /></div><div className="mt-3 flex flex-wrap gap-2">{value.season_peaks.map((peak) => <span key={peak.season} className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">{peak.season}: {formatNumber(peak.peak_ndvi, { maximumFractionDigits: 2 })}</span>)}</div></Card>;
 }
 
 function Moisture({ value }: { value: MoistureTrend | { available: false; reason: string } }) {
   const { t, formatNumber } = useI18n();
+  const [days, setDays] = useState<7 | 30>(30);
   if (!value.available) return <Card title={t('fieldAnalytics.health.moisture')}><UnavailableNote data={value} /></Card>;
-  const used = value.measured.filter((point) => point.used);
-  const last = value.modelled[value.modelled.length - 1];
+  const allModelled = value.modelled;
+  const last = allModelled[allModelled.length - 1];
+  const cutoff = last ? new Date(last.date).getTime() - days * 24 * 60 * 60 * 1000 : 0;
+  const modelled = allModelled.filter((point) => new Date(point.date).getTime() >= cutoff);
+  const used = value.measured.filter((point) => point.used && new Date(point.date).getTime() >= cutoff);
   const range = value.usual_range;
   const below = Boolean(range && last && last.rootzone_m3m3 < range.p10);
   const above = Boolean(range && last && last.rootzone_m3m3 > range.p90);
-  const top = Math.max(0.15, ...value.modelled.map((point) => point.rootzone_m3m3), ...(range ? [range.p90] : [])) * 1.15;
+  const top = Math.max(0.15, ...modelled.map((point) => point.rootzone_m3m3), ...(range ? [range.p90] : [])) * 1.15;
   const status = range ? below ? t('fieldAnalytics.health.belowUsual', { from: formatNumber(range.p10, { maximumFractionDigits: 2 }), to: formatNumber(range.p90, { maximumFractionDigits: 2 }) }) : above ? t('fieldAnalytics.health.aboveUsual') : t('fieldAnalytics.health.withinUsual') : '';
-  return <Card title={t('fieldAnalytics.health.moisture')} source="modelled" right={<><span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">30D</span><Info label="About soil moisture"><InfoRow k="Units">m³/m³, root zone 0–100 cm</InfoRow></Info></>}><div className="relative min-h-56"><LineChart yMin={0} yMax={top} decimals={2} unitLabel="m³/m³" marker={last ? { x: last.date, label: t('fieldAnalytics.health.today') } : undefined} band={range ? { from: range.p10, to: range.p90, colour: 'rgba(34,165,90,0.16)' } : undefined} series={[{ name: 'Root zone', colour: '#2563eb', points: value.modelled.map((point) => ({ x: point.date, y: point.rootzone_m3m3 })) }, ...(used.length ? [{ name: 'Surface', colour: '#0f766e', style: 'dots' as const, points: used.map((point) => ({ x: point.date, y: point.value_m3m3 })) }] : [])]} /></div>{status && <div className={`mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-bold ${below ? 'bg-red-50 text-red-800' : above ? 'bg-blue-50 text-blue-800' : 'bg-emerald-50 text-emerald-800'}`}>{below ? <AlertTriangle size={14} /> : <CheckCircle2 size={14} />}{status}</div>}</Card>;
+  const title = t('fieldAnalytics.health.moisture').replace(/,\s*(?:last|letzte)\s+30\s+(?:days|Tage)/i, '');
+  return <Card title={title} source="modelled" right={<><RangeSelector options={[7, 30]} selected={days} format={(n) => `${n}D`} onChange={setDays} label={title} /><Info label="About soil moisture"><InfoRow k="Units">m³/m³, root zone 0–100 cm</InfoRow></Info></>}><div className="relative min-h-56"><LineChart yMin={0} yMax={top} decimals={2} unitLabel="m³/m³" marker={last ? { x: last.date, label: t('fieldAnalytics.health.today') } : undefined} band={range ? { from: range.p10, to: range.p90, colour: 'rgba(34,165,90,0.16)' } : undefined} series={[{ name: 'Root zone', colour: '#2563eb', points: modelled.map((point) => ({ x: point.date, y: point.rootzone_m3m3 })) }, ...(used.length ? [{ name: 'Surface', colour: '#0f766e', style: 'dots' as const, points: used.map((point) => ({ x: point.date, y: point.value_m3m3 })) }] : [])]} /></div>{status && <div className={`mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-bold ${below ? 'bg-red-50 text-red-800' : above ? 'bg-blue-50 text-blue-800' : 'bg-emerald-50 text-emerald-800'}`}>{below ? <AlertTriangle size={14} /> : <CheckCircle2 size={14} />}{status}</div>}</Card>;
+}
+
+function RangeSelector<T extends number>({ options, selected, format, onChange, label }: { options: T[]; selected: T; format: (value: T) => string; onChange: (value: T) => void; label: string }) {
+  return <div role="group" aria-label={label} className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+    {options.map((option) => <button key={option} type="button" aria-pressed={selected === option} onClick={() => onChange(option)} className={`rounded-md px-2 py-1 text-xs font-bold transition-colors ${selected === option ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>{format(option)}</button>)}
+  </div>;
 }
 
 function FitBounds({ geometry }: { geometry: any }) { const map = useMap(); useEffect(() => { if (geometry) map.fitBounds(L.geoJSON(geometry).getBounds(), { padding: [20, 20] }); }, [geometry, map]); return null; }

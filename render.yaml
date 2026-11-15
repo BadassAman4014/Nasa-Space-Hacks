@@ -1,10 +1,10 @@
 services:
-  # FastAPI Backend Service (Docker)
+  # FastAPI Backend Service (Docker) - FREE TIER
   - type: web
     name: nasa-space-hacks-backend
     runtime: docker
     rootDir: backend
-    plan: starter
+    plan: free  # CHANGED: starter → free
     dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: PORT
@@ -29,35 +29,37 @@ services:
         value: /data
     healthCheckPath: /health
     autoDeploy: true
-    disk:
-      name: data
-      mountPath: /data
-      sizeGB: 5  # Increased for satellite data caching
+    # REMOVED: disk mount (not available on free tier)
+    # disk:
+    #   name: data
+    #   mountPath: /data
+    #   sizeGB: 5
 
-  # Optional: Background Worker for NASA AppEEARS
-  - type: worker
-    name: nasa-worker
-    runtime: python
-    rootDir: backend
-    plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: python -m app.services.nasa.real.appeears worker
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.0
-      # Share the same credentials as web service
-      - key: EARTHDATA_USERNAME
-        fromService:
-          type: web
-          name: nasa-space-hacks-backend
-          envVarKey: EARTHDATA_USERNAME
-      - key: EARTHDATA_PASSWORD
-        fromService:
-          type: web
-          name: nasa-space-hacks-backend
-          envVarKey: EARTHDATA_PASSWORD
-      - key: EARTHDATA_TOKEN
-        fromService:
-          type: web
-          name: nasa-space-hacks-backend
-          envVarKey: EARTHDATA_TOKEN
+# REMOVED: Worker service (not needed initially, free tier limited)
+#  # Optional: Background Worker for NASA AppEEARS
+#  - type: worker
+#    name: nasa-worker
+#    runtime: python
+#    rootDir: backend
+#    plan: free
+#    buildCommand: pip install -r requirements.txt
+#    startCommand: python -m app.services.nasa.real.appeears worker
+#    envVars:
+#      - key: PYTHON_VERSION
+#        value: 3.11.0
+#      # Share the same credentials as web service
+#      - key: EARTHDATA_USERNAME
+#        fromService:
+#          type: web
+#          name: nasa-space-hacks-backend
+#          envVarKey: EARTHDATA_USERNAME
+#      - key: EARTHDATA_PASSWORD
+#        fromService:
+#          type: web
+#          name: nasa-space-hacks-backend
+#          envVarKey: EARTHDATA_PASSWORD
+#      - key: EARTHDATA_TOKEN
+#        fromService:
+#          type: web
+#          name: nasa-space-hacks-backend
+#          envVarKey: EARTHDATA_TOKEN
