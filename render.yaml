@@ -20,7 +20,10 @@ services:
         sync: false
       - key: GEMINI_MODEL
         value: gemini-3.5-flash
-      # CORS settings - update with your Vercel domain after deployment
+      # Disable the PyTorch field-segmentation API on the 512 MB free plan.
+      - key: ENABLE_FIELD_SEGMENTATION
+        value: "false"
+      # CORS settings
       - key: CORS_ORIGINS
         value: https://app-smoky-tau-52.vercel.app,http://localhost:5173
     healthCheckPath: /health

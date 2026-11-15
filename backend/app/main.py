@@ -22,7 +22,6 @@ from app.api import (
     recommendations,
     scenarios,
     reports,
-    ai_field_detection,
     field_analytics,
     nasa_challenge,
     weather,
@@ -32,6 +31,13 @@ from app.api import (
 )
 
 app = FastAPI(title='Farmily API', version='0.2.0')
+
+# The field-segmentation router imports PyTorch. Keep it disabled by default so
+# low-memory deployments can start the rest of the API. Enable it only on an
+# instance with enough memory for model inference.
+field_segmentation_enabled = os.getenv("ENABLE_FIELD_SEGMENTATION", "false").lower() == "true"
+if field_segmentation_enabled:
+    from app.api import ai_field_detection
 
 # CORS configuration
 cors_origins = os.getenv('CORS_ORIGINS', '*')
@@ -58,7 +64,6 @@ for router in [
     recommendations.router,
     scenarios.router,
     reports.router,
-    ai_field_detection.router,
     field_analytics.router,
     nasa_challenge.router,
     weather.router,
@@ -67,6 +72,9 @@ for router in [
     crop_planner.router,
 ]:
     app.include_router(router, prefix='/api')
+
+if field_segmentation_enabled:
+    app.include_router(ai_field_detection.router, prefix='/api')
 
 @app.on_event('startup')
 def _start_appeears_worker() -> None:
