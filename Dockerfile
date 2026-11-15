@@ -22,12 +22,12 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy application code and build the indexed DFBK boundary dataset.
 COPY backend/app ./app
 COPY backend/scripts ./scripts
-
-# Create data directory for persistent storage
-RUN mkdir -p /data
+RUN python scripts/download_dfbk.py \
+    && python scripts/preprocess_dfbk.py \
+    && rm -rf data/raw data/dfbk.zip
 
 # Expose port
 EXPOSE 8000
