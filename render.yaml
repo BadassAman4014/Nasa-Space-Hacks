@@ -25,7 +25,7 @@ services:
         value: "false"
       # CORS settings
       - key: CORS_ORIGINS
-        value: https://app-smoky-tau-52.vercel.app,http://localhost:5173
+        value: https://guiding-spendable-spinal.ngrok-free.dev,http://localhost:5173
     healthCheckPath: /health
     autoDeploy: true
 

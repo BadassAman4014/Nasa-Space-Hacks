@@ -27,7 +27,7 @@ This project uses a split architecture:
    - `EARTHDATA_TOKEN` - NASA Earthdata token (optional)
    - `GEMINI_API_KEY` - Google Gemini API key
    - `GEMINI_MODEL` - gemini-3.8-flash (default)
-   - `CORS_ORIGINS` - Update with your Vercel frontend URL after deployment
+   - `CORS_ORIGINS` - Set to the frontend origin (configured for the current ngrok URL in `render.yaml`)
 
 4. **Deploy**:
    - Render will build and deploy automatically
@@ -35,7 +35,7 @@ This project uses a split architecture:
 
 ### 2. Frontend Deployment (Vercel) - ✅ COMPLETED
 
-**Your Vercel URL**: `https://app-smoky-tau-52.vercel.app`
+**Dashboard URL**: [https://guiding-spendable-spinal.ngrok-free.dev/dashboard](https://guiding-spendable-spinal.ngrok-free.dev/dashboard)
 
 #### Next Steps:
 1. **Set Environment Variables in Vercel**:
