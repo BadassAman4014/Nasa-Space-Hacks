@@ -40,3 +40,4 @@ backend/app/data/crop_planner.db*
 
 # Deployment
 
+*.example
