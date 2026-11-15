@@ -3,9 +3,8 @@ services:
   - type: web
     name: nasa-space-hacks-backend
     runtime: docker
-    rootDir: backend
-    plan: free  # CHANGED: starter → free
-    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: PORT
         value: 8000
@@ -23,17 +22,9 @@ services:
         value: gemini-3.5-flash
       # CORS settings - update with your Vercel domain after deployment
       - key: CORS_ORIGINS
-        value: https://nasa-space-hacks.vercel.app,http://localhost:5173
-      # Data directory
-      - key: DATA_DIR
-        value: /data
+        value: http://localhost:5173  # Will update after Vercel deploy
     healthCheckPath: /health
     autoDeploy: true
-    # REMOVED: disk mount (not available on free tier)
-    # disk:
-    #   name: data
-    #   mountPath: /data
-    #   sizeGB: 5
 
 # REMOVED: Worker service (not needed initially, free tier limited)
 #  # Optional: Background Worker for NASA AppEEARS
