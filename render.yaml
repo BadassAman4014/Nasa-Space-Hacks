@@ -19,7 +19,7 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
-        value: gemini-3.5-flash
+        value: gemini-3.8-flash
       # Disable the PyTorch field-segmentation API on the 512 MB free plan.
       - key: ENABLE_FIELD_SEGMENTATION
         value: "false"

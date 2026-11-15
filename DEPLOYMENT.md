@@ -26,7 +26,7 @@ This project uses a split architecture:
    - `EARTHDATA_PASSWORD` - NASA Earthdata password (optional)
    - `EARTHDATA_TOKEN` - NASA Earthdata token (optional)
    - `GEMINI_API_KEY` - Google Gemini API key
-   - `GEMINI_MODEL` - gemini-3.5-flash (default)
+   - `GEMINI_MODEL` - gemini-3.8-flash (default)
    - `CORS_ORIGINS` - Update with your Vercel frontend URL after deployment
 
 4. **Deploy**:
@@ -62,7 +62,7 @@ This project uses a split architecture:
 | `EARTHDATA_PASSWORD` | No | NASA Earthdata password |
 | `EARTHDATA_TOKEN` | No | NASA Earthdata bearer token |
 | `GEMINI_API_KEY` | Yes | Google Gemini API key |
-| `GEMINI_MODEL` | No | Gemini model (default: gemini-3.5-flash) |
+| `GEMINI_MODEL` | No | Gemini model (default: gemini-3.8-flash) |
 | `CORS_ORIGINS` | Yes | Comma-separated allowed origins |
 | `DATA_DIR` | No | Data directory path (default: /data) |
 

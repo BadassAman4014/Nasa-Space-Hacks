@@ -47,9 +47,8 @@ CORE RESPONSE REQUIREMENTS:
 class GeminiService:
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY", "").strip()
-        self.primary_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-        # gemini-2.5-flash (named in plan.md) is retired for new API keys (HTTP 404); 3.5-flash is the live equivalent.
-        self.advisor_model = os.getenv("GEMINI_ADVISOR_MODEL", "gemini-3.5-flash")
+        self.primary_model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
+        self.advisor_model = os.getenv("GEMINI_ADVISOR_MODEL", "gemini-3.8-flash").strip()
 
     def _get_api_key(self) -> str:
         key = os.getenv("GEMINI_API_KEY", "").strip()
@@ -119,7 +118,9 @@ class GeminiService:
         """
         api_key = self._get_api_key()
 
-        if api_key:
+        if not api_key:
+            print("[GeminiService] GEMINI_API_KEY is missing; cannot call Gemini.")
+        else:
             try:
                 reply, model = await self._call_gemini_api(
                     api_key=api_key,
@@ -132,8 +133,9 @@ class GeminiService:
                 if reply and reply.strip():
                     cleaned = self._sanitize_response(reply)
                     return cleaned, model
+                print("[GeminiService] Gemini returned an empty response.")
             except Exception as e:
-                print(f"[GeminiService] Gemini API call exception: {e}. Falling back to internal Agronomic Engine.")
+                print(f"[GeminiService] Gemini API call failed: {type(e).__name__}: {e}")
 
         # The former local fallback returned fixed diagnoses, soil values, and
         # fertilizer rates. It is intentionally disabled because no model has
@@ -200,16 +202,12 @@ class GeminiService:
         }
 
         # Candidate models supported by Gemini API
-        if is_advisor:
-            models_to_try = [self.advisor_model, "gemini-3.8-flash", "gemini-flash-latest"]
-        else:
-            models_to_try = [
-                self.primary_model,
-                "gemini-3.5-flash",
-                "gemini-3.1-flash-lite",
-                "gemini-flash-latest",
-                "gemini-3.8-flash",
-            ]
+        models_to_try = [
+            self.advisor_model if is_advisor else self.primary_model,
+            "gemini-3.8-flash",
+            "gemini-flash-latest",
+            "gemini-3.5-flash",
+        ]
         seen = set()
 
         async with httpx.AsyncClient(timeout=30.0 if is_advisor else 18.0) as client:
@@ -234,8 +232,22 @@ class GeminiService:
                             text_parts = [p.get("text", "") for p in parts if "text" in p]
                             if text_parts:
                                 return "".join(text_parts), model_candidate
+                        print(
+                            f"[GeminiService] Model '{model_candidate}' returned HTTP 200 without text; "
+                            f"promptFeedback={data.get('promptFeedback', {})}; "
+                            f"finishReason={candidates[0].get('finishReason') if candidates else 'no candidates'}."
+                        )
                     else:
-                        print(f"[GeminiService] Model '{model_candidate}' returned status {resp.status_code}: {resp.text[:200]}")
+                        try:
+                            provider_error = resp.json().get("error", {})
+                            error_detail = provider_error.get("message", resp.text[:500])
+                            error_status = provider_error.get("status", "")
+                        except Exception:
+                            error_status, error_detail = "", resp.text[:500]
+                        print(
+                            f"[GeminiService] Model '{model_candidate}' returned HTTP {resp.status_code} "
+                            f"({error_status}): {error_detail}"
+                        )
                 except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadTimeout) as timeout_err:
                     print(f"[GeminiService] Network connection or read timeout ({timeout_err}).")
                     break

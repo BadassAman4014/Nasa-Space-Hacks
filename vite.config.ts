@@ -11,6 +11,8 @@ export default defineConfig({
     },
   },
   server: {
+    // Keep Vite's host check enabled and allow this account's fixed ngrok dev domain.
+    allowedHosts: ['guiding-spendable-spinal.ngrok-free.dev'],
     proxy: {
       '/api': {
         target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000',
