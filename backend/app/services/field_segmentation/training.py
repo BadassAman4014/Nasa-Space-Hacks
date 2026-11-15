@@ -261,7 +261,7 @@ def train_field_segmentation(
         json.dump(class_mapping, f, indent=2)
 
     # 5. model_card.md
-    model_card = f"""# FieldShift AI — Agricultural Field Boundary Segmentation Model Card
+    model_card = f"""# Farmily — Agricultural Field Boundary Segmentation Model Card
 
 ## Model Overview
 - **Architecture**: U-Net with MobileNetV3-Small Encoder

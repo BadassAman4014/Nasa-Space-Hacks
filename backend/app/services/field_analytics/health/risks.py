@@ -230,7 +230,7 @@ def erosion_risk(field_id: str, soil: Dict[str, Any], rain: Dict[str, Any], ndvi
     return {
         "available": True, "level": level, "score": score, "water_points": water, "wind_points": wind, "dominant": dominant,
         "factors": factors, "recommendation": rec, "provenance": DERIVED,
-        "method": "Points per factor; the higher of water and wind totals sets the light: 0-1 green, 2 yellow, >= 3 red. A FieldShift screening rule, not a DIN 19708 assessment.",
+        "method": "Points per factor; the higher of water and wind totals sets the light: 0-1 green, 2 yellow, >= 3 red. A Farmily screening rule, not a DIN 19708 assessment.",
     }
 
 

@@ -31,11 +31,18 @@ from app.api import (
     crop_planner,
 )
 
-app = FastAPI(title='FieldShift AI API', version='0.2.0')
+app = FastAPI(title='Farmily API', version='0.2.0')
+
+# CORS configuration
+cors_origins = os.getenv('CORS_ORIGINS', '*')
+if cors_origins == '*':
+    allow_origins = ['*']
+else:
+    allow_origins = [origin.strip() for origin in cors_origins.split(',')]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -70,5 +77,6 @@ def _start_appeears_worker() -> None:
 
 
 @app.get('/health')
+@app.get('/api/health')
 def health() -> dict[str, str]:
     return {'status': 'ok', 'service': 'fieldshift-api', 'version': '0.2.0'}

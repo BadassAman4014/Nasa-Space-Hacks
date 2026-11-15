@@ -147,6 +147,13 @@ export interface ThreeJsSimulationParams {
   lighting_preset: string;
 }
 
+export interface FieldVirtualStationStatus {
+  is_active: boolean;
+  name: string;
+  installed_at: string | null;
+  sensors: Record<string, string | null>;
+}
+
 export interface FieldWeatherData {
   field_id: string;
   field_name: string;
@@ -155,7 +162,7 @@ export interface FieldWeatherData {
   crop: string;
   coordinates: [number, number]; // [lat, lon]
   geometry: any;
-  virtual_station: VirtualStation;
+  virtual_station: FieldVirtualStationStatus;
   current: {
     temperature_c: number;
     feels_like_c: number | null;

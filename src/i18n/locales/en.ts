@@ -52,7 +52,7 @@ export const en = {
     hectares: 'ha',
   },
   firstLaunch: {
-    welcomeTitle: 'Welcome to FieldShift AI',
+    welcomeTitle: 'Welcome to Farmily',
     welcomeSubtitle: 'Precision Agriculture & Earth Observation Intelligence',
     selectPrompt: 'Please select your preferred language to get started:',
     englishOptionTitle: 'English',
@@ -140,7 +140,7 @@ export const en = {
     addFirstField: 'Add Your First Field',
 
     // List
-    yourFarmFields: 'Your Farm Fields',
+    yourFarmFields: 'Your fields',
     addShort: 'Add',
     noCropAssigned: 'No crop assigned',
     openAnalyticsTooltip: 'Open Field Analytics Workspace',
@@ -348,7 +348,7 @@ export const en = {
   farmerProfile: {
     eyebrow: 'FARMER PROFILE',
     title: 'Tell us about your farm',
-    description: 'Your priorities help FieldShift make recommendations that fit the way you farm.',
+    description: 'Your priorities help Farmily make recommendations that fit the way you farm.',
     saveProfile: 'Save profile',
     saved: 'Saved',
     profileSavedNotify: 'Farmer profile saved',
@@ -387,7 +387,7 @@ export const en = {
     finishProfile: 'Finish profile',
     profileReadyNotify: 'Profile complete — ready for recommendations',
     whyWeAskTitle: 'Why we ask',
-    whyWeAskDesc: 'FieldShift combines your practical experience with environmental evidence. You stay in control of the decision.',
+    whyWeAskDesc: 'Farmily combines your practical experience with environmental evidence. You stay in control of the decision.',
     privacyNote: 'Your data stays private',
     explainableNote: 'Recommendations are explainable',
     changeableNote: 'Every input can be changed',
@@ -627,7 +627,7 @@ export const en = {
     inputsUsedDemo: 'Inputs currently used in this demo',
     fiveSourcesBadge: '5 SOURCES',
     modelInfo: 'Model information',
-    engineName: 'FieldShift Rotation Engine',
+    engineName: 'Farmily Rotation Engine',
     engineVersion: 'v0.1 · Demo',
     modelType: 'Model type',
     modelTypeVal: 'Multi-objective optimiser',
@@ -665,9 +665,14 @@ export const en = {
     soilPh: 'Soil pH (H₂O)',
     organicCarbon: 'Organic Carbon',
     bulkDensity: 'Bulk Density',
+    compactionRisk: 'Compaction risk',
+    normalForSandyLoam: 'Normal for sandy loam',
     cec: 'Cation Exch. (CEC)',
     totalNitrogen: 'Total Nitrogen',
+    totalNitrogenMeaning: 'Total soil nitrogen',
+    totalNitrogenInfo: 'Total N in soil, not the N available to crops.',
     cnRatio: 'C : N Ratio',
+    cnRatioMeaning: 'Organic carbon relative to total nitrogen',
     fineEarthDensity: 'Fine earth density',
     nutrientRetention: 'Nutrient retention',
     acidic: 'Acidic',
@@ -830,6 +835,20 @@ export const en = {
     projectedNetGain: 'Projected Net Gain',
     additionalYield: 'Additional Yield',
   },
+  fieldAnalytics: {
+    tabs: { map: 'Field Map', health: 'Field Health', status: 'Status', data: 'Data' },
+    layers: { water: 'Water', nitrogen: 'Nitrogen', nutrientLoss: 'Nutrient loss', risk: 'Risk', waterTip: 'Water status across the field', nitrogenTip: 'Crop nitrogen uptake zones', nutrientLossTip: 'Areas more exposed to nutrient loss', riskTip: 'Combined field risks' },
+    kpi: { moisture: 'Soil moisture', rain: 'Last rain', health: 'Soil health', nitrogen: 'Nitrogen', addCrop: 'Add crop', days: 'days', low: 'Low', medium: 'Medium', ok: 'OK', unavailable: 'Not available', about: 'About {label}', dry: 'Drier than usual', slightlyDry: 'Slightly dry', usualMoisture: 'Within the usual range', rainRecent: '{amount} mm in 7 days', nitrogenRemaining: 'kg N/ha left this season', nitrogenEstimate: 'Estimate based on crop, yield target, Nmin and applications.', rootZone: 'Root zone', source: 'Source', value: 'Value', method: 'Method' },
+    map: { updated: 'Updated {date}', oldData: 'Older than 7 days', loading: 'Loading map data', unavailable: 'This layer is not available.', legend: 'Map legend' },
+    needs: { title: 'Needs attention', noRisks: 'No risks detected', why: 'Why?', erosion: '{level} - {type} erosion', nutrientLoss: '{level} - nutrient loss', dryArea: 'Low soil moisture', reviewWater: 'Check the driest area before irrigating.', erosionAction: 'Protect exposed soil and reduce traffic on vulnerable areas.', lossAction: 'Delay nitrogen application when heavy rain is likely.', levelLow: 'Low', levelModerate: 'Moderate', levelHigh: 'High', levelUnknown: 'Unknown', wind: 'wind', water: 'water', sandyTopsoil: 'Sandy topsoil', heavyRainDays: 'Heavy rain days', coverSoil: 'Keep the soil covered: use a cover crop after harvest and leave stubble.', protectSoil: 'Protect exposed soil and reduce traffic on vulnerable areas.' },
+    health: { overall: 'Overall health', trendUnavailable: 'Trend available after the next period', weakest: 'Weakest: {factor}', verdictGood: 'The field is generally in good condition. Review the weakest factor first.', verdictWatch: 'Some field conditions need attention.', whatToDo: 'What to do', doNow: 'Do now', keepInMind: 'Keep in mind', nothing: 'Nothing needs action right now.', blockingEnds: 'Ends {date}', changing: "How it's changing", greenness: 'Plant greenness, last 3 years', moisture: 'Soil moisture, last 30 days', stable: 'Stable', technicalNdvi: 'Technical measure: NDVI from cloud-free Sentinel-2 images.', belowUsual: 'Below usual range ({from}-{to} m³/m³)', aboveUsual: 'Above usual range', withinUsual: 'Within usual range', today: 'Today', productivity: 'Productivity zones', productivityHelp: 'Zones show where crop growth has been consistently stronger or weaker across seasons.', high: 'High', medium: 'Medium', low: 'Low', soilProfile: 'Soil profile', refresh: 'Refresh', dryActionTitle: 'Soil drier than usual', dryActionBody: 'Root zone is below the usual range for this time of year. Avoid sowing into a dry seedbed.', erosionActionTitle: '{level} {type} erosion risk', fertilizerBlockTitle: 'Fertiliser blocking period', fertilizerBlockBody: 'No nitrogen on arable land until {date} (DüV blocking period).', springGreenTitle: 'Spring green-up is weaker', springGreenBody: 'Spring green-up was weaker than in {year}. Check crop, weather and soil.', nitrateRiskTitle: 'Nitrate leaching risk', coverCropTitle: 'Good window to sow a cover crop', limeTitle: 'Check lime need', organicMatterTitle: 'Build organic matter' },
+    healthCopy: { goodLabel: 'Good', weakestCompaction: 'compaction', weakestSoilReaction: 'soil pH', weakestOrganicCarbon: 'organic carbon', weakestNutrientHolding: 'nutrient retention', improving: 'Improving', stable: 'Stable', declining: 'Declining', aboutGreenness: 'About plant greenness', aboutMoisture: 'About soil moisture', aboutZones: 'About productivity zones', measure: 'Measure', units: 'Units', method: 'Method', caveat: 'Caveat' },
+    inputs: { title: 'Crop & nitrogen inputs', subtitle: 'Add the field information needed for a nitrogen estimate.', cropGroup: 'Crop', nitrogenGroup: 'Nitrogen', crop: 'Crop', previousCrop: 'Previous crop', yieldTarget: 'Yield target (dt/ha)', yieldHelp: 'Expected marketable yield for this field.', selectCrop: 'Select crop', selectPreviousCrop: 'Select previous crop', nmin: 'Nmin 0-90 cm (kg N/ha)', nminHelp: 'Mineral nitrogen from the latest soil test.', organicN: 'Organic N last year (kg/ha)', appliedN: 'N applied so far (kg/ha)', lastDate: 'Last N date', requiredHelp: 'Crop, yield target and Nmin are required.', save: 'Save inputs', saving: 'Saving...', saved: 'Crop and nitrogen inputs saved.', loadError: 'Inputs could not be loaded.', saveError: 'Inputs could not be saved.' },
+    data: { search: 'Search data sources', weather: 'Weather', soil: 'Soil', satellite: 'Satellite', inputs: 'Inputs', cropInputs: 'Crop & nitrogen inputs', noResults: 'No data sources match your search.', expand: 'Show group', collapse: 'Hide group' },
+    dashboardPanel: { openAnalytics: 'Open field analytics', viewSoil: 'View soil profile', weatherAt: 'Weather at {field}', unavailable: 'Unavailable', loading: 'Loading...', loadingFields: 'Loading fields', retry: 'Retry', expand: 'Expand farm panel', collapse: 'Collapse farm panel' },
+    sources: { modelled: 'Model', satellite_estimate: 'Satellite est.', measured: 'Satellite est.', observed: 'Satellite est.', derived: 'Calculated', farmer_input: 'Your input' }
+  },
+
 };
 
 export type TranslationDictionary = typeof en;

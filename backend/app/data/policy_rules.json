@@ -5,7 +5,7 @@
   "gloez7": {
     "label_en": "GLÖZ 7 crop rotation (Fruchtwechsel)",
     "enforcement": "hard",
-    "enforcement_note": "Applies to farms with more than 10 ha arable land. Organic farms and some grassland/legume-dominated farms are exempt. FieldShift does not know the farm exemptions, so the rule is applied as a hard filter and the farmer is told to check exemptions.",
+    "enforcement_note": "Applies to farms with more than 10 ha arable land. Organic farms and some grassland/legume-dominated farms are exempt. Farmily does not know the farm exemptions, so the rule is applied as a hard filter and the farmer is told to check exemptions.",
     "min_distinct_main_crops": 2,
     "window_years": 3,
     "winter_and_summer_forms_are_distinct": true,
@@ -40,8 +40,8 @@
     "label_en": "Düngeverordnung Anlage 4 fertiliser requirement (Düngebedarfsermittlung)",
     "humus_deduction": {"threshold_pct_exclusive": 4.0, "deduction_kg_n_ha": 20, "ref": "Table 6: Humusgehalt größer 4,0 % (humos): 20 kg N/ha"},
     "yield_difference_basis": "Average yield of the last five years on the farm. Unknown here, so no yield correction is applied unless the farmer enters it.",
-    "red_area_note": "Nitrate-vulnerable ('rote') areas require a further 20 % reduction under DüV §13a. The area status is not known to FieldShift and is not applied.",
-    "nmin_note": "Nmin (0-90 cm, at start of vegetation) must be measured or taken from the state's Nmin service. FieldShift cannot estimate it.",
+    "red_area_note": "Nitrate-vulnerable ('rote') areas require a further 20 % reduction under DüV §13a. The area status is not known to Farmily and is not applied.",
+    "nmin_note": "Nmin (0-90 cm, at start of vegetation) must be measured or taken from the state's Nmin service. Farmily cannot estimate it.",
     "source": {
       "name": "Düngeverordnung (DüV) Anlage 4, Tabellen 2, 3, 6, 7",
       "url": "https://www.gesetze-im-internet.de/d_v_2017/anlage_4.html",

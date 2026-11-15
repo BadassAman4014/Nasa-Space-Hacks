@@ -110,7 +110,7 @@ class UserFarmsRepository:
             return {
                 "id": row["id"],
                 "name": row["name"],
-                "location": row["location"] or "Brandenburg, Germany",
+                "location": row["location"] or "",
                 "created_at": row["created_at"],
                 "updated_at": row["updated_at"],
                 "field_count": stats["cnt"],
@@ -131,7 +131,7 @@ class UserFarmsRepository:
                 farms.append({
                     "id": r["id"],
                     "name": r["name"],
-                    "location": r["location"] or "Brandenburg, Germany",
+                    "location": r["location"] or "",
                     "created_at": r["created_at"],
                     "updated_at": r["updated_at"],
                     "field_count": stats["cnt"],

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { SidebarV2 } from './components/shell/Sidebar';
 import { DashboardV2 } from './components/dashboard/Dashboard';
@@ -10,8 +10,10 @@ import { AdvisorDrawer } from './components/advisor/AdvisorDrawer';
 import { CropPlannerView } from './components/crop-planner/CropPlannerView';
 import { SettingsModal } from './components/common/SettingsModal';
 import { useI18n } from './i18n';
+import { boundariesApi, type SavedField } from './services/boundariesApi';
+import { calculateGeometryCentroid, reverseGeocodeLocation } from './services/geocodingService';
 import {
-  ArrowLeft, Bell, Check, Download, Menu, Plus, Search, Settings, X
+  ArrowLeft, Bell, Check, Menu, Plus, Search, Settings, X
 } from 'lucide-react';
 
 export type PageKey =
@@ -20,43 +22,89 @@ export type PageKey =
   | 'analytics'
   | 'ai-assistant'
   | 'weather'
-  | 'environment'
-  | 'farmer-profile'
-  | 'rotation-studio'
-  | 'scenario-simulator'
-  | 'reports';
+  | 'rotation-studio';
+
+const VALID_PAGES: PageKey[] = ['dashboard', 'fields', 'analytics', 'ai-assistant', 'weather', 'rotation-studio'];
 
 function App() {
   const { t } = useI18n();
-  const [page, setPage] = useState<PageKey>(() => (window.location.pathname.slice(1) as PageKey) || 'dashboard');
-  const [analyticsFieldId, setAnalyticsFieldId] = useState<string>('');
+  const requestedPath = window.location.pathname.slice(1);
+  // Keep bookmarks to the removed Field Risk page useful: open analytics on
+  // the map and let its legacy query select the Risk layer.
+  const initialPath = requestedPath === 'risk' ? 'analytics' : requestedPath;
+  const [page, setPage] = useState<PageKey>(
+    VALID_PAGES.includes(initialPath as PageKey) ? (initialPath as PageKey) : 'dashboard'
+  );
+  const [selectedFieldId, setSelectedFieldId] = useState<string>('');
+  const [availableFields, setAvailableFields] = useState<SavedField[]>([]);
+  const [selectedLocationLabel, setSelectedLocationLabel] = useState('');
   const [mobileNav, setMobileNav] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    async function resolveActiveField() {
-      try {
-        let resp = await fetch('/api/fields');
-        if (!resp.ok) {
-          resp = await fetch('http://127.0.0.1:8000/api/fields');
-        }
-        if (resp.ok) {
-          const list = await resp.json();
-          if (Array.isArray(list) && list.length > 0) {
-            setAnalyticsFieldId((prev) => (list.some((f) => f.id === prev) ? prev : list[0].id));
-          }
-        }
-      } catch (e) {
-        console.warn('Could not auto-resolve initial field ID:', e);
-      }
+    if (requestedPath === 'risk') {
+      window.history.replaceState({}, '', '/analytics?tab=risk');
+      return;
     }
-    resolveActiveField();
-  }, []);
+    if (!VALID_PAGES.includes(initialPath as PageKey)) {
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, [initialPath, requestedPath]);
+
+  useEffect(() => {
+    let active = true;
+    boundariesApi.listFields()
+      .then((list) => {
+        if (!active) return;
+        const fields = Array.isArray(list) ? list : [];
+        setAvailableFields(fields);
+        setSelectedFieldId((current) =>
+          fields.some((field) => field.id === current) ? current : fields[0]?.id || ''
+        );
+      })
+      .catch((error) => console.warn('Could not load saved fields:', error));
+    return () => {
+      active = false;
+    };
+  }, [page]);
+
+  const selectedField = useMemo(
+    () => availableFields.find((field) => field.id === selectedFieldId) || null,
+    [availableFields, selectedFieldId]
+  );
+
+  useEffect(() => {
+    let active = true;
+    if (!selectedField) {
+      setSelectedLocationLabel('');
+      return () => {
+        active = false;
+      };
+    }
+    const center = calculateGeometryCentroid(selectedField.geometry);
+    if (!center) {
+      setSelectedLocationLabel(selectedField.farm_location || selectedField.farm_name || selectedField.name);
+      return () => {
+        active = false;
+      };
+    }
+    setSelectedLocationLabel('');
+    reverseGeocodeLocation(center[0], center[1])
+      .then((label) => {
+        if (active) setSelectedLocationLabel(label || selectedField.farm_location || selectedField.farm_name || selectedField.name);
+      })
+      .catch(() => {
+        if (active) setSelectedLocationLabel(selectedField.farm_location || selectedField.farm_name || selectedField.name);
+      });
+    return () => {
+      active = false;
+    };
+  }, [selectedField]);
 
   const navigate = (next: PageKey, extraFieldId?: string) => {
-    if (extraFieldId) setAnalyticsFieldId(extraFieldId);
+    if (extraFieldId) setSelectedFieldId(extraFieldId);
     setPage(next);
     setMobileNav(false);
     window.history.pushState({}, '', `/${next}`);
@@ -105,18 +153,21 @@ function App() {
               navigate={navigate}
               notify={notify}
               onMenu={() => setMobileNav(true)}
-              selectedFieldId={analyticsFieldId}
-              onSelectField={(id) => setAnalyticsFieldId(id)}
+              selectedFieldId={selectedFieldId}
+              selectedLocationLabel={selectedLocationLabel}
+              onSelectField={(id) => setSelectedFieldId(id || '')}
             />
           )}
           {page === 'fields' && <FieldExplorer notify={notify} navigate={navigate} />}
           {page === 'analytics' && (
-            analyticsFieldId ? (
+            selectedFieldId ? (
               <FieldAnalyticsWorkspace
-                fieldId={analyticsFieldId}
+                fieldId={selectedFieldId}
                 onClose={() => navigate('dashboard')}
                 notify={notify}
-                onSelectField={(id) => setAnalyticsFieldId(id)}
+                fields={availableFields}
+                locationLabel={selectedLocationLabel}
+                onSelectField={setSelectedFieldId}
                 onNavigate={(p) => navigate(p as PageKey)}
               />
             ) : (
@@ -127,25 +178,29 @@ function App() {
             <AIAssistantView
               notify={notify}
               navigate={(p, extra) => navigate(p as PageKey, extra)}
-              initialFieldId={analyticsFieldId}
+              initialFieldId={selectedFieldId}
             />
           )}
           {page === 'weather' && (
             <WeatherView
-              initialFieldId={analyticsFieldId}
+              fields={availableFields}
+              selectedFieldId={selectedFieldId}
+              locationLabel={selectedLocationLabel}
+              onSelectField={setSelectedFieldId}
               onNavigateFieldAnalytics={(fieldId) => {
-                setAnalyticsFieldId(fieldId);
+                setSelectedFieldId(fieldId);
                 navigate('analytics', fieldId);
               }}
             />
           )}
-          {page === 'environment' && <Environment />}
-          {page === 'farmer-profile' && <FarmerProfile notify={notify} />}
           {page === 'rotation-studio' && (
-            <CropPlannerView fieldId={analyticsFieldId} onSelectField={(id) => setAnalyticsFieldId(id)} notify={notify} />
+            <CropPlannerView
+              fields={availableFields}
+              fieldId={selectedFieldId}
+              onSelectField={setSelectedFieldId}
+              notify={notify}
+            />
           )}
-          {page === 'scenario-simulator' && <ScenarioSimulator notify={notify} />}
-          {page === 'reports' && <Reports notify={notify} />}
         </div>
       </main>
       {page !== 'ai-assistant' && <AdvisorDrawer onOpenFields={() => navigate('fields')} />}
@@ -206,9 +261,6 @@ function Topbar({
         <span className="shortcut">⌘ K</span>
       </div>
       <div className="top-actions flex items-center gap-2">
-        <button className="outline-button hide-small" onClick={() => navigate('reports')}>
-          <Download size={15} /> {t('topbar.export')}
-        </button>
         <button className="icon-button" onClick={onOpenSettings} title={t('settings.title')}>
           <Settings size={18} />
         </button>
@@ -259,26 +311,7 @@ function FieldExplorer({ notify, navigate }: { notify: (message: string) => void
   return <FieldExplorerView onNotify={notify} onNavigateDashboard={() => navigate('dashboard')} />;
 }
 
-function Environment() {
-  const { t } = useI18n();
-  return (
-    <>
-      <PageTitle
-        eyebrow={t('environmental.eyebrow')}
-        title={t('environmental.title')}
-        description={t('environmental.description')}
-      />
-      <Card>
-        <CardHeader title="Environmental profile unavailable" />
-        <p className="muted">
-          No field-specific environmental response is connected to this page. The former demonstration
-          indicators and charts are disabled so they cannot be mistaken for observations.
-        </p>
-      </Card>
-    </>
-  );
-}
-function FarmerProfile({ notify }: { notify: (message: string) => void }) {
+export function FarmerProfile({ notify }: { notify: (message: string) => void }) {
   const { t } = useI18n();
   return (
     <>
@@ -294,48 +327,6 @@ function FarmerProfile({ notify }: { notify: (message: string) => void }) {
         <p className="muted">
           Saved farm details, crop history, priorities, and constraints are not available from a durable data source.
           The former pre-filled farm, field, and crop records are disabled.
-        </p>
-      </Card>
-    </>
-  );
-}
-function ScenarioSimulator({ notify }: { notify: (message: string) => void }) {
-  const { t } = useI18n();
-  return (
-    <>
-      <PageTitle
-        eyebrow={t('scenarioSimulator.eyebrow')}
-        title={t('scenarioSimulator.title')}
-        description={t('scenarioSimulator.description')}
-        action={t('scenarioSimulator.runScenario')}
-        onAction={() => notify('No calibrated scenario model is connected. No result was generated.')}
-      />
-      <Card>
-        <CardHeader title="Scenario results unavailable" />
-        <p className="muted">
-          Strategy scores and impact percentages are hidden until a calibrated model can derive them from
-          selected assumptions and sourced baseline data.
-        </p>
-      </Card>
-    </>
-  );
-}
-function Reports({ notify }: { notify: (message: string) => void }) {
-  const { t } = useI18n();
-  return (
-    <>
-      <PageTitle
-        eyebrow={t('reports.eyebrow')}
-        title={t('reports.title')}
-        description={t('reports.description')}
-        action={t('reports.downloadReport')}
-        onAction={() => notify('No sourced report is available to download.')}
-      />
-      <Card>
-        <CardHeader title="Recommendation report unavailable" />
-        <p className="muted">
-          No generated recommendation report is connected to this page. Fixed source statuses, model metadata,
-          farm names, and recommendation scores are not shown.
         </p>
       </Card>
     </>

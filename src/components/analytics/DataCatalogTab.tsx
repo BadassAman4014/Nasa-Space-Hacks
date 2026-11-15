@@ -19,8 +19,10 @@ import {
   DollarSign,
   Trees,
   X,
-  Code
+  Code,
+  ChevronDown
 } from 'lucide-react';
+import { useI18n } from '../../i18n';
 import { FieldStatusSummary, FullFieldReportResponse, NDVITimeSeriesResponse } from '../../services/fieldAnalyticsApi';
 import {
   nasaChallengeApi,
@@ -33,7 +35,9 @@ interface DataCatalogTabProps {
   summary: FieldStatusSummary;
   fullReport: FullFieldReportResponse | null;
   ndviData?: NDVITimeSeriesResponse | null;
+  locationLabel?: string;
   notify: (msg: string) => void;
+  onOpenInputs: () => void;
 }
 
 interface OperationalLayer {
@@ -53,8 +57,11 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
   summary,
   fullReport,
   ndviData,
+  locationLabel,
   notify,
+  onOpenInputs,
 }) => {
+  const { t } = useI18n();
   // Navigation between Operational Layers and NASA Challenge Hub
   const [activeCatalogView, setActiveCatalogView] = useState<'challenge_hub' | 'operational'>('challenge_hub');
 
@@ -67,6 +74,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
   const [selectedChallengeCategory, setSelectedChallengeCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loadingCatalog, setLoadingCatalog] = useState<boolean>(true);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
 
   // Live Query State
   const [queryingDatasetId, setQueryingDatasetId] = useState<string | null>(null);
@@ -84,12 +92,14 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
     async function loadCatalog() {
       try {
         setLoadingCatalog(true);
+        setCatalogError(null);
         const data = await nasaChallengeApi.getCatalog();
         if (isMounted) {
           setChallengeDatasets(data);
         }
       } catch (err) {
         console.error('Failed to load NASA Challenge Catalog:', err);
+        if (isMounted) setCatalogError(err instanceof Error ? err.message : 'Catalogue unavailable');
       } finally {
         if (isMounted) {
           setLoadingCatalog(false);
@@ -136,7 +146,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
         source: `${soilProfile?.source || 'ISRIC SoilGrids'} ${soilProfile?.dataset_version || ''}`.trim(),
         lastUpdated: soilProfile?.extraction_date || soilProfile?.updated_at || soilProfile?.created_at || 'Timestamp unavailable',
         status: 'synced',
-        description: `Soil properties extracted for ${summary.location || summary.name}; values are SoilGrids model predictions, not field samples.`,
+        description: `Soil properties extracted for ${locationLabel || summary.name}; values are SoilGrids model predictions, not field samples.`,
         recordsCount: soilPropsCount,
         format: 'JSON',
       });
@@ -170,7 +180,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
       });
     }
     return layers;
-  }, [summary, fullReport, obsCount, latestS2Date, soilProfile, soilPropsCount, reportGeneratedAt]);
+  }, [summary, fullReport, obsCount, latestS2Date, soilProfile, soilPropsCount, reportGeneratedAt, locationLabel]);
   // Filtered operational layers
   const filteredOpLayers =
     operationalCategory === 'all'
@@ -344,18 +354,7 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
           </button>
         </div>
 
-        {activeCatalogView === 'challenge_hub' && (
-          <div className="relative w-64 hidden sm:block">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search datasets, sensors, APIs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            />
-          </div>
-        )}
+
       </div>
 
       {/* Multi-Probe Snapshot Banner (if executed) */}
@@ -403,116 +402,39 @@ export const DataCatalogTab: React.FC<DataCatalogTabProps> = ({
         </div>
       )}
 
-      {/* VIEW 1: NASA Challenge Datasets Hub (23 Datasets) */}
+      {/* Grouped source catalogue */}
       {activeCatalogView === 'challenge_hub' && (
-        <div className="space-y-6">
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-            {[
-              { id: 'all', label: 'All Resources (23)' },
-              { id: 'soil', label: 'Soil & Properties' },
-              { id: 'climate', label: 'Climate & Weather' },
-              { id: 'satellite', label: 'Satellite & Indices' },
-              { id: 'topography', label: 'Topography & DEM' },
-              { id: 'ecology', label: 'Land Cover & Ecology' },
-              { id: 'water', label: 'Water & Hydrology' },
-              { id: 'economics', label: 'Agronomic Economics' },
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedChallengeCategory(cat.id)}
-                className={`px-3.5 py-1.5 font-bold rounded-xl whitespace-nowrap transition ${
-                  selectedChallengeCategory === cat.id
-                    ? 'bg-gray-900 text-white shadow-xs'
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+        <div className="space-y-4">
+          <div className="relative w-full">
+            <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input type="search" placeholder={t('fieldAnalytics.data.search')} value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-11 pr-4 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/15" />
           </div>
-
-          {/* Dataset Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredChallengeDatasets.map((dataset) => {
-              const isQueryingThis = queryingDatasetId === dataset.id;
-              return (
-                <div
-                  key={dataset.id}
-                  className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs hover:border-blue-400 hover:shadow-md transition flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Agency & Category Header */}
-                    <div className="flex items-center justify-between gap-2 mb-2.5">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getAgencyColor(dataset.agency)}`}>
-                        {dataset.agency}
-                      </span>
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-gray-500 capitalize bg-gray-50 px-2 py-0.5 rounded">
-                        {getCategoryIcon(dataset.category)}
-                        <span>{dataset.category}</span>
-                      </span>
-                    </div>
-
-                    {/* Dataset Name */}
-                    <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-600">
-                      {dataset.name}
-                    </h3>
-
-                    {/* Physics & Sensor Description */}
-                    <p className="text-xs text-gray-500 mt-2 line-clamp-3 leading-relaxed">
-                      {dataset.description}
-                    </p>
-
-                    {/* Agricultural Application */}
-                    <div className="mt-3.5 p-2.5 bg-blue-50/50 rounded-xl border border-blue-100 text-[11px] text-blue-900 leading-snug">
-                      <span className="font-bold text-blue-950 block mb-0.5">Crop Rotation & Resilience:</span>
-                      {dataset.agricultural_application}
-                    </div>
-
-                    {/* Resolution Metadata */}
-                    <div className="mt-3 space-y-1 text-[11px] text-gray-400 border-t border-gray-100 pt-2.5">
-                      <div className="flex justify-between">
-                        <span>Resolution:</span>
-                        <span className="font-semibold text-gray-700">{dataset.spatial_resolution}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Cadence:</span>
-                        <span className="font-semibold text-gray-700">{dataset.temporal_cadence}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Actions */}
-                  <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleQuerySingleDataset(dataset)}
-                      disabled={isQueryingThis || !dataset.is_live_queryable}
-                      className="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition disabled:opacity-50"
-                    >
-                      {isQueryingThis ? (
-                        <RefreshCw size={13} className="animate-spin" />
-                      ) : (
-                        <Activity size={13} />
-                      )}
-                      <span>{isQueryingThis ? 'Querying API...' : dataset.is_live_queryable ? 'Query for Field' : 'Connector unavailable'}</span>
-                    </button>
-
-                    <a
-                      href={dataset.official_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 transition"
-                      title="Open official documentation and data portal"
-                    >
-                      <ExternalLink size={14} />
-                    </a>
-                  </div>
+          {loadingCatalog && <div className="grid grid-cols-1 gap-4 md:grid-cols-2">{[0,1,2,3].map((item) => <div key={item} className="h-40 animate-pulse rounded-2xl bg-white" />)}</div>}
+          {catalogError && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{catalogError}</div>}
+          {!loadingCatalog && [
+            { id: 'weather', label: t('fieldAnalytics.data.weather'), categories: ['climate', 'water'] },
+            { id: 'soil', label: t('fieldAnalytics.data.soil'), categories: ['soil'] },
+            { id: 'satellite', label: t('fieldAnalytics.data.satellite'), categories: ['satellite', 'ecology', 'topography'] },
+            { id: 'inputs', label: t('fieldAnalytics.data.inputs'), categories: ['economics'] },
+          ].map((group) => {
+            const datasets = filteredChallengeDatasets.filter((dataset) => group.categories.includes(dataset.category));
+            const showInputs = group.id === 'inputs';
+            if (!datasets.length && !showInputs) return null;
+            return (
+              <details key={group.id} open className="group rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-6 py-4"><span className="text-base font-extrabold text-slate-950">{group.label} <span className="ml-1 text-sm font-semibold text-slate-500">({datasets.length + (showInputs ? 1 : 0)})</span></span><ChevronDown size={18} className="text-slate-500 transition group-open:rotate-180" /></summary>
+                <div className="grid grid-cols-1 gap-4 border-t border-slate-100 p-6 md:grid-cols-2 xl:grid-cols-3">
+                  {showInputs && <button type="button" onClick={onOpenInputs} className="flex min-h-40 flex-col items-start justify-between rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-left transition hover:border-emerald-500"><span className="grid h-10 w-10 place-items-center rounded-xl bg-white text-emerald-700"><DollarSign size={19} /></span><span><strong className="block text-sm text-slate-950">{t('fieldAnalytics.data.cropInputs')}</strong><span className="mt-1 block text-xs text-slate-600">{t('fieldAnalytics.inputs.subtitle')}</span></span></button>}
+                  {datasets.map((dataset) => {
+                    const querying = queryingDatasetId === dataset.id;
+                    return <article key={dataset.id} className="flex min-h-40 flex-col rounded-2xl border border-slate-200 p-5"><div className="flex items-start justify-between gap-3"><span className="flex items-center gap-2 text-xs font-bold text-slate-600">{getCategoryIcon(dataset.category)}{dataset.agency}</span><span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600">{dataset.spatial_resolution}</span></div><h3 className="mt-3 text-sm font-extrabold text-slate-950">{dataset.name}</h3><p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600">{dataset.agricultural_application}</p><div className="mt-auto flex gap-2 pt-4"><button onClick={() => handleQuerySingleDataset(dataset)} disabled={querying || !dataset.is_live_queryable} className="flex-1 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:bg-slate-300">{querying ? 'Loading…' : dataset.is_live_queryable ? 'Open for field' : 'Unavailable'}</button><a href={dataset.official_url} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-200 p-2 text-slate-600" aria-label="Official documentation"><ExternalLink size={15} /></a></div></article>;
+                  })}
                 </div>
-              );
-            })}
-          </div>
+              </details>
+            );
+          })}
+          {!loadingCatalog && !catalogError && filteredChallengeDatasets.length === 0 && !searchQuery.trim() && <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">{t('fieldAnalytics.data.noResults')}</div>}
+          {!loadingCatalog && searchQuery.trim() && filteredChallengeDatasets.length === 0 && <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">{t('fieldAnalytics.data.noResults')}</div>}
         </div>
       )}
 

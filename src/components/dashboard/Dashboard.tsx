@@ -1,101 +1,64 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import L from 'leaflet';
 import { CircleMarker, GeoJSON, MapContainer, Marker, ScaleControl, TileLayer, useMap } from 'react-leaflet';
 import {
   Bell,
   ChevronDown,
-  ChevronLeft,
   ChevronRight,
-  Cloud,
-  CloudRain,
-  CloudSun,
-  Compass,
-  Droplets,
-  Download,
-  Layers3,
   Map,
   Maximize2,
   MoreVertical,
   Navigation,
   Plus,
-  Search,
-  Star,
-  Sun,
-  Thermometer,
-  TrendingUp,
   X,
   Sprout,
-  Pencil,
   Trash2,
-  Sparkles,
-  CheckCircle2,
-  Calendar,
   Layers,
-  ArrowRight,
-  FlaskConical,
   Satellite,
-  CloudSnow,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ArrowLeft,
 } from 'lucide-react';
-import type { Feature, FeatureCollection, Polygon, MultiPolygon } from 'geojson';
 import { boundariesApi, type SavedField, type UserFarm } from '../../services/boundariesApi';
 import { FieldSoilCard } from './FieldSoilCard';
-import { FieldEnvironmentalCard } from './FieldEnvironmentalCard';
 import { MapSearchBar } from '../common/MapSearchBar';
 import { MapLegend } from '../common/MapLegend';
 import { useI18n } from '../../i18n';
-import { reverseGeocodeLocation, type SearchResult } from '../../services/geocodingService';
+import { calculateGeometryCentroid, type SearchResult } from '../../services/geocodingService';
 import { fetchAllFieldsWeather, fetchPointWeather, type FieldWeatherSummary, type PointWeather } from '../../services/weatherApi';
 import { createVirtualStationDivIcon } from '../weather/VirtualWeatherStationMarker';
-
-export type LayerState = {
-  ndvi: boolean;
-  moisture: boolean;
-  rainfall: boolean;
-  temperature: boolean;
-  [key: string]: boolean;
-};
 
 type PageKey =
   | 'dashboard'
   | 'fields'
   | 'analytics'
   | 'weather'
-  | 'environment'
-  | 'farmer-profile'
-  | 'rotation-studio'
-  | 'scenario-simulator'
-  | 'reports';
-
-const BRANDENBURG_CENTER: [number, number] = [52.415, 13.045];
+  | 'rotation-studio';
 
 export function DashboardV2(props: {
   navigate: (p: PageKey, extraFieldId?: string) => void;
   notify: (s: string) => void;
   onMenu: () => void;
   selectedFieldId?: string | null;
-  onSelectField?: (id: string) => void;
+  selectedLocationLabel?: string;
+  onSelectField?: (id: string | null) => void;
 }) {
-  const { t, formatHectares } = useI18n();
+  const { t } = useI18n();
   const [farms, setFarms] = useState<UserFarm[]>([]);
   const [fields, setFields] = useState<SavedField[]>([]);
   const [selectedFarmId, setSelectedFarmId] = useState<string>('all');
-  const [selectedFieldId, setSelectedFieldIdState] = useState<string | null>(props.selectedFieldId || null);
+  const selectedFieldId = props.selectedFieldId || null;
   const [farmMenuOpen, setFarmMenuOpen] = useState(false);
+  const [panelView, setPanelView] = useState<'list' | 'summary'>('list');
+  const [panelCollapsed, setPanelCollapsed] = useState(false);
+  const [mobileSheetSnap, setMobileSheetSnap] = useState<'peek' | 'half' | 'full'>('half');
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [weatherSummaries, setWeatherSummaries] = useState<FieldWeatherSummary[]>([]);
 
   const setSelectedFieldId = useCallback((id: string | null) => {
-    setSelectedFieldIdState(id);
-    if (id) {
-      props.onSelectField?.(id);
-    }
+    props.onSelectField?.(id);
   }, [props.onSelectField]);
-
-  useEffect(() => {
-    if (props.selectedFieldId && props.selectedFieldId !== selectedFieldId) {
-      setSelectedFieldIdState(props.selectedFieldId);
-    }
-  }, [props.selectedFieldId]);
 
   // Edit / Delete modals
   const [editModalField, setEditModalField] = useState<SavedField | null>(null);
@@ -112,6 +75,7 @@ export function DashboardV2(props: {
   // Load farms and fields from persistent backend SQLite storage
   const loadData = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const [farmsData, fieldsData, weatherData] = await Promise.all([
         boundariesApi.listFarms(),
@@ -121,18 +85,18 @@ export function DashboardV2(props: {
       setFarms(farmsData || []);
       setFields(fieldsData || []);
       setWeatherSummaries(weatherData || []);
-      if (fieldsData && fieldsData.length > 0 && !selectedFieldId) {
-        const initialId = props.selectedFieldId && fieldsData.some(f => f.id === props.selectedFieldId)
-          ? props.selectedFieldId
-          : fieldsData[0].id;
-        setSelectedFieldId(initialId);
+      if (fieldsData && fieldsData.length > 0 && !fieldsData.some((field) => field.id === selectedFieldId)) {
+        setSelectedFieldId(fieldsData[0].id);
+      } else if ((!fieldsData || fieldsData.length === 0) && selectedFieldId) {
+        setSelectedFieldId(null);
       }
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
+      setLoadError(err instanceof Error ? err.message : 'Dashboard data could not be loaded.');
     } finally {
       setLoading(false);
     }
-  }, [selectedFarmId, props.selectedFieldId, setSelectedFieldId, selectedFieldId]);
+  }, [selectedFarmId, setSelectedFieldId, selectedFieldId]);
 
   useEffect(() => {
     loadData();
@@ -148,6 +112,8 @@ export function DashboardV2(props: {
   const totalAreaHa = useMemo(() => {
     return fields.reduce((sum, f) => sum + (f.area_hectares || 0), 0);
   }, [fields]);
+
+  const selectedField = fields.find((field) => field.id === selectedFieldId) || null;
 
   // Open edit modal
   const handleOpenEdit = (field: SavedField) => {
@@ -219,61 +185,54 @@ export function DashboardV2(props: {
 
   return (
     <div className="dashboard-grid">
-      {/* Left Data & Metrics Panel - Floating iOS Style */}
       <section
-        className="dash-panel"
-        onMouseDown={(e) => e.stopPropagation()}
-        onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => e.stopPropagation()}
-        onWheel={(e) => e.stopPropagation()}
+        className={`dash-panel dash-panel--mobile-${mobileSheetSnap} ${panelCollapsed ? 'dash-panel--collapsed' : ''}`}
+        onMouseDown={(event) => event.stopPropagation()}
+        onClick={(event) => event.stopPropagation()}
+        onDoubleClick={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
       >
-        <PanelHeader
-          onAddField={() => props.navigate('fields')}
-          onExport={() => props.navigate('reports')}
-          onNotify={props.notify}
-          farms={farms}
-          activeFarm={activeFarm}
-          onOpenDeleteFarm={(farm) => setDeleteConfirmFarm(farm)}
-          onOpenManageFarms={() => setManageFarmsModalOpen(true)}
-        />
+        <button className="dash-sheet-handle" onClick={() => setMobileSheetSnap((value) => value === 'peek' ? 'half' : value === 'half' ? 'full' : 'peek')} aria-label="Change panel height"><span /></button>
+        <div className="dash-panel-pinned">
+          <button className="dash-panel-collapse" onClick={() => setPanelCollapsed((value) => !value)} title={panelCollapsed ? t('fieldAnalytics.dashboardPanel.expand') : t('fieldAnalytics.dashboardPanel.collapse')} aria-label={panelCollapsed ? t('fieldAnalytics.dashboardPanel.expand') : t('fieldAnalytics.dashboardPanel.collapse')}>
+            {panelCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
+          {!panelCollapsed && <>
+            <PropertyHeader
+              activeFarm={activeFarm}
+              farms={farms}
+              selectedFarmId={selectedFarmId}
+              onSelectFarm={(farmId) => { setSelectedFarmId(farmId); setFarmMenuOpen(false); setPanelView('list'); }}
+              farmMenuOpen={farmMenuOpen}
+              setFarmMenuOpen={setFarmMenuOpen}
+              totalAreaHa={totalAreaHa}
+              locationLabel={props.selectedLocationLabel}
+              onAddField={() => props.navigate('fields')}
+              onOpenDeleteFarm={(farm) => setDeleteConfirmFarm(farm)}
+              onOpenManageFarms={() => setManageFarmsModalOpen(true)}
+            />
+            <FieldWeatherChip field={selectedField || fields[0] || null} onOpenWeather={() => props.navigate('weather')} />
+          </>}
+        </div>
 
-        <PropertyHeader
-          activeFarm={activeFarm}
-          farms={farms}
-          selectedFarmId={selectedFarmId}
-          onSelectFarm={(fid) => {
-            setSelectedFarmId(fid);
-            setFarmMenuOpen(false);
-          }}
-          farmMenuOpen={farmMenuOpen}
-          setFarmMenuOpen={setFarmMenuOpen}
-          totalAreaHa={totalAreaHa}
-          onAddField={() => props.navigate('fields')}
-          onOpenDeleteFarm={(farm) => setDeleteConfirmFarm(farm)}
-          onOpenManageFarms={() => setManageFarmsModalOpen(true)}
-        />
-
-        {/* Empty State when user has 0 saved fields */}
-        {fields.length === 0 ? (
-          <EmptyDashboardState onAddField={() => props.navigate('fields')} />
-        ) : (
-          <>
-            <SavedFieldsOverview fields={fields} totalAreaHa={totalAreaHa} />
+        {!panelCollapsed && <div className="dash-panel-body">
+          {loading ? <DashboardPanelSkeleton /> : loadError ? <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><p>{loadError}</p><button onClick={() => loadData()} className="mt-3 font-bold underline">Retry</button></div> : fields.length === 0 ? <EmptyDashboardState onAddField={() => props.navigate('fields')} /> : panelView === 'list' ? (
             <SavedFieldsList
               fields={fields}
               selectedFieldId={selectedFieldId}
-              onSelectField={(id) => setSelectedFieldId(id)}
-              onEdit={handleOpenEdit}
-              onDelete={(field) => setDeleteConfirmField(field)}
+              onSelectField={(id) => { setSelectedFieldId(id); setPanelView('summary'); }}
               onAddField={() => props.navigate('fields')}
-              onOpenAnalytics={(fid) => props.navigate('analytics', fid)}
             />
-            <RegionalConditions
-              onNavigateWeather={() => props.navigate('weather')}
+          ) : selectedField ? (
+            <DashboardFieldSummary
+              field={selectedField}
+              onBack={() => setPanelView('list')}
+              onOpenAnalytics={() => props.navigate('analytics', selectedField.id)}
+              onViewProfile={() => { sessionStorage.setItem('farmily_analytics_tab', 'health'); props.navigate('analytics', selectedField.id); }}
               notify={props.notify}
             />
-          </>
-        )}
+          ) : null}
+        </div>}
       </section>
 
       {/* Right Leaflet Map Stage */}
@@ -286,9 +245,8 @@ export function DashboardV2(props: {
         navigate={props.navigate}
         notify={props.notify}
         onMenu={props.onMenu}
-        onEdit={handleOpenEdit}
-        onDelete={(field) => setDeleteConfirmField(field)}
-        onOpenAnalytics={(fid) => props.navigate('analytics', fid)}
+        panelCollapsed={panelCollapsed}
+        onFieldOpen={() => { setPanelView('summary'); setPanelCollapsed(false); }}
       />
 
       {/* Edit Field Modal */}
@@ -522,7 +480,6 @@ export function DashboardV2(props: {
 
 function PanelHeader({
   onAddField,
-  onExport,
   onNotify,
   farms,
   activeFarm,
@@ -530,7 +487,6 @@ function PanelHeader({
   onOpenManageFarms,
 }: {
   onAddField: () => void;
-  onExport?: () => void;
   onNotify?: (msg: string) => void;
   farms: UserFarm[];
   activeFarm: UserFarm | null;
@@ -615,13 +571,8 @@ function PanelHeader({
         )}
       </div>
 
-      {/* RIGHT: Export button & Notifications button */}
+      {/* RIGHT: Notifications button */}
       <div className="dash-head-right flex items-center gap-2">
-        {onExport && (
-          <button className="dash-export-btn" onClick={onExport} title="Export reports & evidence">
-            <Download size={14} /> <span>{t('dashboard.exportBtn')}</span>
-          </button>
-        )}
         {onNotify && (
           <button
             className="dash-bell-btn"
@@ -648,6 +599,7 @@ function PropertyHeader({
   farmMenuOpen,
   setFarmMenuOpen,
   totalAreaHa,
+  locationLabel,
   onAddField,
   onOpenDeleteFarm,
   onOpenManageFarms,
@@ -659,13 +611,14 @@ function PropertyHeader({
   farmMenuOpen: boolean;
   setFarmMenuOpen: (v: boolean) => void;
   totalAreaHa: number;
+  locationLabel?: string;
   onAddField: () => void;
   onOpenDeleteFarm: (farm: UserFarm) => void;
   onOpenManageFarms: () => void;
 }) {
   const { t, formatHectares } = useI18n();
   const farmDisplayName = activeFarm ? activeFarm.name : farms.length > 0 ? t('dashboard.allFarms') : t('dashboard.myFarms');
-  const locationText = activeFarm ? activeFarm.location : 'Brandenburg, Germany';
+  const locationText = locationLabel || activeFarm?.location || '';
 
   return (
     <section className="card-v2 property">
@@ -732,9 +685,7 @@ function PropertyHeader({
 
       <strong>{totalAreaHa > 0 ? formatHectares(totalAreaHa) : '0 ha'}</strong>
       <p>{locationText}</p>
-      <span>
-        <TrendingUp size={14} /> {t('dashboard.verifiedRecords')}
-      </span>
+      <span>{t('dashboard.totalArea')}</span>
     </section>
   );
 }
@@ -762,114 +713,20 @@ function EmptyDashboardState({ onAddField }: { onAddField: () => void }) {
   );
 }
 
-function SavedFieldsOverview({
-  fields,
-  totalAreaHa,
-}: {
-  fields: SavedField[];
-  totalAreaHa: number;
-}) {
-  const { t, formatHectares } = useI18n();
-  const crops = useMemo(() => {
-    const set = new Set(fields.map((f) => f.current_crop).filter(Boolean));
-    return set.size;
-  }, [fields]);
-
-  const avgSize = fields.length > 0 ? (totalAreaHa / fields.length).toFixed(1) : '0';
-
-  return (
-    <section className="card-v2 metrics-card">
-      <div className="metrics-v2">
-        <div className="metric-v2">
-          <div>
-            <span>{t('dashboard.savedFields')}</span>
-            <Layers size={18} />
-          </div>
-          <main>
-            <strong>{fields.length}</strong>
-            <dl>
-              <div>
-                <dt>{t('common.status')}</dt>
-                <dd>{fields.length > 0 ? t('dashboard.statusVerified') : t('dashboard.statusEmpty')}</dd>
-              </div>
-            </dl>
-          </main>
-        </div>
-
-        <div className="metric-v2">
-          <div>
-            <span>{t('dashboard.totalArea')}</span>
-            <Map size={18} />
-          </div>
-          <main>
-            <strong>
-              {totalAreaHa > 0 ? formatHectares(totalAreaHa) : '0 ha'}
-            </strong>
-            <dl>
-              <div>
-                <dt>{t('dashboard.averageSize')}</dt>
-                <dd>{avgSize} ha</dd>
-              </div>
-            </dl>
-          </main>
-        </div>
-
-        <div className="metric-v2">
-          <div>
-            <span>{t('dashboard.crops')}</span>
-            <Sprout size={18} />
-          </div>
-          <main>
-            <strong>{crops}</strong>
-            <dl>
-              <div>
-                <dt>{t('dashboard.cropTypes')}</dt>
-                <dd>{crops > 0 ? t('dashboard.activeCount', { count: crops }) : t('dashboard.noneAssigned')}</dd>
-              </div>
-            </dl>
-          </main>
-        </div>
-
-        <div className="metric-v2">
-          <div>
-            <span>{t('dashboard.dfbkStatus')}</span>
-            <CheckCircle2 size={18} />
-          </div>
-          <main>
-            <strong>100%</strong>
-            <dl>
-              <div>
-                <dt>{t('common.sync')}</dt>
-                <dd>{t('dashboard.syncDurable')}</dd>
-              </div>
-            </dl>
-          </main>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function SavedFieldsList({
   fields,
   selectedFieldId,
   onSelectField,
-  onEdit,
-  onDelete,
   onAddField,
-  onOpenAnalytics,
 }: {
   fields: SavedField[];
   selectedFieldId: string | null;
   onSelectField: (id: string) => void;
-  onEdit: (f: SavedField) => void;
-  onDelete: (f: SavedField) => void;
   onAddField: () => void;
-  onOpenAnalytics?: (fieldId: string) => void;
 }) {
   const { t, formatHectares } = useI18n();
   return (
-    <section className="card-v2 p-4">
+    <section className="dashboard-fields-card card-v2 p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-[#111827] flex items-center gap-1.5">
           <Sprout size={16} className="text-[#1fa35b]" /> {t('dashboard.yourFarmFields')} ({fields.length})
@@ -919,186 +776,56 @@ function SavedFieldsList({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
-                {onOpenAnalytics && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenAnalytics(f.id);
-                    }}
-                    className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition"
-                    title={t('dashboard.openAnalyticsTooltip')}
-                  >
-                    <Sparkles size={13} />
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(f);
-                  }}
-                  className="p-1.5 rounded-lg hover:bg-black/5 text-[#6b7280] hover:text-[#111827]"
-                  title={t('dashboard.editTooltip')}
-                >
-                  <Pencil size={13} />
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(f);
-                  }}
-                  className="p-1.5 rounded-lg hover:bg-red-50 text-[#9ca3af] hover:text-red-600"
-                  title={t('dashboard.deleteTooltip')}
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
+              <ChevronRight
+                size={16}
+                className={isSelected ? 'shrink-0 text-[#1fa35b]' : 'shrink-0 text-[#9ca3af]'}
+                aria-hidden="true"
+              />
             </div>
           );
         })}
       </div>
+
     </section>
   );
 }
 
-function RegionalConditions({
-  onNavigateWeather,
-  notify,
-}: {
-  onNavigateWeather?: () => void;
-  notify?: (msg: string) => void;
-}) {
+function DashboardPanelSkeleton() {
   const { t } = useI18n();
-  const [weather, setWeather] = useState<PointWeather | null>(null);
-  const [locationName, setLocationName] = useState<string>('Potsdam, Brandenburg');
-  const [isLiveGps, setIsLiveGps] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [locating, setLocating] = useState<boolean>(false);
+  return <div className="space-y-3" aria-label={t('fieldAnalytics.dashboardPanel.loadingFields')}>{[0, 1, 2].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-slate-100" />)}</div>;
+}
 
-  const loadWeatherForCoords = useCallback(async (lat: number, lon: number, isGps = false) => {
-    try {
-      const [wData, locName] = await Promise.all([
-        fetchPointWeather(lat, lon),
-        reverseGeocodeLocation(lat, lon),
-      ]);
-      setWeather(wData);
-      if (locName) {
-        setLocationName(locName);
-      }
-      setIsLiveGps(isGps);
-    } catch (err) {
-      console.warn('Failed to fetch weather for coordinates:', err);
-    } finally {
-      setLoading(false);
-      setLocating(false);
-    }
-  }, []);
-
-  const detectDeviceLocation = useCallback(() => {
-    if (!('geolocation' in navigator)) {
-      // Geolocation not supported, fallback to default Potsdam
-      loadWeatherForCoords(52.415, 13.045, false);
-      return;
-    }
-
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        loadWeatherForCoords(latitude, longitude, true);
-      },
-      (err) => {
-        console.warn('Device location unavailable or permission denied:', err.message);
-        // Fallback gracefully to Brandenburg regional baseline
-        loadWeatherForCoords(52.415, 13.045, false);
-      },
-      { timeout: 8000, enableHighAccuracy: false, maximumAge: 300000 }
-    );
-  }, [loadWeatherForCoords]);
-
-  useEffect(() => {
-    detectDeviceLocation();
-  }, [detectDeviceLocation]);
-
-  // Weather icon selector
-  const renderWeatherIcon = () => {
-    if (loading || locating) {
-      return <CloudSun size={28} className="text-[#4a8fcc] animate-pulse" />;
-    }
-    const iconType = weather?.icon || 'partly_cloudy';
-    if (iconType === 'sunny') {
-      return <Sun size={28} className="text-amber-500" />;
-    }
-    if (iconType === 'rain') {
-      return <CloudRain size={28} className="text-blue-500" />;
-    }
-    if (iconType === 'snow') {
-      return <CloudSnow size={28} className="text-sky-300" />;
-    }
-    if (iconType === 'cloudy') {
-      return <Cloud size={28} className="text-slate-500" />;
-    }
-    return <CloudSun size={28} className="text-[#4a8fcc]" />;
-  };
-
+function DashboardFieldSummary({ field, onBack, onOpenAnalytics, onViewProfile, notify }: { field: SavedField; onBack: () => void; onOpenAnalytics: () => void; onViewProfile: () => void; notify: (message: string) => void }) {
+  const { formatHectares, t } = useI18n();
   return (
-    <section className="card-v2 weather-v2 p-4">
-      <div className="flex items-center justify-between mb-2.5">
-        <div className="flex items-center gap-1.5">
-          <Sprout size={15} className="text-[#1fa35b]" />
-          <label className="text-xs font-bold text-[#111827] block">
-            {t('dashboard.regionalClimateTitle')}
-          </label>
-        </div>
-        {isLiveGps ? (
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-            <span>Live GPS</span>
-          </span>
-        ) : (
-          <button
-            type="button"
-            onClick={detectDeviceLocation}
-            disabled={locating}
-            className="text-[10px] text-gray-500 hover:text-gray-900 flex items-center gap-1 hover:underline transition cursor-pointer"
-            title="Fetch current device location via GPS"
-          >
-            <Navigation size={10} className={locating ? 'animate-spin text-[#1fa35b]' : ''} />
-            <span>{locating ? 'Locating...' : 'Use My GPS'}</span>
-          </button>
-        )}
-      </div>
-
-      <header className="flex items-center gap-3">
-        <div className="shrink-0">{renderWeatherIcon()}</div>
-        <strong className="text-2xl font-bold text-[#111827]">
-          {loading ? '—' : weather ? `${weather.temperature_c.toFixed(1)}°C` : '--'}
-        </strong>
-        <span className="text-[11px] text-[#6b7280] leading-tight mr-auto truncate max-w-[180px]">
-          <span className="font-semibold text-gray-900 block truncate" title={locationName}>
-            {locationName}
-          </span>
-          <span className="text-[#9ca3af] text-[10px] truncate block">
-            {weather
-              ? `${weather.condition} • ${weather.feels_like_c != null ? `Feels like ${weather.feels_like_c}°C` : ''}`
-              : t('dashboard.seasonBaseline')}
-          </span>
-        </span>
-        {onNavigateWeather && (
-          <button
-            onClick={onNavigateWeather}
-            className="text-xs font-semibold bg-white border border-[#e5e7eb] px-3 py-1.5 rounded-xl flex items-center gap-1.5 hover:bg-gray-50 shadow-2xs text-[#374151] transition shrink-0 cursor-pointer"
-            title="Open 7-day meteorological forecast"
-          >
-            <CloudSun size={14} className="text-[#4a8fcc]" />
-            <span>{t('dashboard.forecastBtn')}</span>
-          </button>
-        )}
-      </header>
+    <section className="space-y-4">
+      <button onClick={onBack} className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-emerald-700"><ArrowLeft size={17} />{t('dashboard.yourFarmFields')}</button>
+      <div><h2 className="text-xl font-extrabold text-slate-950">{field.name}</h2><p className="mt-1 text-sm text-slate-600">{formatHectares(field.area_hectares)} · {field.current_crop || t('dashboard.noCropAssigned')}</p></div>
+      <FieldSoilCard fieldId={field.id} fieldName={field.name} fieldAreaHa={field.area_hectares} notify={notify} variant="compact" onOpenAnalytics={onOpenAnalytics} onViewProfile={onViewProfile} />
     </section>
+  );
+}
+
+function FieldWeatherChip({ field, onOpenWeather }: { field: SavedField | null; onOpenWeather: () => void }) {
+  const { formatNumber, t } = useI18n();
+  const [weather, setWeather] = useState<PointWeather | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (!field) return;
+    const center = calculateGeometryCentroid(field.geometry);
+    if (!center) return;
+    let active = true;
+    setWeather(null);
+    setFailed(false);
+    fetchPointWeather(center[0], center[1]).then((result) => active && setWeather(result)).catch(() => active && setFailed(true));
+    return () => { active = false; };
+  }, [field]);
+  if (!field) return null;
+  return (
+    <button onClick={onOpenWeather} className="mt-2 flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-left hover:border-emerald-300" aria-label={t('fieldAnalytics.dashboardPanel.weatherAt', { field: field.name })}>
+      <span className="min-w-0"><span className="block truncate text-xs font-bold text-slate-800">{t('fieldAnalytics.dashboardPanel.weatherAt', { field: field.name })}</span><span className="block truncate text-[11px] text-slate-500">{failed ? t('fieldAnalytics.dashboardPanel.unavailable') : weather ? weather.condition : t('fieldAnalytics.dashboardPanel.loading')}</span></span>
+      <span className="shrink-0 text-right"><span className="block text-sm font-extrabold text-slate-950">{weather ? `${formatNumber(weather.temperature_c, { maximumFractionDigits: 0 })}°C` : '—'}</span><span className="text-[10px] font-bold text-emerald-700">{t('dashboard.forecastBtn')} →</span></span>
+    </button>
   );
 }
 
@@ -1139,9 +866,8 @@ export function MapViewV2({
   navigate,
   notify,
   onMenu,
-  onEdit,
-  onDelete,
-  onOpenAnalytics,
+  panelCollapsed = false,
+  onFieldOpen,
   floatingChrome = true,
 }: {
   fields: SavedField[];
@@ -1152,43 +878,42 @@ export function MapViewV2({
   navigate: (p: PageKey) => void;
   notify: (s: string) => void;
   onMenu?: () => void;
-  onEdit: (f: SavedField) => void;
-  onDelete: (f: SavedField) => void;
-  onOpenAnalytics?: (fieldId: string) => void;
+  panelCollapsed?: boolean;
+  onFieldOpen?: () => void;
   floatingChrome?: boolean;
 }) {
   const { t, formatHectares } = useI18n();
   const [map, setMap] = useState<L.Map | null>(null);
-  const [cardOpen, setCardOpen] = useState(true);
-  const [fieldCardTab, setFieldCardTab] = useState<'soil' | 'nasa' | 'details'>('soil');
-  const [layersOpen, setLayersOpen] = useState(false);
-  const [layers, setLayers] = useState<LayerState>({
-    ndvi: true,
-    moisture: false,
-    rainfall: false,
-    temperature: false,
-  });
 
   // User exact location GPS state
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
   const [locating, setLocating] = useState(false);
 
   const selected = useMemo(() => {
-    if (!fields.length) return null;
-    return fields.find((f) => f.id === selectedFieldId) || fields[0];
+    if (!selectedFieldId) return null;
+    return fields.find((field) => field.id === selectedFieldId) || null;
   }, [fields, selectedFieldId]);
+  const initialMapCenter = useMemo<[number, number]>(
+    () => calculateGeometryCentroid(selected?.geometry || fields[0]?.geometry) || [0, 0],
+    [fields, selected]
+  );
+  const desktopLeftPadding = typeof window !== 'undefined'
+    ? window.innerWidth >= 1200
+      ? (panelCollapsed ? 230 : 590)
+      : (panelCollapsed ? 100 : 470)
+    : 590;
 
   // Handle search selection prioritizing saved fields and farms
   const handleSearchResult = useCallback(
     (result: SearchResult) => {
       if (result.category === 'field' && result.fieldId) {
         setSelectedFieldId(result.fieldId);
-        setCardOpen(true);
+        onFieldOpen?.();
         if (result.bounds && map) {
           const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 851;
           map.fitBounds(result.bounds, {
-            paddingTopLeft: isDesktop ? [60, 710] : [60, 60],
-            paddingBottomRight: isDesktop ? [380, 60] : [60, 60],
+            paddingTopLeft: isDesktop ? [desktopLeftPadding, 60] : [60, 60],
+            paddingBottomRight: [60, 60],
             maxZoom: 16.5,
           });
         } else if (result.lat && result.lon && map) {
@@ -1245,8 +970,8 @@ export function MapViewV2({
       if (b.isValid()) {
         const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 851;
         map.flyToBounds(b, {
-          paddingTopLeft: isDesktop ? [60, 710] : [40, 40],
-          paddingBottomRight: isDesktop ? [380, 60] : [40, 40],
+          paddingTopLeft: isDesktop ? [desktopLeftPadding, 60] : [40, 40],
+          paddingBottomRight: [60, 60],
           maxZoom: 16.5,
           duration: 0.8,
         });
@@ -1260,7 +985,7 @@ export function MapViewV2({
     <section className="map-stage">
       <MapContainer
         ref={setMap}
-        center={BRANDENBURG_CENTER}
+        center={initialMapCenter}
         zoom={12}
         zoomSnap={0.5}
         minZoom={8}
@@ -1290,7 +1015,7 @@ export function MapViewV2({
               eventHandlers={{
                 click: () => {
                   setSelectedFieldId(f.id);
-                  setCardOpen(true);
+        onFieldOpen?.();
                 },
               }}
             />
@@ -1306,7 +1031,7 @@ export function MapViewV2({
             eventHandlers={{
               click: () => {
                 setSelectedFieldId(station.field_id);
-                setCardOpen(true);
+        onFieldOpen?.();
               },
             }}
           />
@@ -1359,6 +1084,7 @@ export function MapViewV2({
           )}
           <MapSearchBar
             mode="dashboard"
+            placeholder="Search your field"
             savedFields={fields}
             savedFarms={farms}
             onSelectResult={handleSearchResult}
@@ -1388,155 +1114,8 @@ export function MapViewV2({
         </div>
       )}
 
-      {/* Selected Field Card */}
-      {selected && cardOpen && (
-        <aside className="field-card">
-          <header>
-            <div>
-              <h2>{selected.name}</h2>
-              <p>
-                {selected.farm_name || 'Farm'} · {selected.current_crop || t('dashboard.noCropAssigned')}
-              </p>
-            </div>
-            <button onClick={() => setCardOpen(false)}>
-              <X size={18} />
-            </button>
-          </header>
-
-          {/* Segmented Control Tabs */}
-          <div className="flex bg-[#f3f4f6] p-1 rounded-xl my-2.5 gap-1">
-            <button
-              type="button"
-              onClick={() => setFieldCardTab('soil')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-1 ${
-                fieldCardTab === 'soil'
-                  ? 'bg-white shadow-xs text-[#1fa35b]'
-                  : 'text-[#6b7280] hover:text-[#111]'
-              }`}
-            >
-              <FlaskConical size={13} /> {t('dashboard.soilGridsTab')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setFieldCardTab('nasa')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-1 ${
-                fieldCardTab === 'nasa'
-                  ? 'bg-white shadow-xs text-[#0284c7]'
-                  : 'text-[#6b7280] hover:text-[#111]'
-              }`}
-            >
-              <Satellite size={13} /> {t('dashboard.nasaSatellitesTab')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setFieldCardTab('details')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-1 ${
-                fieldCardTab === 'details'
-                  ? 'bg-white shadow-xs text-[#111]'
-                  : 'text-[#6b7280] hover:text-[#111]'
-              }`}
-            >
-              <Layers size={13} /> {t('dashboard.fieldInfoTab')}
-            </button>
-          </div>
-
-          {fieldCardTab === 'soil' && (
-            <FieldSoilCard
-              fieldId={selected.id}
-              fieldName={selected.name}
-              fieldAreaHa={selected.area_hectares}
-              notify={notify}
-            />
-          )}
-
-          {fieldCardTab === 'nasa' && (
-            <FieldEnvironmentalCard
-              fieldId={selected.id}
-              fieldName={selected.name}
-              fieldAreaHa={selected.area_hectares}
-              notify={notify}
-            />
-          )}
-
-          {fieldCardTab === 'details' && (
-            <>
-              <div className="dates">
-                <div>
-                  <span>{t('dashboard.fieldArea')}</span>
-                  <b>{formatHectares(selected.area_hectares)}</b>
-                </div>
-                <div>
-                  <span>{t('dashboard.currentCrop')}</span>
-                  <b>{selected.current_crop || t('common.unassigned')}</b>
-                </div>
-              </div>
-
-              <div className="sensor-box mb-3">
-                <div>
-                  <span>{t('dashboard.provenance')}</span>
-                  <b>{selected.boundary_source}</b>
-                </div>
-                <div>
-                  <span>{t('dashboard.boundaryId')}</span>
-                  <b className="truncate max-w-[130px]">
-                    {selected.source_boundary_id || 'User-drawn'}
-                  </b>
-                </div>
-                {selected.land_use_category && (
-                  <div>
-                    <span>{t('dashboard.category')}</span>
-                    <b>{selected.land_use_category}</b>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-
-          <div className="space-y-2 mt-3">
-            <button
-              onClick={() => (onOpenAnalytics ? onOpenAnalytics(selected.id) : navigate('rotation-studio'))}
-              className="w-full py-2.5 rounded-xl bg-[#1fa35b] hover:bg-[#188a4c] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow"
-            >
-              <Sparkles size={14} /> {t('dashboard.fieldAnalyticsBtn')}
-            </button>
-
-            <button
-              onClick={() => navigate('rotation-studio')}
-              className="w-full py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs flex items-center justify-center gap-1.5"
-            >
-              <Sprout size={13} /> {t('dashboard.rotationStudioBtn')}
-            </button>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => onEdit(selected)}
-                className="py-2 rounded-xl bg-[#f0f0f0] hover:bg-[#e4e4e4] text-[#1b1b1b] font-semibold text-xs flex items-center justify-center gap-1"
-              >
-                <Pencil size={13} /> {t('dashboard.editFieldBtn')}
-              </button>
-              <button
-                onClick={() => onDelete(selected)}
-                className="py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-xs flex items-center justify-center gap-1"
-              >
-                <Trash2 size={13} /> {t('dashboard.deleteFieldBtn')}
-              </button>
-            </div>
-          </div>
-
-          <footer className="mt-3">
-            <span>{t('dashboard.verifiedRecordFooter')}</span>
-            <p className="text-xs text-[#aaa]">
-              {selected.attribution || '© MLEUV, dl-de/by-2-0'}
-            </p>
-          </footer>
-        </aside>
-      )}
-
       {/* Map Floating Controls */}
       <div className="map-controls">
-        <button onClick={() => setLayersOpen(!layersOpen)}>
-          <Layers3 />
-        </button>
         <button
           onClick={() =>
             document.fullscreenElement

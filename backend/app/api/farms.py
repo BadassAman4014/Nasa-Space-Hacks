@@ -11,7 +11,7 @@ router = APIRouter(prefix="/farms", tags=["farms"])
 
 class CreateFarmRequest(BaseModel):
     name: str = Field(..., min_length=1, description="Farm name")
-    location: Optional[str] = Field(default="Brandenburg, Germany", description="Farm location")
+    location: Optional[str] = Field(default=None, description="Farm location")
 
 class UpdateFarmRequest(BaseModel):
     name: Optional[str] = Field(default=None, min_length=1)
@@ -21,7 +21,7 @@ class UpdateFarmRequest(BaseModel):
 def create_farm(payload: CreateFarmRequest):
     """Create a new persistent user farm."""
     try:
-        farm = user_farms_repo.create_farm(name=payload.name, location=payload.location or "Brandenburg, Germany")
+        farm = user_farms_repo.create_farm(name=payload.name, location=payload.location or "")
         return farm
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create farm: {e}")

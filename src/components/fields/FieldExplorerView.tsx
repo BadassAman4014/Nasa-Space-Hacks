@@ -179,7 +179,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
   const [selectedFarmId, setSelectedFarmId] = useState<string>('');
   const [isCreatingNewFarm, setIsCreatingNewFarm] = useState(false);
   const [newFarmName, setNewFarmName] = useState('');
-  const [newFarmLocation, setNewFarmLocation] = useState('Potsdam, Brandenburg');
+  const [newFarmLocation, setNewFarmLocation] = useState('');
   const [saving, setSaving] = useState(false);
 
   // AI Satellite Field Detection state
@@ -466,7 +466,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
     if (userFarms.length === 0) {
       setIsCreatingNewFarm(true);
       setNewFarmName('Test Farm');
-      setNewFarmLocation('Potsdam, Brandenburg');
+      setNewFarmLocation('');
     } else {
       setIsCreatingNewFarm(false);
       setSelectedFarmId(userFarms[0].id);
@@ -485,7 +485,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
     if (userFarms.length === 0) {
       setIsCreatingNewFarm(true);
       setNewFarmName('Test Farm');
-      setNewFarmLocation('Potsdam, Brandenburg');
+      setNewFarmLocation('');
     } else {
       setIsCreatingNewFarm(false);
       setSelectedFarmId(userFarms[0].id);
@@ -507,7 +507,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
     if (userFarms.length === 0) {
       setIsCreatingNewFarm(true);
       setNewFarmName('Test Farm');
-      setNewFarmLocation('Potsdam, Brandenburg');
+      setNewFarmLocation('');
     } else {
       setIsCreatingNewFarm(false);
       setSelectedFarmId(userFarms[0].id);
@@ -678,7 +678,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
         }
         const createdFarm = await boundariesApi.createFarm({
           name: newFarmName.trim(),
-          location: newFarmLocation.trim() || 'Brandenburg, Germany',
+          location: newFarmLocation.trim(),
         });
         targetFarmId = createdFarm.id;
         setSelectedFarmId(createdFarm.id);
@@ -832,7 +832,7 @@ export function FieldExplorerView({ onNotify, onNavigateDashboard }: FieldExplor
               <Leaf size={16} strokeWidth={2.4} />
             </div>
             <span className="font-bold text-sm tracking-tight text-white flex items-center">
-              FieldShift<span className="text-[#1fa35b]">AI</span>
+              Farmily
             </span>
           </div>
 

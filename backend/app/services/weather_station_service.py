@@ -245,12 +245,7 @@ class WeatherStationService:
         """
         field = user_farms_repo.get_field(field_id)
         if not field:
-            fields = user_farms_repo.list_fields()
-            if fields:
-                field = fields[0]
-                field_id = field["id"]
-            else:
-                raise ValueError(f"Field '{field_id}' not found.")
+            raise ValueError(f"Field '{field_id}' not found.")
 
         lat, lon = self._calculate_centroid(field.get("geometry"))
         station = self.get_station_for_field(field_id)
@@ -405,7 +400,7 @@ class WeatherStationService:
             "farm_name": field.get("farm_name", "My Farm"),
             "area_ha": round(float(field["area_hectares"]), 2) if field.get("area_hectares") is not None else None,
             "crop": field.get("current_crop"),
-            "coordinates": {"lat": lat, "lon": lon},
+            "coordinates": [lat, lon],
             "elevation_m": api_data.get("elevation"),
             "geometry": field.get("geometry"),
             "virtual_station": {

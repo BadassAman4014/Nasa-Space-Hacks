@@ -5,6 +5,44 @@
 
 import { apiRequest } from './apiClient';
 
+export type RiskLevel = 'green' | 'yellow' | 'red' | 'info' | 'unavailable';
+export type RiskProvenance = 'live' | 'cached' | 'unavailable';
+
+export interface FieldRiskItem {
+  id: 'erosion' | 'heat_stress' | 'bare_soil';
+  label: string;
+  level: RiskLevel;
+  reading: string;
+  value?: number;
+  source_used?: string | null;
+  as_of?: string | null;
+  sources?: string[];
+  method?: string | null;
+  factors?: Array<{
+    factor: string;
+    value: string;
+    points: number | null;
+    provenance?: RiskProvenance;
+    as_of?: string | null;
+    source: string;
+    reason?: string;
+  }>;
+}
+
+export interface FieldRiskResponse {
+  field_id: string;
+  field_name: string;
+  area_ha: number;
+  items: FieldRiskItem[];
+  soil_texture: {
+    farmer: string | null;
+    satellite: string | null;
+    label_source: 'farmer-provided' | 'SoilGrids';
+    check: { consistent: boolean | null; note: string | null } | null;
+  };
+}
+
+
 export interface CurrentWeather {
   temperature_c: number;
   feels_like_c: number;
@@ -195,6 +233,8 @@ export interface FullFieldReportResponse {
 }
 
 export const fieldAnalyticsApi = {
+  getRiskCard: (fieldId: string, refresh = false) =>
+    apiRequest<FieldRiskResponse>(`/fields/${fieldId}/risk-card?refresh=${refresh}`),
   getSummary: (fieldId: string) =>
     apiRequest<FieldStatusSummary>(`/fields/${fieldId}/analytics/summary`),
 

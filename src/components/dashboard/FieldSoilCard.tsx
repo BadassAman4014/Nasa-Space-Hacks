@@ -25,6 +25,10 @@ interface FieldSoilCardProps {
   fieldName: string;
   fieldAreaHa: number;
   notify?: (msg: string) => void;
+  variant?: 'full' | 'compact';
+  title?: string;
+  onOpenAnalytics?: () => void;
+  onViewProfile?: () => void;
 }
 
 const DEPTH_LABELS: Record<string, string> = {
@@ -41,8 +45,12 @@ export const FieldSoilCard: React.FC<FieldSoilCardProps> = ({
   fieldName,
   fieldAreaHa,
   notify,
+  variant = 'full',
+  title,
+  onOpenAnalytics,
+  onViewProfile,
 }) => {
-  const { t, formatDate } = useI18n();
+  const { t, formatDate, formatNumber } = useI18n();
   const [profile, setProfile] = useState<SoilProfileResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [extracting, setExtracting] = useState<boolean>(false);
@@ -159,13 +167,32 @@ export const FieldSoilCard: React.FC<FieldSoilCardProps> = ({
 
   const topsoil = profile.topsoil_summary;
 
+  if (variant === 'compact' && topsoil) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+          <div className="flex items-center justify-between text-sm"><span className="font-bold text-emerald-800">{t('soilCard.usdaTextureClass')}</span><strong className="text-emerald-800">{topsoil.texture_class}</strong></div>
+          <div className="my-2 flex h-2 overflow-hidden rounded-full bg-slate-100"><span className="bg-amber-500" style={{ width: `${topsoil.sand_pct}%` }} /><span className="bg-blue-500" style={{ width: `${topsoil.silt_pct}%` }} /><span className="bg-red-500" style={{ width: `${topsoil.clay_pct}%` }} /></div>
+          <div className="flex justify-between text-xs text-slate-600"><span>{t('soilCard.sand')}: {formatNumber(topsoil.sand_pct, { maximumFractionDigits: 1 })}%</span><span>{t('soilCard.silt')}: {formatNumber(topsoil.silt_pct, { maximumFractionDigits: 1 })}%</span><span>{t('soilCard.clay')}: {formatNumber(topsoil.clay_pct, { maximumFractionDigits: 1 })}%</span></div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <CompactSoilTile label={t('soilCard.soilPh')} value={formatNumber(topsoil.ph, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} />
+          <CompactSoilTile label={t('soilCard.organicCarbon')} value={`${formatNumber(topsoil.organic_carbon_g_kg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} g/kg`} />
+          <CompactSoilTile label={t('soilCard.bulkDensity')} value={`${formatNumber(topsoil.bulk_density_g_cm3, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} g/cm³`} />
+        </div>
+        {onOpenAnalytics && <button onClick={onOpenAnalytics} className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-extrabold text-white hover:bg-emerald-700">{t('fieldAnalytics.dashboardPanel.openAnalytics')}</button>}
+        {onViewProfile && <button onClick={onViewProfile} className="w-full text-sm font-bold text-emerald-700 hover:underline">{t('fieldAnalytics.dashboardPanel.viewSoil')}</button>}
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-xl p-3.5 my-3 shadow-sm space-y-3">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
       {/* Header with Title and Refresh */}
       <div className="flex items-center justify-between border-b border-[#f0f0f0] pb-2.5">
         <div className="flex items-center gap-1.5">
           <FlaskConical size={16} className="text-[#1fa35b]" />
-          <h4 className="text-xs font-bold text-[#1f2937]">{t('soilCard.title')}</h4>
+          <h4 className="text-xl font-extrabold text-slate-950">{title || t('soilCard.title')}</h4>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] bg-[#f3f4f6] text-[#4b5563] px-2 py-0.5 rounded-full font-medium">
@@ -210,7 +237,7 @@ export const FieldSoilCard: React.FC<FieldSoilCardProps> = ({
           >
             {t('soilCard.topsoilCompositeButton')}
           </button>
-          {['0-5cm', '5-15cm', '15-30cm', '30-60cm', '60-100cm', '100-200cm'].map((depthKey) => (
+          {['30-60cm', '60-100cm', '100-200cm'].map((depthKey) => (
             <button
               key={depthKey}
               onClick={() => setSelectedDepth(depthKey)}
@@ -258,75 +285,25 @@ export const FieldSoilCard: React.FC<FieldSoilCardProps> = ({
             </div>
             <div className="flex justify-between text-[10px] text-[#4b5563]">
               <span className="flex items-center gap-1">
-                <i className="w-2 h-2 rounded-full bg-[#f59e0b] inline-block" /> {t('soilCard.sand')}: {topsoil.sand_pct}%
+                <i className="w-2 h-2 rounded-full bg-[#f59e0b] inline-block" /> {t('soilCard.sand')}: {formatNumber(topsoil.sand_pct, { maximumFractionDigits: 1 })}%
               </span>
               <span className="flex items-center gap-1">
-                <i className="w-2 h-2 rounded-full bg-[#3b82f6] inline-block" /> {t('soilCard.silt')}: {topsoil.silt_pct}%
+                <i className="w-2 h-2 rounded-full bg-[#3b82f6] inline-block" /> {t('soilCard.silt')}: {formatNumber(topsoil.silt_pct, { maximumFractionDigits: 1 })}%
               </span>
               <span className="flex items-center gap-1">
-                <i className="w-2 h-2 rounded-full bg-[#ef4444] inline-block" /> {t('soilCard.clay')}: {topsoil.clay_pct}%
+                <i className="w-2 h-2 rounded-full bg-[#ef4444] inline-block" /> {t('soilCard.clay')}: {formatNumber(topsoil.clay_pct, { maximumFractionDigits: 1 })}%
               </span>
             </div>
           </div>
 
-          {/* Properties Grid */}
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-[#f9fafb] border border-[#f3f4f6] rounded-lg p-2">
-              <span className="text-[10px] text-[#6b7280] block">{t('soilCard.soilPh')}</span>
-              <strong className="text-sm font-bold text-[#111827]">{topsoil.ph.toFixed(1)}</strong>
-              <span className="text-[10px] text-[#15803d] block mt-0.5">
-                {topsoil.ph < 5.5 ? t('soilCard.acidic') : topsoil.ph > 7.5 ? t('soilCard.alkaline') : t('soilCard.optimal')}
-              </span>
-            </div>
-
-            <div className="bg-[#f9fafb] border border-[#f3f4f6] rounded-lg p-2">
-              <span className="text-[10px] text-[#6b7280] block">{t('soilCard.organicCarbon')}</span>
-              <strong className="text-sm font-bold text-[#111827]">
-                {topsoil.organic_carbon_g_kg.toFixed(1)}{' '}
-                <small className="text-[10px] font-normal text-[#6b7280]">g/kg</small>
-              </strong>
-              <span className="text-[10px] text-[#6b7280] block mt-0.5">
-                ({topsoil.organic_carbon_pct.toFixed(2)}% SOC)
-              </span>
-            </div>
-
-            <div className="bg-[#f9fafb] border border-[#f3f4f6] rounded-lg p-2">
-              <span className="text-[10px] text-[#6b7280] block">{t('soilCard.bulkDensity')}</span>
-              <strong className="text-sm font-bold text-[#111827]">
-                {topsoil.bulk_density_g_cm3.toFixed(2)}{' '}
-                <small className="text-[10px] font-normal text-[#6b7280]">g/cm³</small>
-              </strong>
-              <span className="text-[10px] text-[#6b7280] block mt-0.5">{t('soilCard.fineEarthDensity')}</span>
-            </div>
-
-            <div className="bg-[#f9fafb] border border-[#f3f4f6] rounded-lg p-2">
-              <span className="text-[10px] text-[#6b7280] block">{t('soilCard.cec')}</span>
-              <strong className="text-sm font-bold text-[#111827]">
-                {topsoil.cec_mmol_kg.toFixed(1)}{' '}
-                <small className="text-[10px] font-normal text-[#6b7280]">mmol(c)/kg</small>
-              </strong>
-              <span className="text-[10px] text-[#6b7280] block mt-0.5">{t('soilCard.nutrientRetention')}</span>
-            </div>
-
-            <div className="bg-[#f9fafb] border border-[#f3f4f6] rounded-lg p-2 col-span-2">
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-[10px] text-[#6b7280] block">{t('soilCard.totalNitrogen')}</span>
-                  <strong className="text-sm font-bold text-[#111827]">
-                    {topsoil.total_nitrogen_g_kg.toFixed(2)}{' '}
-                    <small className="text-[10px] font-normal text-[#6b7280]">g/kg</small>
-                  </strong>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-[#6b7280] block">{t('soilCard.cnRatio')}</span>
-                  <strong className="text-xs font-bold text-[#374151]">
-                    {topsoil.total_nitrogen_g_kg > 0
-                      ? (topsoil.organic_carbon_g_kg / topsoil.total_nitrogen_g_kg).toFixed(1)
-                      : '—'}
-                  </strong>
-                </div>
-              </div>
-            </div>
+          {/* Uniform 2-column soil metrics */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <SoilMetric label={t('soilCard.soilPh')} value={formatNumber(topsoil.ph, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} unit="pH" meaning={topsoil.ph < 5.5 ? t('soilCard.acidic') : topsoil.ph > 7.5 ? t('soilCard.alkaline') : t('soilCard.optimal')} tone={topsoil.ph >= 5.5 && topsoil.ph <= 7.5 ? 'green' : 'amber'} />
+            <SoilMetric label={t('soilCard.organicCarbon')} value={formatNumber(topsoil.organic_carbon_g_kg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} unit="g/kg" meaning={`${formatNumber(topsoil.organic_carbon_pct, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% SOC`} />
+            <SoilMetric label={t('soilCard.bulkDensity')} value={formatNumber(topsoil.bulk_density_g_cm3, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} unit="g/cm³" meaning={topsoil.bulk_density_g_cm3 > 1.6 ? t('soilCard.compactionRisk') : t('soilCard.normalForSandyLoam')} tone={topsoil.bulk_density_g_cm3 > 1.6 ? 'amber' : 'green'} />
+            <SoilMetric label={t('soilCard.cec')} value={formatNumber(topsoil.cec_mmol_kg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} unit="mmol(c)/kg" meaning={t('soilCard.nutrientRetention')} />
+            <SoilMetric label={t('soilCard.totalNitrogen')} value={formatNumber(topsoil.total_nitrogen_g_kg, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} unit="g/kg" meaning={t('soilCard.totalNitrogenMeaning')} info={t('soilCard.totalNitrogenInfo')} />
+            <SoilMetric label={t('soilCard.cnRatio')} value={topsoil.total_nitrogen_g_kg > 0 ? formatNumber(topsoil.organic_carbon_g_kg / topsoil.total_nitrogen_g_kg, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '—'} meaning={t('soilCard.cnRatioMeaning')} />
           </div>
         </div>
       )}
@@ -376,20 +353,29 @@ export const FieldSoilCard: React.FC<FieldSoilCardProps> = ({
         </div>
       )}
 
-      {/* Provenance & Citation Metadata Footer */}
-      <div className="pt-2 border-t border-[#f0f0f0] text-[10px] text-[#9ca3af] flex flex-col gap-0.5">
-        <div className="flex justify-between">
-          <span>{t('soilCard.sourceCitation')}</span>
-          <span>{t('soilCard.coverage', { pct: profile.coverage_percentage })}</span>
+      <details className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+        <summary className="cursor-pointer font-bold text-slate-700">Data details</summary>
+        <div className="mt-2 space-y-1">
+          <div className="flex justify-between gap-3"><span>{t('soilCard.sourceCitation')}</span><span>{t('soilCard.coverage', { pct: profile.coverage_percentage })}</span></div>
+          {profile.extraction_date && <div className="flex justify-between gap-3"><span>{t('soilCard.extractedDate', { date: formatDate(profile.extraction_date) })}</span><span>{t('soilCard.cells', { count: topsoil?.valid_pixel_count || 1 })}</span></div>}
         </div>
-        {profile.extraction_date && (
-          <div className="flex justify-between">
-            <span>{t('soilCard.extractedDate', { date: formatDate(profile.extraction_date) })}</span>
-            <span>{t('soilCard.cells', { count: topsoil?.valid_pixel_count || 1 })}</span>
-          </div>
-        )}
-      </div>
+      </details>
     </div>
   );
 };
 
+
+function CompactSoilTile({ label, value }: { label: string; value: string }) {
+  return <div className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-2.5"><span className="block truncate text-[11px] font-semibold text-slate-500">{label}</span><strong className="mt-1 block text-sm font-extrabold text-slate-900">{value}</strong></div>;
+}
+
+function SoilMetric({ label, value, unit, meaning, tone = 'neutral', info }: { label: string; value: string; unit?: string; meaning: string; tone?: 'green' | 'amber' | 'neutral'; info?: string }) {
+  const toneClass = tone === 'green' ? 'bg-emerald-50 text-emerald-700' : tone === 'amber' ? 'bg-amber-50 text-amber-800' : 'bg-slate-100 text-slate-600';
+  return (
+    <div className="flex min-h-32 flex-col rounded-xl border border-slate-200 bg-white p-4">
+      <div className="flex items-start justify-between gap-2"><span className="text-sm font-bold text-slate-700">{label}</span>{info && <button type="button" title={info} aria-label={info} className="text-slate-400"><Info size={15} /></button>}</div>
+      <div className="mt-3 text-2xl font-extrabold text-slate-950">{value}{unit && <span className="ml-1 text-sm font-semibold text-slate-500">{unit}</span>}</div>
+      <span className={`mt-auto w-fit rounded-full px-2 py-1 text-xs font-bold ${toneClass}`}>{meaning}</span>
+    </div>
+  );
+}

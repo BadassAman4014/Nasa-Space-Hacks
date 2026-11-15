@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Sprout, X } from 'lucide-react';
 import { useI18n } from '../../i18n';
+import type { SoilProfileResponse } from '../../services/soilApi';
 import type { PlannerInputs } from './types';
 
 export interface InputValues {
@@ -12,6 +13,7 @@ export interface InputValues {
 
 interface Props {
   inputs: PlannerInputs;
+  soilProfile: SoilProfileResponse | null;
   busy: boolean;
   problems: string[];
   onSave: (v: InputValues) => Promise<void>;
@@ -25,7 +27,7 @@ function initialRows(inputs: PlannerInputs): { year: number; crop: string }[] {
   return [y - 2, y - 1, y].map((year) => ({ year, crop: '' }));
 }
 
-export function FarmerInputForm({ inputs, busy, problems, onSave, onGenerate }: Props) {
+export function FarmerInputForm({ inputs, soilProfile, busy, problems, onSave, onGenerate }: Props) {
   const { t, language } = useI18n();
   const [rows, setRows] = useState(() => initialRows(inputs));
   const [soil, setSoil] = useState(inputs.soil_texture ?? '');
@@ -78,8 +80,22 @@ export function FarmerInputForm({ inputs, busy, problems, onSave, onGenerate }: 
             </button>
           )}
         </div>
+        {soilProfile?.topsoil_summary && (
+          <div className="cp-soil-evidence" aria-label="Automatic SoilGrids evidence">
+            <div className="cp-row" style={{ justifyContent: 'space-between' }}>
+              <strong>Automatic SoilGrids evidence</strong>
+              <span className="cp-badge">{soilProfile.source} · {soilProfile.spatial_resolution}</span>
+            </div>
+            <p className="cp-sub">
+              {soilProfile.topsoil_summary.texture_class} · sand {soilProfile.topsoil_summary.sand_pct}% ·
+              silt {soilProfile.topsoil_summary.silt_pct}% · clay {soilProfile.topsoil_summary.clay_pct}% ·
+              pH {soilProfile.topsoil_summary.ph}
+            </p>
+            <p className="cp-src">Read-only model evidence. It is not copied into the farmer-entered soil texture below.</p>
+          </div>
+        )}
         <label>
-          {t('cropPlanner.form.soil')}
+          {t('cropPlanner.form.soil')} <span className="cp-badge">farmer-entered</span>
           <select value={soil} onChange={(e) => setSoil(e.target.value)}>
             <option value="">{t('cropPlanner.form.choose')}</option>
             {inputs.options.soil_texture.map((s) => <option key={s.id} value={s.id}>{language === 'de' ? s.de : `${s.en} (${s.de})`}</option>)}

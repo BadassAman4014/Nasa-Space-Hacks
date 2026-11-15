@@ -1,23 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertCircle, Info as InfoIcon, Loader2 } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 import type { Provenance, Unavailable } from '../../../services/fieldHealthApi';
 
 /** Short, plain source word shown quietly next to a value. Details live in the ⓘ popover. */
-const SOURCE_WORD: Record<Provenance, string> = {
-  measured: 'Satellite',
-  observed: 'Satellite',
-  satellite_estimate: 'Satellite est.',
-  modelled: 'Model',
-  derived: 'Calculated',
-  farmer_input: 'Your input',
-  unavailable: '',
-};
-
 export function SourceTag({ p }: { p?: Provenance | string | null }) {
-  const word = SOURCE_WORD[(p as Provenance) || 'unavailable'];
-  return word ? <span className="text-[10px] font-semibold text-gray-400">{word}</span> : null;
+  const { t } = useI18n();
+  if (!p || p === 'unavailable') return null;
+  return (
+    <span className="inline-flex shrink-0 items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-bold text-slate-600">
+      {t(`fieldAnalytics.sources.${p}`)}
+    </span>
+  );
 }
-
 /** Small ⓘ button that opens a popover with source, method and caveats. */
 export function Info({ children, label = 'Details', align = 'right' }: { children: React.ReactNode; label?: string; align?: 'left' | 'right' }) {
   const [open, setOpen] = useState(false);
@@ -43,7 +38,7 @@ export function Info({ children, label = 'Details', align = 'right' }: { childre
       {open && (
         <div
           role="dialog"
-          className={`absolute top-6 z-[600] w-72 space-y-1.5 rounded-xl border border-gray-200 bg-white p-3 text-[11px] leading-snug text-gray-700 shadow-xl ${align === 'right' ? 'right-0' : 'left-0'}`}
+          className={`fixed left-4 right-4 top-20 z-[600] max-h-[min(24rem,70vh)] w-auto space-y-1.5 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3 text-[11px] leading-snug text-gray-700 shadow-xl sm:absolute sm:left-auto sm:right-auto sm:top-6 sm:w-72 ${align === 'right' ? 'sm:right-0' : 'sm:left-0'}`}
         >
           {children}
         </div>
@@ -108,6 +103,8 @@ export function LineChart({
   yMax,
   band,
   decimals = 2,
+  marker,
+  unitLabel,
 }: {
   series: { name: string; colour: string; points: { x: string; y: number | null }[]; style?: 'line' | 'dots'; dashed?: boolean }[];
   height?: number;
@@ -115,6 +112,8 @@ export function LineChart({
   yMax?: number;
   band?: { from: number; to: number; colour: string };
   decimals?: number;
+  marker?: { x: string; label: string };
+  unitLabel?: string;
 }) {
   const W = 700;
   const pad = { l: 40, r: 8, t: 8, b: 20 };
@@ -134,6 +133,13 @@ export function LineChart({
     <svg viewBox={`0 0 ${W} ${height}`} className="h-auto w-full overflow-visible" role="img">
       {band && (
         <rect x={pad.l} width={W - pad.l - pad.r} y={Y(Math.min(hi, band.to))} height={Math.max(0, Y(Math.max(lo, band.from)) - Y(Math.min(hi, band.to)))} fill={band.colour} />
+      )}
+      {unitLabel && <text x="4" y="12" fontSize="10" fill="#64748b" fontWeight="700">{unitLabel}</text>}
+      {marker && (
+        <g>
+          <line x1={X(marker.x)} x2={X(marker.x)} y1={pad.t} y2={height - pad.b} stroke="#2563eb" strokeWidth="1.5" strokeDasharray="4 3" />
+          <text x={X(marker.x) - 2} y={pad.t + 10} fontSize="10" textAnchor="end" fill="#1d4ed8" fontWeight="700">{marker.label}</text>
+        </g>
       )}
       {ticks.map((v, i) => (
         <g key={i}>

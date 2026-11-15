@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bot, Send, X, Database, AlertCircle, Loader2, Image as ImageIcon, Mic, MicOff, MapPin, Layers, HelpCircle, RotateCcw, Repeat } from 'lucide-react';
+import { Bot, Send, X, Database, AlertCircle, Loader2, Image as ImageIcon, Mic, MicOff, MapPin, Layers, HelpCircle, RotateCcw, Repeat, MessageCircleMore, Sparkles } from 'lucide-react';
 import { aiAssistantApi } from '../ai-assistant/aiAssistantApi';
 import type { FieldOption, FieldCategory, ImageAttachment } from '../ai-assistant/types';
 
@@ -266,11 +266,17 @@ export function AdvisorDrawer({ onOpenFields }: { onOpenFields?: () => void }) {
       {!open && (
         <button
           onClick={openDrawer}
-          aria-label="Open AI Advisor"
-          title="AI Advisor"
-          className="fixed bottom-5 right-5 z-[1200] flex h-14 w-14 items-center justify-center rounded-full bg-[#1fa35b] text-white shadow-xl transition hover:bg-[#188a4c] active:scale-95"
+          aria-label="Open AI Advisor: Hi! Ask me Anything"
+          title="Open AI Advisor"
+          className="advisor-launch fixed right-5 top-5 z-[1200] flex items-center gap-2.5 rounded-full border border-emerald-600/20 bg-white py-2 pl-2 pr-4 text-[#166534] shadow-xl"
         >
-          <Bot size={26} />
+          <span className="advisor-launch-icon relative flex h-9 w-9 items-center justify-center rounded-full bg-[#1fa35b] text-white">
+            <MessageCircleMore size={19} strokeWidth={2.2} />
+            <Sparkles size={10} className="absolute -right-0.5 -top-0.5 text-amber-300" fill="currentColor" />
+          </span>
+          <span className="text-left text-xs font-extrabold leading-tight">
+            Hi!, <span className="font-semibold text-slate-600">Ask me Anything</span>
+          </span>
         </button>
       )}
 

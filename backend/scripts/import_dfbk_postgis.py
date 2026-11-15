@@ -192,7 +192,7 @@ def import_postgis(db_url: str = None, batch_size: int = 5000, limit: int = None
 
     except Exception as e:
         print(f"[POSTGIS NOTICE] PostgreSQL is currently offline or unreachable ({e}).")
-        print(f"[FALLBACK ACTIVE] The FieldShift AI boundary service automatically uses the local indexed GeoPackage ({gpkg_path})")
+        print(f"[FALLBACK ACTIVE] The Farmily boundary service automatically uses the local indexed GeoPackage ({gpkg_path})")
         print("                  which provides sub-10ms bounding-box queries without requiring a running PostgreSQL server.")
         return False
 

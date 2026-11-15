@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Check, Globe } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 import { UKFlag, GermanFlag } from './FlagIcons';
 import { useI18n } from '../../i18n';
 import type { Language } from '../../i18n/types';
@@ -160,6 +160,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         <button
           type="button"
           onClick={() => handleToggle('en')}
+          aria-pressed={language === 'en'}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all ${
             language === 'en'
               ? dark
@@ -178,6 +179,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         <button
           type="button"
           onClick={() => handleToggle('de')}
+          aria-pressed={language === 'de'}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all ${
             language === 'de'
               ? dark

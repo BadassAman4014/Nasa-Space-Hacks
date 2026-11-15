@@ -77,7 +77,7 @@ class FieldReportService:
             planting_date=planting_date,
             harvest_date=harvest_date,
             days_since_planting=days_since_planting,
-            location=farm.get("location") if farm and farm.get("location") else "Brandenburg, Germany",
+            location=farm.get("location") if farm and farm.get("location") else "",
             boundary_source=field.get("boundary_source", "DFBK"),
             analysis_status="Verified Satellite Analytics",
             current_weather=current_w,

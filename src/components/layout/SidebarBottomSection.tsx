@@ -1,42 +1,15 @@
 import React from 'react';
-import { Settings, CircleHelp } from 'lucide-react';
-import { SidebarNavItem } from './SidebarNavItem';
-import { SidebarUserProfile } from './SidebarUserProfile';
-import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 
-interface SidebarBottomSectionProps {
-  onSettingsClick?: () => void;
-  onHelpClick?: () => void;
-  onProfileClick?: () => void;
-}
-
-export const SidebarBottomSection: React.FC<SidebarBottomSectionProps> = ({
-  onSettingsClick,
-  onHelpClick,
-  onProfileClick,
-}) => {
-  const { t } = useI18n();
-
+export const SidebarBottomSection: React.FC = () => {
   return (
     <div className="floating-sidebar-bottom">
-      <div className="bottom-nav-items">
-        <SidebarNavItem
-          id="settings"
-          label={t('nav.settings')}
-          icon={Settings}
-          onClick={onSettingsClick || (() => { })}
-        />
-        <SidebarNavItem
-          id="help"
-          label={t('nav.helpCenter')}
-          icon={CircleHelp}
-          onClick={onHelpClick || (() => { })}
-        />
+      <div className="sidebar-language-selector sidebar-language-selector--full">
+        <LanguageSwitcher variant="pill" />
       </div>
-
-      <div className="floating-divider" role="separator" />
-
-      <SidebarUserProfile onClick={onProfileClick} />
+      <div className="sidebar-language-selector sidebar-language-selector--compact">
+        <LanguageSwitcher variant="icon-only" />
+      </div>
     </div>
   );
 };

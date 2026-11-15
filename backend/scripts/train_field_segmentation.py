@@ -13,7 +13,7 @@ def main():
     batch_size = 4
     lr = 2e-4
     print("=" * 60)
-    print("FieldShift AI — CNN Field Boundary Segmentation Training")
+    print("Farmily — CNN Field Boundary Segmentation Training")
     print(f"Epochs: {epochs}, Batch size: {batch_size}, Initial LR: {lr}")
     print("=" * 60)
 

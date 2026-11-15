@@ -14,7 +14,7 @@ from app.services.field_segmentation.training import compute_segmentation_metric
 
 def main():
     print("=" * 60)
-    print("FieldShift AI — Field Segmentation Evaluation")
+    print("Farmily — Field Segmentation Evaluation")
     print("=" * 60)
 
     engine = FieldInferenceEngine.get_instance()

@@ -22,7 +22,7 @@ export function ExplainBox({ strategy }: { strategy: Strategy }) {
           <ul>{e.weak_points.map((w) => <li key={w.axis}>{w.statement}</li>)}</ul>
         </>
       )}
-      <details open>
+      <details>
         <summary><strong>{t('cropPlanner.explain.limits')}</strong></summary>
         <ul>{e.limitations.map((l, i) => <li key={i}>{l.text}</li>)}</ul>
       </details>

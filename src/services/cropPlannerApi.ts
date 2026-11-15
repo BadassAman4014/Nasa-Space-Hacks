@@ -1,5 +1,5 @@
 import { baseUrl } from './apiClient';
-import type { ApiProblem, PlannerInputs, Recommendation, RiskCardData, TimelineData } from '../components/crop-planner/types';
+import type { ApiProblem, PlannerInputs, Recommendation, TimelineData } from '../components/crop-planner/types';
 
 export class PlannerApiError extends Error {
   status: number;
@@ -33,7 +33,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 }
 
 export const cropPlannerApi = {
-  riskCard: (fieldId: string, refresh = false) => request<RiskCardData>(`/fields/${fieldId}/risk-card?refresh=${refresh}`),
   inputs: (fieldId: string) => request<PlannerInputs>(`/fields/${fieldId}/planner-inputs`),
   saveInputs: (fieldId: string, body: Pick<PlannerInputs, 'history' | 'soil_texture' | 'priority' | 'irrigation'>) =>
     request<PlannerInputs>(`/fields/${fieldId}/planner-inputs`, { method: 'PUT', body: JSON.stringify(body) }),

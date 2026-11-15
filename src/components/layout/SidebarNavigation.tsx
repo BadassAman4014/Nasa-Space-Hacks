@@ -4,11 +4,7 @@ import {
   Map,
   Sparkles,
   CloudSun,
-  Globe2,
-  Users,
   Sprout,
-  SlidersHorizontal,
-  FileText,
   type LucideIcon,
 } from 'lucide-react';
 import { SidebarNavItem } from './SidebarNavItem';
@@ -20,11 +16,7 @@ export type PageKey =
   | 'analytics'
   | 'ai-assistant'
   | 'weather'
-  | 'environment'
-  | 'farmer-profile'
-  | 'rotation-studio'
-  | 'scenario-simulator'
-  | 'reports';
+  | 'rotation-studio';
 
 export interface NavItemConfig {
   id: PageKey;
@@ -41,15 +33,9 @@ export const NAV_ITEMS: NavItemConfig[] = [
   { id: 'fields',             labelKey: 'nav.fields',           defaultLabel: 'Field Explorer',   group: 1, icon: Map },
   { id: 'analytics',          labelKey: 'nav.analytics',        defaultLabel: 'Field Analytics',  group: 1, icon: Sparkles },
   { id: 'weather',            labelKey: 'nav.weather',          defaultLabel: 'Weather',          group: 1, icon: CloudSun },
-  { id: 'environment',        labelKey: 'nav.environment',      defaultLabel: 'Environmental',    group: 1, icon: Globe2 },
 
   // Group 2 — Farm Operations
-  { id: 'farmer-profile',     labelKey: 'nav.farmerProfile',     defaultLabel: 'Farmer Profile',   group: 2, icon: Users },
   { id: 'rotation-studio',    labelKey: 'nav.rotationStudio',    defaultLabel: 'Crop Planner',  group: 2, icon: Sprout, badge: 'NEW' },
-  { id: 'scenario-simulator', labelKey: 'nav.scenarioSimulator', defaultLabel: 'Scenarios',        group: 2, icon: SlidersHorizontal },
-
-  // Group 3 — Reporting
-  { id: 'reports',            labelKey: 'nav.reports',          defaultLabel: 'Reports',          group: 3, icon: FileText },
 ];
 
 interface SidebarNavigationProps {

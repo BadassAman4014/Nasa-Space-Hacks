@@ -1,6 +1,7 @@
 /* ── Navigation Sidebar is maintained independently in floating-sidebar.css ── */
 
 /* ── Floating iOS Dashboard Layout ── */
+.dash-sheet-handle { display: none; }
 .dashboard-grid {
   position: relative;
   width: 100%;
@@ -53,12 +54,13 @@
   }
   .dash-panel {
     position: absolute !important;
-    top: 14px !important;
-    bottom: 14px !important;
-    left: 226px !important; /* 12px margin + 200px sidebar + 14px gap = 226px */
-    width: 456px !important;
-    max-width: calc(100vw - 260px) !important;
-    max-height: calc(100dvh - 28px) !important;
+    top: 16px !important;
+    bottom: auto !important;
+    left: 226px !important;
+    width: min(350px, 25vw) !important;
+    min-width: 0 !important;
+    max-width: 360px !important;
+    max-height: calc(100dvh - 32px) !important;
     z-index: 400 !important;
     background: rgba(255, 255, 255, 0.98) !important;
     backdrop-filter: blur(20px) !important;
@@ -66,23 +68,65 @@
     border-radius: 26px !important;
     border: 1px solid rgba(0, 0, 0, 0.05) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03) !important;
-    padding: 14px !important;
+    padding: 12px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
-    overflow-y: auto !important;
+    gap: 0 !important;
+    overflow: hidden !important;
     scrollbar-width: none !important;
     pointer-events: auto !important;
   }
   .dash-panel::-webkit-scrollbar {
     display: none !important;
   }
+  .dash-panel-pinned {
+    position: relative;
+    flex: 0 0 auto;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .dash-panel-body {
+    min-height: 0;
+    max-height: calc(100dvh - 210px);
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-top: 12px;
+    scrollbar-width: thin;
+  }
+  .dash-panel-collapse {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 20;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 10px;
+    background: #f1f5f3;
+    color: #52615a;
+  }
+  .dash-panel--collapsed {
+    width: 52px !important;
+    min-width: 52px !important;
+    padding: 10px !important;
+  }
+  .dash-panel--collapsed .dash-panel-pinned {
+    padding: 0;
+    border: 0;
+  }
+  .dash-panel--collapsed .dash-panel-collapse {
+    position: static;
+  }
+  .app-shell--map-full:has(.dash-panel--collapsed) .map-topbar {
+    left: 294px !important;
+  }
   .map-topbar {
     position: absolute !important;
     top: 14px !important;
-    left: 698px !important; /* 226px + 456px + 16px = 698px */
-    right: 20px !important;
-    max-width: calc(100% - 718px) !important;
+    left: 592px !important;
+    right: 220px !important;
+    max-width: 520px !important;
     display: flex !important;
     gap: 10px !important;
     align-items: center !important;
@@ -92,12 +136,14 @@
 
 @media (max-width: 1199px) and (min-width: 851px) {
   .app-shell--map-full .dash-panel {
-    left: 98px !important; /* 12px margin + 72px sidebar + 14px gap = 98px */
-    width: 395px !important;
+    left: 98px !important;
+    width: min(350px, 25vw) !important;
+    min-width: 0 !important;
   }
   .app-shell--map-full .map-topbar {
-    left: 509px !important; /* 98px + 395px + 16px = 509px */
-    max-width: calc(100% - 529px) !important;
+    left: calc(98px + min(350px, 25vw) + 16px) !important;
+    top: 76px !important;
+    max-width: calc(100% - min(350px, 25vw) - 130px) !important;
   }
   .metric-v2 strong {
     font-size: 24px !important;
@@ -116,6 +162,14 @@
 .app-shell--analytics,
 .app-shell--ai-assistant {
   background: #f1f4f2 !important;
+}
+@media (max-width: 640px) {
+  .field-analytics-header {
+    padding-top: 80px !important;
+  }
+  .field-analytics-header > div:first-of-type {
+    padding-right: 0 !important;
+  }
 }
 
 /* ==========================================================================
@@ -180,33 +234,39 @@
 
 @media (max-width: 850px) {
   .dashboard-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    height: auto !important;
-    position: relative !important;
-    overflow: visible !important;
-    background: var(--bg-panel) !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    background: #58735e !important;
   }
   .map-stage {
-    height: 68dvh !important;
-    order: -1 !important;
-    flex: none !important;
-    position: relative !important;
+    position: absolute !important;
+    inset: 0 !important;
+    height: 100dvh !important;
   }
   .dash-panel {
-    position: relative !important;
+    position: fixed !important;
+    z-index: 700 !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 8px !important;
     top: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    width: calc(100% - 24px) !important;
-    margin: 12px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
     border-radius: 22px !important;
     background: #ffffff !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.16) !important;
     padding: 12px !important;
-    overflow: visible !important;
-    max-height: none !important;
+    overflow: hidden !important;
+    transition: height 220ms ease !important;
   }
+  .dash-panel--mobile-peek { height: 112px !important; }
+  .dash-panel--mobile-half { height: 52dvh !important; }
+  .dash-panel--mobile-full { height: calc(100dvh - 16px) !important; }
+  .dash-panel-body { min-height: 0; overflow-y: auto; }
+  .dash-sheet-handle { display: flex; width: 100%; height: 18px; align-items: center; justify-content: center; }
+  .dash-sheet-handle span { width: 44px; height: 4px; border-radius: 99px; background: #cbd5e1; }
+  .dash-panel-collapse { display: none !important; }
   .field-card {
     left: 12px !important;
     right: 12px !important;
@@ -223,7 +283,7 @@
   .map-topbar {
     left: 12px !important;
     right: 12px !important;
-    top: 12px !important;
+    top: 76px !important;
     max-width: none !important;
   }
   .map-topbar label {
@@ -383,6 +443,7 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   row-gap: 4px;
+  padding-right: 36px;
 }
 .property-name {
   font-size: 16px;
@@ -534,6 +595,14 @@
   font-weight: 600;
   color: #111827;
   font-size: 11px;
+}
+
+/* Keep the field details and following climate card visually connected without crowding them. */
+.dashboard-fields-card {
+  padding-bottom: 10px !important;
+}
+.dashboard-soil-slot > div {
+  margin-bottom: 0 !important;
 }
 
 /* ── Regional Climate & Weather (RegionalConditions) ── */

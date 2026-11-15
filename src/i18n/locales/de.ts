@@ -54,7 +54,7 @@ export const de: TranslationDictionary = {
     hectares: 'ha',
   },
   firstLaunch: {
-    welcomeTitle: 'Willkommen bei FieldShift AI',
+    welcomeTitle: 'Willkommen bei Farmily',
     welcomeSubtitle: 'Präzisionslandwirtschaft & Raumfahrtgestützte Erdbeobachtung',
     selectPrompt: 'Bitte wählen Sie Ihre bevorzugte Sprache für den Einstieg:',
     englishOptionTitle: 'English',
@@ -142,7 +142,7 @@ export const de: TranslationDictionary = {
     addFirstField: 'Erstes Feld hinzufügen',
 
     // List
-    yourFarmFields: 'Ihre Betriebsschläge',
+    yourFarmFields: 'Ihre Felder',
     addShort: 'Hinzufügen',
     noCropAssigned: 'Keine Kultur zugewiesen',
     openAnalyticsTooltip: 'Feldanalyse-Arbeitsbereich öffnen',
@@ -350,7 +350,7 @@ export const de: TranslationDictionary = {
   farmerProfile: {
     eyebrow: 'BETRIEBSPROFIL',
     title: 'Erzählen Sie uns von Ihrem Betrieb',
-    description: 'Ihre Prioritäten ermöglichen es FieldShift, Empfehlungen genau auf Ihre Bewirtschaftung abzustimmen.',
+    description: 'Ihre Prioritäten ermöglichen es Farmily, Empfehlungen genau auf Ihre Bewirtschaftung abzustimmen.',
     saveProfile: 'Profil speichern',
     saved: 'Gespeichert',
     profileSavedNotify: 'Betriebsprofil wurde gespeichert',
@@ -389,7 +389,7 @@ export const de: TranslationDictionary = {
     finishProfile: 'Profil abschließen',
     profileReadyNotify: 'Profil vollständig — bereit für Fruchtfolge-Empfehlungen',
     whyWeAskTitle: 'Warum wir fragen',
-    whyWeAskDesc: 'FieldShift verbindet Ihre praktische Erfahrung mit verlässlichen Erdbeobachtungsdaten. Sie behalten die volle Entscheidungskontrolle.',
+    whyWeAskDesc: 'Farmily verbindet Ihre praktische Erfahrung mit verlässlichen Erdbeobachtungsdaten. Sie behalten die volle Entscheidungskontrolle.',
     privacyNote: 'Ihre Betriebsdaten bleiben geschützt',
     explainableNote: 'Empfehlungen sind transparent nachvollziehbar',
     changeableNote: 'Jeder Eingabewert kann angepasst werden',
@@ -629,7 +629,7 @@ export const de: TranslationDictionary = {
     inputsUsedDemo: 'In dieser Demonstration genutzte Eingangsdaten',
     fiveSourcesBadge: '5 QUELLEN',
     modelInfo: 'Modell-Informationen',
-    engineName: 'FieldShift Fruchtfolge-Engine',
+    engineName: 'Farmily Fruchtfolge-Engine',
     engineVersion: 'v0.1 · Demo',
     modelType: 'Modelltyp',
     modelTypeVal: 'Multi-Kriterien-Optimierer',
@@ -667,9 +667,14 @@ export const de: TranslationDictionary = {
     soilPh: 'Boden-pH (H₂O)',
     organicCarbon: 'Organischer Kohlenstoff',
     bulkDensity: 'Lagerungsdichte',
+    compactionRisk: 'Verdichtungsrisiko',
+    normalForSandyLoam: 'Normal für sandigen Lehm',
     cec: 'Kationenaustauschkapazität (KAK)',
     totalNitrogen: 'Gesamtstickstoff',
+    totalNitrogenMeaning: 'Gesamtstickstoff im Boden',
+    totalNitrogenInfo: 'Gesamtstickstoff im Boden, nicht der für Pflanzen verfügbare Stickstoff.',
     cnRatio: 'C : N-Verhältnis',
+    cnRatioMeaning: 'Verhältnis von organischem Kohlenstoff zu Gesamtstickstoff',
     fineEarthDensity: 'Feinbodendichte',
     nutrientRetention: 'Nährstoffbindung',
     acidic: 'Sauer',
@@ -832,4 +837,18 @@ export const de: TranslationDictionary = {
     projectedNetGain: 'Prognostizierter Nettogewinn',
     additionalYield: 'Zusatzertrag',
   },
+  fieldAnalytics: {
+    tabs: { map: 'Feldkarte', health: 'Feldgesundheit', status: 'Status', data: 'Daten' },
+    layers: { water: 'Wasser', nitrogen: 'Stickstoff', nutrientLoss: 'Nährstoffverlust', risk: 'Risiko', waterTip: 'Wasserstatus innerhalb des Feldes', nitrogenTip: 'Zonen der Stickstoffaufnahme', nutrientLossTip: 'Bereiche mit höherem Nährstoffverlustrisiko', riskTip: 'Kombinierte Feldrisiken' },
+    kpi: { moisture: 'Bodenfeuchte', rain: 'Letzter Regen', health: 'Bodengesundheit', nitrogen: 'Stickstoff', addCrop: 'Kultur hinzufügen', days: 'Tage', low: 'Niedrig', medium: 'Mittel', ok: 'OK', unavailable: 'Nicht verfügbar', about: 'Informationen zu {label}', dry: 'Trockener als üblich', slightlyDry: 'Leicht trocken', usualMoisture: 'Im üblichen Bereich', rainRecent: '{amount} mm in 7 Tagen', nitrogenRemaining: 'kg N/ha für diese Saison übrig', nitrogenEstimate: 'Schätzung anhand von Kultur, Zielertrag, Nmin und bisherigen Gaben.', rootZone: 'Wurzelzone', source: 'Quelle', value: 'Wert', method: 'Methode' },
+    map: { updated: 'Aktualisiert {date}', oldData: 'Älter als 7 Tage', loading: 'Kartendaten werden geladen', unavailable: 'Diese Ebene ist nicht verfügbar.', legend: 'Kartenlegende' },
+    needs: { title: 'Handlungsbedarf', noRisks: 'Keine Risiken erkannt', why: 'Warum?', erosion: '{level}e {type}erosion', nutrientLoss: '{level} – Nährstoffverlust', dryArea: 'Niedrige Bodenfeuchte', reviewWater: 'Prüfen Sie den trockensten Bereich vor der Bewässerung.', erosionAction: 'Schützen Sie offenen Boden und vermeiden Sie Verkehr in gefährdeten Bereichen.', lossAction: 'Verschieben Sie die Stickstoffgabe bei erwartetem Starkregen.', levelLow: 'Niedrig', levelModerate: 'Mäßig', levelHigh: 'Hoch', levelUnknown: 'Unbekannt', wind: 'Wind', water: 'Wasser', sandyTopsoil: 'Sandiger Oberboden', heavyRainDays: 'Starkregentage', coverSoil: 'Bedecken Sie den Boden: Bauen Sie nach der Ernte eine Zwischenfrucht an und lassen Sie die Stoppeln stehen.', protectSoil: 'Schützen Sie offenen Boden und vermeiden Sie Verkehr in gefährdeten Bereichen.' },
+    health: { overall: 'Gesamtzustand', trendUnavailable: 'Trend nach dem nächsten Zeitraum verfügbar', weakest: 'Schwächster Faktor: {factor}', verdictGood: 'Das Feld ist insgesamt in gutem Zustand. Prüfen Sie zuerst den schwächsten Faktor.', verdictWatch: 'Einige Feldbedingungen benötigen Aufmerksamkeit.', whatToDo: 'Was ist zu tun?', doNow: 'Jetzt erledigen', keepInMind: 'Im Blick behalten', nothing: 'Derzeit besteht kein Handlungsbedarf.', blockingEnds: 'Endet am {date}', changing: 'Entwicklung', greenness: 'Pflanzenvitalität, letzte 3 Jahre', moisture: 'Bodenfeuchte, letzte 30 Tage', stable: 'Stabil', technicalNdvi: 'Technischer Messwert: NDVI aus wolkenfreien Sentinel-2-Bildern.', belowUsual: 'Unter dem üblichen Bereich ({from}–{to} m³/m³)', aboveUsual: 'Über dem üblichen Bereich', withinUsual: 'Im üblichen Bereich', today: 'Heute', productivity: 'Produktivitätszonen', productivityHelp: 'Die Zonen zeigen, wo das Pflanzenwachstum über mehrere Jahre stärker oder schwächer war.', high: 'Hoch', medium: 'Mittel', low: 'Niedrig', soilProfile: 'Bodenprofil', refresh: 'Aktualisieren', dryActionTitle: 'Bodenfeuchte niedriger als üblich', dryActionBody: 'Die Feuchte in der Wurzelzone liegt unter dem üblichen Bereich. Säen Sie nicht in ein trockenes Saatbett.', erosionActionTitle: '{level} {type}erosion', fertilizerBlockTitle: 'Düngersperrfrist', fertilizerBlockBody: 'Auf Ackerland darf bis zum {date} kein Stickstoff ausgebracht werden (Düngersperrfrist).', springGreenTitle: 'Schwächerer Frühjahrsaufwuchs', springGreenBody: 'Der Frühjahrsaufwuchs war schwächer als {year}. Prüfen Sie Kultur, Wetter und Boden.', nitrateRiskTitle: 'Risiko der Nitratauswaschung', coverCropTitle: 'Günstiger Zeitraum für eine Zwischenfrucht', limeTitle: 'Kalkbedarf prüfen', organicMatterTitle: 'Humus aufbauen' },
+    healthCopy: { goodLabel: 'Gut', weakestCompaction: 'Verdichtung', weakestSoilReaction: 'Boden-pH', weakestOrganicCarbon: 'organischer Kohlenstoff', weakestNutrientHolding: 'Nährstoffbindung', improving: 'Verbessert sich', stable: 'Stabil', declining: 'Rückläufig', aboutGreenness: 'Zur Pflanzenvitalität', aboutMoisture: 'Zur Bodenfeuchte', aboutZones: 'Zu Produktivitätszonen', measure: 'Messgröße', units: 'Einheiten', method: 'Methode', caveat: 'Hinweis' },
+    inputs: { title: 'Kultur- & Stickstoffangaben', subtitle: 'Ergänzen Sie die Felddaten für die Stickstoffschätzung.', cropGroup: 'Kultur', nitrogenGroup: 'Stickstoff', crop: 'Kultur', previousCrop: 'Vorfrucht', yieldTarget: 'Zielertrag (dt/ha)', yieldHelp: 'Erwarteter marktfähiger Ertrag für dieses Feld.', selectCrop: 'Kultur auswählen', selectPreviousCrop: 'Vorfrucht auswählen', nmin: 'Nmin 0–90 cm (kg N/ha)', nminHelp: 'Mineralischer Stickstoff aus der letzten Bodenprobe.', organicN: 'Organischer N im Vorjahr (kg/ha)', appliedN: 'Bisher ausgebrachter N (kg/ha)', lastDate: 'Datum der letzten N-Gabe', requiredHelp: 'Kultur, Zielertrag und Nmin sind erforderlich.', save: 'Angaben speichern', saving: 'Wird gespeichert …', saved: 'Kultur- und Stickstoffangaben gespeichert.', loadError: 'Angaben konnten nicht geladen werden.', saveError: 'Angaben konnten nicht gespeichert werden.' },
+    data: { search: 'Datenquellen suchen', weather: 'Wetter', soil: 'Boden', satellite: 'Satellit', inputs: 'Eingaben', cropInputs: 'Kultur- & Stickstoffangaben', noResults: 'Keine passenden Datenquellen gefunden.', expand: 'Gruppe anzeigen', collapse: 'Gruppe ausblenden' },
+    dashboardPanel: { openAnalytics: 'Feldanalyse öffnen', viewSoil: 'Bodenprofil ansehen', weatherAt: 'Wetter bei {field}', unavailable: 'Nicht verfügbar', loading: 'Wird geladen ...', loadingFields: 'Felder werden geladen', retry: 'Erneut versuchen', expand: 'Betriebsleiste öffnen', collapse: 'Betriebsleiste einklappen' },
+    sources: { modelled: 'Modell', satellite_estimate: 'Satellitenschätzung', measured: 'Satellitenschätzung', observed: 'Satellitenschätzung', derived: 'Berechnet', farmer_input: 'Ihre Eingabe' }
+  },
+
 };

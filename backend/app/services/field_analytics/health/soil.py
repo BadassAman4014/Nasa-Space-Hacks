@@ -66,5 +66,5 @@ def soil_health_score(field_id: str) -> Dict[str, Any]:
         "silt_pct": round(float(top.silt_pct), 1),
         "provenance": DERIVED,
         "source": "ISRIC SoilGrids v2.0, 0-30 cm, 250 m",
-        "method": "Equal-weight mean of four component scores. A FieldShift indicator, not an official soil index.",
+        "method": "Equal-weight mean of four component scores. A Farmily indicator, not an official soil index.",
     }

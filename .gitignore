@@ -37,3 +37,6 @@ scratch/onesoil_profile/
 
 # Crop planner local database (farmer inputs, cached POWER weather)
 backend/app/data/crop_planner.db*
+
+# Deployment
+

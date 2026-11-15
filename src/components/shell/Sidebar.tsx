@@ -5,11 +5,7 @@ export type PageKey =
   | 'analytics'
   | 'ai-assistant'
   | 'weather'
-  | 'environment'
-  | 'farmer-profile'
-  | 'rotation-studio'
-  | 'scenario-simulator'
-  | 'reports';
+  | 'rotation-studio';
 
 export function SidebarV2(props: FloatingSidebarProps) {
   return <FloatingSidebar {...props} />;

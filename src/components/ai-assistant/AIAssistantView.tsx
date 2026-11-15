@@ -342,7 +342,7 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
         <div className="assistant-header-left">
           <div className="assistant-brand-badge">
             <Sparkles size={16} className="assistant-brand-icon" />
-            <h1 className="assistant-header-title">FieldShift Assistant</h1>
+            <h1 className="assistant-header-title">Farmily Assistant</h1>
           </div>
 
           <div className="gemini-powered-pill">
@@ -576,7 +576,7 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
           <div className="assistant-disclaimer">
             <Info size={12} className="disclaimer-icon" />
             <span>
-              FieldShift AI recommendations are based on SoilGrids v2.0 and German DüV regulations.
+              Farmily recommendations are based on the sources listed in each response.
               Always cross-check field applications with certified agricultural testing.
             </span>
           </div>

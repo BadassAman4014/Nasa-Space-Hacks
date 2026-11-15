@@ -117,7 +117,7 @@ class AdvisorContextBuilder:
         area = round(float(field.get("area_hectares") or 0.0), 2)
         crop = field.get("current_crop") or None
         farm = user_farms_repo.get_farm(field["farm_id"]) if field.get("farm_id") else None
-        location = (farm or {}).get("location") or "Brandenburg, Germany"
+        location = (farm or {}).get("location") or "NOT AVAILABLE"
         lat = lon = None
         try:
             lat, lon = weather_station_service._calculate_centroid(field.get("geometry"))

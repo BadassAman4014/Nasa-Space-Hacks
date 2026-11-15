@@ -26,19 +26,19 @@ import {
 } from 'lucide-react';
 import {
   fetchAllFieldsWeather,
-  fetchAvailableFields,
   fetchFieldWeather,
   addVirtualStation,
   deleteVirtualStation,
   clearAllVirtualStations,
   type FieldWeatherSummary,
-  type AvailableField,
   type FieldWeatherData,
   type DailyForecastPoint,
   type MonthlyOutlookPoint,
   type MonthlyDayTrend,
   type DwdAlerts,
 } from '../../services/weatherApi';
+import type { SavedField } from '../../services/boundariesApi';
+import { calculateGeometryCentroid } from '../../services/geocodingService';
 import { createVirtualStationDivIcon } from './VirtualWeatherStationMarker';
 import { ThreeSatelliteViewer } from './ThreeSatelliteViewer';
 import { useI18n } from '../../i18n';
@@ -176,63 +176,47 @@ function BarSparkline({
 }
 
 export function WeatherView({
-  initialFieldId,
+  fields,
+  selectedFieldId,
+  locationLabel,
+  onSelectField,
   onNavigateFieldAnalytics,
 }: {
-  initialFieldId?: string | null;
+  fields: SavedField[];
+  selectedFieldId: string;
+  locationLabel?: string;
+  onSelectField: (fieldId: string) => void;
   onNavigateFieldAnalytics?: (fieldId: string) => void;
 }) {
-  const [availableFields, setAvailableFields] = useState<AvailableField[]>([]);
   const [fieldsSummary, setFieldsSummary] = useState<FieldWeatherSummary[]>([]);
-  const [selectedFieldId, setSelectedFieldId] = useState<string>(initialFieldId || '');
   const [fieldWeather, setFieldWeather] = useState<FieldWeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [weatherError, setWeatherError] = useState<string | null>(null);
-
-  // Sync selected field with dashboard selection by default
-  useEffect(() => {
-    if (initialFieldId) {
-      setSelectedFieldId(initialFieldId);
-    }
-  }, [initialFieldId]);
 
   // Layer switches: 'satellite' | 'ndvi' | 'weather'
   const [activeLayer, setActiveLayer] = useState<'satellite' | 'ndvi' | 'weather'>('satellite');
 
   // Weather Card Tabs: 'daily' | 'weekly' | 'monthly' (No duplicate dropdown)
   const [forecastTab, setForecastTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [isCardMinimized, setIsCardMinimized] = useState<boolean>(false);
+  const [isCardMinimized, setIsCardMinimized] = useState<boolean>(true);
 
   // Popups & Modals
   const [is3DExpanded, setIs3DExpanded] = useState<boolean>(false);
   const [stationModalOpen, setStationModalOpen] = useState<boolean>(false);
   const [activeStationPopup, setActiveStationPopup] = useState<FieldWeatherSummary | null>(null);
 
-  // 1. Initial Load of all fields and active stations
+  // Refresh weather summaries without owning a second field-selection state.
   const loadSummaries = useCallback(async () => {
     try {
       setRefreshing(true);
-      const [allFields, summaries] = await Promise.all([
-        fetchAvailableFields().catch(() => [] as AvailableField[]),
-        fetchAllFieldsWeather().catch(() => [] as FieldWeatherSummary[]),
-      ]);
-      setAvailableFields(allFields);
-      setFieldsSummary(summaries);
-
-      if (!selectedFieldId) {
-        if (initialFieldId && allFields.some((f) => f.field_id === initialFieldId)) {
-          setSelectedFieldId(initialFieldId);
-        } else if (allFields.length > 0) {
-          setSelectedFieldId(allFields[0].field_id);
-        }
-      }
+      setFieldsSummary(await fetchAllFieldsWeather().catch(() => [] as FieldWeatherSummary[]));
     } catch (err) {
-      console.error('Failed to load fields and weather:', err);
+      console.error('Failed to load fields weather:', err);
     } finally {
       setRefreshing(false);
     }
-  }, [selectedFieldId, initialFieldId]);
+  }, []);
 
   useEffect(() => {
     loadSummaries();
@@ -270,13 +254,17 @@ export function WeatherView({
     return fieldsSummary.find((f) => f.field_id === selectedFieldId) || null;
   }, [fieldsSummary, selectedFieldId]);
 
-  // Active available field
+  const availableFields = useMemo(() => fields.map((field) => ({
+    field_id: field.id,
+    field_name: field.name,
+    farm_name: field.farm_name || '',
+    has_station: fieldsSummary.some((summary) => summary.field_id === field.id),
+    geometry: field.geometry,
+  })), [fields, fieldsSummary]);
+
+  // Active selected field from the shared App state.
   const currentAvailableField = useMemo(() => {
-    return (
-      availableFields.find((f) => f.field_id === selectedFieldId) ||
-      availableFields[0] ||
-      null
-    );
+    return availableFields.find((field) => field.field_id === selectedFieldId) || null;
   }, [availableFields, selectedFieldId]);
 
   // Whether current selected field has an active virtual station
@@ -288,8 +276,8 @@ export function WeatherView({
   const mapCenter: [number, number] = useMemo(() => {
     if (fieldWeather?.coordinates) return fieldWeather.coordinates;
     if (currentSummary?.coordinates) return currentSummary.coordinates;
-    return [52.4312, 12.9948];
-  }, [fieldWeather, currentSummary]);
+    return calculateGeometryCentroid(currentAvailableField?.geometry) || [0, 0];
+  }, [fieldWeather, currentSummary, currentAvailableField]);
 
   // Add virtual station
   const handleAddStation = async (fieldId: string) => {
@@ -387,11 +375,11 @@ export function WeatherView({
   return (
     <div className="relative w-full h-full min-h-0 flex-1 overflow-hidden bg-[#F3F4F2] font-sans select-none flex flex-col">
       {/* 1. TOP FLOATING BAR (Clean, Single Field Selector Capsule) */}
-      <div className="absolute top-4 left-4 z-[500] flex items-center gap-3">
+      <div className="absolute top-3 left-3 right-20 z-[500] flex flex-wrap items-center gap-2 sm:top-4 sm:left-4 sm:right-32 sm:gap-3">
         {/* Field Selector Pill - Clean, with integrated selection, no duplicate dropdown */}
         <div className="relative bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl shadow-lg px-4 py-2 flex items-center gap-3 group hover:border-[#1fa35b] transition-all">
           <div className="w-6 h-6 rounded-lg bg-[#1fa35b]/15 text-[#1fa35b] flex items-center justify-center font-extrabold text-xs">
-            FS
+            F
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
@@ -407,7 +395,7 @@ export function WeatherView({
           <select
             value={selectedFieldId}
             onChange={(e) => {
-              setSelectedFieldId(e.target.value);
+              onSelectField(e.target.value);
               const st = fieldsSummary.find((s) => s.field_id === e.target.value);
               if (st) {
                 setActiveStationPopup(st);
@@ -434,7 +422,7 @@ export function WeatherView({
           title="Manage Virtual Weather Stations"
         >
           <Radio size={15} className="text-[#1fa35b] animate-pulse" />
-          <span>Virtual Stations ({fieldsSummary.length})</span>
+          <span className="hidden md:inline">Virtual Stations ({fieldsSummary.length})</span>
         </button>
 
         {/* Refresh button */}
@@ -574,7 +562,7 @@ export function WeatherView({
                 }}
                 eventHandlers={{
                   click: () => {
-                    setSelectedFieldId(f.field_id);
+                    onSelectField(f.field_id);
                     const st = fieldsSummary.find((s) => s.field_id === f.field_id);
                     if (st) {
                       setActiveStationPopup(st);
@@ -587,7 +575,8 @@ export function WeatherView({
 
           {/* Virtual Weather Station Markers */}
           {fieldsSummary.map((station) => {
-            const pos: [number, number] = station.coordinates || [52.415, 13.045];
+            if (!station.coordinates) return null;
+            const pos: [number, number] = station.coordinates;
             return (
               <Marker
                 key={`station-${station.field_id}`}
@@ -595,7 +584,7 @@ export function WeatherView({
                 icon={createVirtualStationDivIcon(station, station.field_id === selectedFieldId)}
                 eventHandlers={{
                   click: () => {
-                    setSelectedFieldId(station.field_id);
+                    onSelectField(station.field_id);
                     setActiveStationPopup(station);
                   },
                 }}
@@ -681,18 +670,18 @@ export function WeatherView({
       )}
 
       {/* 6. COMPREHENSIVE WEATHER FORECAST & TELEMETRY CARD (Daily / Weekly / Monthly) */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[500] w-[95%] max-w-4xl transition-all">
-        <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-slate-200/90 shadow-2xl p-4 sm:p-5 flex flex-col gap-4 transition-all max-h-[82vh] overflow-y-auto">
+      <div className="absolute bottom-2 left-1/2 z-[500] w-[calc(100%-1rem)] max-w-5xl -translate-x-1/2 transform transition-all sm:bottom-4 sm:w-[94%]">
+        <div className="flex max-h-[72vh] flex-col gap-2 overflow-y-auto rounded-2xl border border-slate-200/90 bg-white/95 p-2.5 shadow-2xl backdrop-blur-md transition-all sm:rounded-3xl sm:p-3">
           {/* Top Bar of the Card */}
           <div className="flex items-center justify-between flex-wrap gap-3">
             {/* Title & Station Name */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-100/80 text-[#1fa35b] flex items-center justify-center font-black text-sm shadow-inner flex-shrink-0">
-                <Radio size={20} className={hasStation ? 'animate-pulse' : 'text-slate-400'} />
+              <div className="w-8 h-8 rounded-xl bg-emerald-100/80 text-[#1fa35b] flex items-center justify-center font-black text-xs shadow-inner flex-shrink-0">
+                <Radio size={16} className={hasStation ? 'animate-pulse' : 'text-slate-400'} />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <span className="text-base font-black text-slate-900 tracking-tight">
+                  <span className="text-sm font-black text-slate-900 tracking-tight">
                     {hasStation
                       ? `Virtual Weather Station • ${currentAvailableField?.field_name || 'Field'}`
                       : `${currentAvailableField?.field_name || 'Field'}`}
@@ -707,14 +696,23 @@ export function WeatherView({
                   </span>
                 </div>
                 <span className="text-[11px] text-slate-500 font-semibold">
-                  {currentAvailableField?.farm_name || 'My Farm'} • Season {new Date().getFullYear()}
+                  {currentAvailableField?.farm_name || 'Farm'}{locationLabel ? ` · ${locationLabel}` : ''}
                 </span>
               </div>
             </div>
 
-            {/* Segmented Selector Buttons (Only 1 clean selector, NO duplicate dropdown!) */}
+            {fieldWeather && (
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-700">
+                <span><Thermometer size={12} className="mr-1 inline text-amber-500" />{Math.round(fieldWeather.current.temperature_c)}°C</span>
+                <span><CloudRain size={12} className="mr-1 inline text-sky-500" />{fieldWeather.current.precipitation_mm} mm</span>
+                <span><Wind size={12} className="mr-1 inline" />{Math.round(fieldWeather.current.wind_speed_ms)} m/s</span>
+                <span><Droplets size={12} className="mr-1 inline text-sky-500" />{Math.round(fieldWeather.current.humidity_percent)}%</span>
+              </div>
+            )}
+
+            {/* Forecast range and expand controls */}
             <div className="flex items-center gap-2 ml-auto">
-              {hasStation && (
+              {hasStation && !isCardMinimized && (
                 <div className="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200 shadow-inner">
                   <button
                     onClick={() => setForecastTab('daily')}
@@ -795,7 +793,7 @@ export function WeatherView({
                   {forecastTab === 'daily' && (
                     <div className="flex flex-col gap-4">
                       {/* Grid of 6 Microclimate Step Cards */}
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
+                      <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
                         {/* 1. Temperature */}
                         <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between shadow-sm">
                           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 mb-0.5">

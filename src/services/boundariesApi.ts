@@ -105,25 +105,12 @@ const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? '';
 
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
-  try {
-    const res = await fetch(url, options);
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`API error ${res.status}: ${errText || res.statusText}`);
-    }
-    return (await res.json()) as T;
-  } catch (err) {
-    if (!API_BASE) {
-      const fallbackUrl = `http://127.0.0.1:8000${endpoint}`;
-      const res = await fetch(fallbackUrl, options);
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`Fallback API error ${res.status}: ${errText || res.statusText}`);
-      }
-      return (await res.json()) as T;
-    }
-    throw err;
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`API error ${res.status}: ${errText || res.statusText}`);
   }
+  return (await res.json()) as T;
 }
 
 export const boundariesApi = {

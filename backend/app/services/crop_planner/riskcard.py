@@ -2,7 +2,7 @@
 Field risk and bare-soil diagnostic card: slope erosion risk, summer heat stress and bare-soil days, each with the
 source that was actually used.
 
-Erosion uses the same points rule as the existing FieldShift Field Health screen (slope, heavy-rain days, bare soil):
+Erosion uses the same points rule as the existing Farmily Field Health screen (slope, heavy-rain days, bare soil):
 a screening rule, not a DIN 19708 assessment. Heat stress uses ECOSTRESS ESI; if no summer overpass is stored, the
 mean number of hot days (Tmax >= 30 deg C, DWD 'Hitzetag') from NASA POWER is shown instead and the card says so.
 """
@@ -55,7 +55,7 @@ def erosion_item(signals: Dict[str, Dict[str, Any]], weights: Dict[str, Any]) ->
     if missing:
         reading += f" Based on available factors only (missing: {', '.join(missing)}); the real risk may be higher."
     return {"id": "erosion", "label": "Slope erosion risk", "level": level, "points": pts, "reading": reading, "factors": factors,
-            "sources": sorted({f["source"] for f in factors}), "method": "Points per factor: slope >= 5° 2, >= 2° 1; >= 3 heavy-rain days 1; >= 30 % of the year bare 1. Total 0-1 green, 2 yellow, >= 3 red. Same screening rule as FieldShift Field Health."}
+            "sources": sorted({f["source"] for f in factors}), "method": "Points per factor: slope >= 5° 2, >= 2° 1; >= 3 heavy-rain days 1; >= 30 % of the year bare 1. Total 0-1 green, 2 yellow, >= 3 red. Same screening rule as Farmily Field Health."}
 
 
 def power_hot_days(lat: float, lon: float, years: List[int], store: PlannerStore) -> Optional[Dict[str, Any]]:

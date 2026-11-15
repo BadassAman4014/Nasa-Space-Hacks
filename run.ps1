@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
-    FieldShift AI - Complete Stack Launcher
+    Farmily - Complete Stack Launcher
 .DESCRIPTION
     Starts the FastAPI backend (port 8000) and Vite React frontend (port 5173),
     verifies health, optionally opens the browser, and handles clean process termination.
 .PARAMETER SeparateWindows
     Launch backend and frontend in separate dedicated console windows.
 .PARAMETER Stop
-    Stop all running FieldShift AI backend and frontend processes.
+    Stop all running Farmily backend and frontend processes.
 .PARAMETER NoBrowser
     Do not automatically open the browser once services are ready.
 .EXAMPLE
@@ -36,7 +36,7 @@ function Write-BrandHeader {
     Clear-Host
     Write-Host ""
     Write-Host " ==================================================================" -ForegroundColor Green
-    Write-Host "   FieldShift AI - High-Precision Satellite & Weather Platform" -ForegroundColor White
+    Write-Host "   Farmily - High-Precision Satellite & Weather Platform" -ForegroundColor White
     Write-Host "   NASA Space Hacks • Automated Full-Stack Environment" -ForegroundColor DarkGray
     Write-Host " ==================================================================" -ForegroundColor Green
     Write-Host ""
@@ -80,7 +80,7 @@ function Test-PortOpen([string]$HostName, [int]$Port) {
 
 if ($Stop) {
     Write-BrandHeader
-    Write-Host " Stopping all FieldShift AI services..." -ForegroundColor Yellow
+    Write-Host " Stopping all Farmily services..." -ForegroundColor Yellow
     Stop-PortProcess -Port 8000
     Stop-PortProcess -Port 5173
     Write-Host " [SUCCESS] All backend and frontend services have been stopped.`n" -ForegroundColor Green
@@ -127,10 +127,10 @@ $frontendScript = "npm run dev -- --host 127.0.0.1 --port 5173"
 
 if ($SeparateWindows) {
     Write-Host "   -> Launching FastAPI Backend in dedicated window..." -ForegroundColor White
-    $backendProcess = Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$RootPath'; `$host.UI.RawUI.WindowTitle = 'FieldShift AI - Backend (8000)'; $backendScript" -PassThru
+    $backendProcess = Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$RootPath'; `$host.UI.RawUI.WindowTitle = 'Farmily - Backend (8000)'; $backendScript" -PassThru
 
     Write-Host "   -> Launching Vite Frontend in dedicated window..." -ForegroundColor White
-    $frontendProcess = Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$RootPath'; `$host.UI.RawUI.WindowTitle = 'FieldShift AI - Frontend (5173)'; $frontendScript" -PassThru
+    $frontendProcess = Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$RootPath'; `$host.UI.RawUI.WindowTitle = 'Farmily - Frontend (5173)'; $frontendScript" -PassThru
 }
 else {
     Write-Host "   -> Starting FastAPI Backend (http://127.0.0.1:8000)..." -ForegroundColor White

@@ -12,35 +12,6 @@ export interface Signal {
   reason: string | null;
 }
 
-export type RiskLevel = 'green' | 'yellow' | 'red' | 'info' | 'unavailable';
-
-export interface RiskItem {
-  id: 'erosion' | 'heat_stress' | 'bare_soil';
-  label: string;
-  level: RiskLevel;
-  reading: string;
-  value?: number;
-  source_used?: string | null;
-  as_of?: string | null;
-  sources?: string[];
-  method?: string | null;
-  factors?: { factor: string; value: string; points: number | null; provenance?: Provenance; as_of?: string | null; source: string; reason?: string }[];
-}
-
-export interface RiskCardData {
-  field_id: string;
-  field_name: string;
-  area_ha: number;
-  items: RiskItem[];
-  signals: Record<string, Signal>;
-  soil_texture: {
-    farmer: string | null;
-    satellite: string | null;
-    label_source: 'farmer-provided' | 'SoilGrids';
-    check: { consistent: boolean | null; note: string | null } | null;
-  };
-}
-
 export interface CropOption {
   id: string;
   label_en: string;

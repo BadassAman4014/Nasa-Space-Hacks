@@ -5,6 +5,7 @@ import {
   Layers,
   CheckCircle2,
   ChevronDown,
+  CloudSun,
 } from 'lucide-react';
 import { FieldStatusSummary } from '../../services/fieldAnalyticsApi';
 import { SavedField } from '../../services/boundariesApi';
@@ -18,7 +19,9 @@ interface FieldHeaderProps {
   setActiveTab: (tab: WorkspaceTab) => void;
   onClose: () => void;
   fields?: SavedField[];
+  locationLabel?: string;
   onSelectField?: (fieldId: string) => void;
+  onOpenWeather?: () => void;
 }
 
 export const FieldHeader: React.FC<FieldHeaderProps> = ({
@@ -27,7 +30,9 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
   setActiveTab,
   onClose,
   fields = [],
+  locationLabel,
   onSelectField,
+  onOpenWeather,
 }) => {
   const { t, formatHectares } = useI18n();
   const [fieldDropdownOpen, setFieldDropdownOpen] = useState(false);
@@ -49,9 +54,8 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
   }, [fieldDropdownOpen]);
 
   return (
-    <header className="bg-[#f1f4f2]/90 backdrop-blur-md px-6 md:px-8 py-4 flex flex-col md:flex-row md:flex-wrap md:items-center justify-between gap-4 sticky top-0 z-30 transition-all">
-      {/* Left: Back button & Field Title/Subtitle */}
-      <div className="flex items-center gap-3.5 min-w-[260px] shrink-0">
+    <header className="field-analytics-header sticky top-0 z-30 flex flex-col bg-white px-4 pt-4 shadow-sm md:px-8">
+      <div className="flex w-full min-w-0 items-center gap-3.5 overflow-x-auto whitespace-nowrap pb-4 pr-[200px]">
         <button
           onClick={onClose}
           className="p-2 rounded-xl text-gray-600 hover:text-gray-900 bg-white/80 hover:bg-white transition flex items-center justify-center border border-black/[0.06] shadow-xs cursor-pointer"
@@ -150,7 +154,7 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-gray-500 mt-0.5 font-medium">
+          <div className="mt-0.5 flex flex-nowrap items-center gap-2.5 text-sm font-medium text-gray-600">
             <span className="font-bold text-gray-800">{formatHectares(summary.area_ha)}</span>
             <span>•</span>
             <span className="text-gray-700">{summary.current_crop || t('analytics.noCropAssigned')}</span>
@@ -160,66 +164,73 @@ export const FieldHeader: React.FC<FieldHeaderProps> = ({
             </span>
             <span>•</span>
             <span className="flex items-center gap-1 text-gray-500">
-              <MapPin size={12} /> {summary.location}
+              <MapPin size={12} /> {locationLabel || 'Resolving field location'}
             </span>
+            {summary.current_weather && (
+              <button onClick={onOpenWeather} className="flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-800 hover:bg-sky-100">
+                <CloudSun size={13} /> {Math.round(summary.current_weather.temperature_c)}°C · {summary.current_weather.condition}
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Middle: 5 Navigation Tabs (OneSoil Architecture) */}
-      <div className="flex items-center bg-slate-200/50 p-1 rounded-2xl border border-black/[0.04] flex-shrink-0">
+      {/* Centered analytics navigation */}
+      <nav
+        className="flex w-full items-center justify-start gap-2 overflow-x-auto border-t border-slate-100 sm:justify-center"
+        aria-label="Field analytics sections"
+      >
         {/* Field Map */}
         <button
           type="button"
           onClick={() => setActiveTab('map')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
-            activeTab === 'map' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-600 hover:text-gray-900'
+          className={`border-b-2 px-5 py-3 text-sm font-bold transition whitespace-nowrap cursor-pointer ${
+            activeTab === 'map' ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Field Map
+          {t('fieldAnalytics.tabs.map')}
         </button>
 
         {/* Field Health Trend */}
         <button
           type="button"
           onClick={() => setActiveTab('health')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
-            activeTab === 'health' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-600 hover:text-gray-900'
+          className={`border-b-2 px-5 py-3 text-sm font-bold transition whitespace-nowrap cursor-pointer ${
+            activeTab === 'health' ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Field Health
+          {t('fieldAnalytics.tabs.health')}
         </button>
 
-        {/* Tab 1: Status */}
+        {/* Status */}
         <button
           type="button"
           onClick={() => setActiveTab('status')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
+          className={`border-b-2 px-5 py-3 text-sm font-bold transition whitespace-nowrap cursor-pointer ${
             activeTab === 'status'
-              ? 'bg-white text-gray-900 shadow-xs'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'border-emerald-600 text-emerald-700'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          {t('analytics.statusTab')}
+          {t('fieldAnalytics.tabs.status')}
         </button>
 
         {/* Tab 4: Data +23 */}
         <button
           type="button"
           onClick={() => setActiveTab('data')}
-          className={`px-2.5 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+          className={`border-b-2 px-5 py-3 text-sm font-bold transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
             activeTab === 'data'
-              ? 'bg-white text-gray-900 shadow-xs'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'border-emerald-600 text-emerald-700'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          <span>{t('analytics.dataTab')}</span>
+          <span>{t('fieldAnalytics.tabs.data')}</span>
           <span className="px-1.5 py-0.2 rounded-md bg-blue-100 text-blue-800 text-[10px] font-extrabold">
             +23
           </span>
         </button>
-
-      </div>
+      </nav>
     </header>
   );
 };

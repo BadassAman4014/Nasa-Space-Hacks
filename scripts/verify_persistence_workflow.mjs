@@ -10,7 +10,7 @@ async function wait(ms) {
 
 async function runScenario() {
   console.log('================================================================');
-  console.log('FieldShift AI — Persistent My Farms / My Fields Verification');
+  console.log('Farmily — Persistent My Farms / My Fields Verification');
   console.log('================================================================');
 
   // Step 1: Ensure SQLite database starts in clean state

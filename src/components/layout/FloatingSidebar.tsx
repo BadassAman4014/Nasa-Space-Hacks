@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { SidebarBrand } from './SidebarBrand';
 import { SidebarNavigation, type PageKey } from './SidebarNavigation';
-import { SidebarBottomSection } from './SidebarBottomSection';
-import { SettingsModal } from '../common/SettingsModal';
-import { useI18n } from '../../i18n';
 import './floating-sidebar.css';
 
 export interface FloatingSidebarProps {
@@ -19,10 +16,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
   navigate,
   mobileOpen,
   onClose,
-  notify,
 }) => {
-  const { t } = useI18n();
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Close on Escape key on mobile
   useEffect(() => {
@@ -35,19 +29,6 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileOpen, onClose]);
 
-  const handleSettings = () => {
-    setSettingsOpen(true);
-  };
-
-  const handleHelp = () => {
-    if (notify) {
-      notify(t('nav.helpCenter') + ': FieldShift AI Support is active');
-    }
-  };
-
-  const handleProfile = () => {
-    navigate('farmer-profile');
-  };
 
   return (
     <>
@@ -76,21 +57,9 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
           {/* Main Navigation */}
           <SidebarNavigation page={page} navigate={navigate} />
 
-          {/* Bottom Section (Settings, Help & Support, User Profile) */}
-          <SidebarBottomSection
-            onSettingsClick={handleSettings}
-            onHelpClick={handleHelp}
-            onProfileClick={handleProfile}
-          />
         </aside>
       </div>
 
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        notify={notify}
-      />
     </>
   );
 };

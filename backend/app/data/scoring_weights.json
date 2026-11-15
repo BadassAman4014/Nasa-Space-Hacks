@@ -26,8 +26,8 @@
     "min_catch_crop_window_days": 30,
     "note": "Gap days and catch-crop window are model parameters. Qualitative support: BZL (Raps is sown in mid-August, so late-harvested crops are not suitable predecessors) and TLL Winterroggen guideline (late-clearing predecessors such as maize or beet are unsuitable)."
   },
-  "bare_ndvi_threshold": {"value": 0.25, "ref": "Same threshold the existing FieldShift erosion screening uses (health/risks.py)."},
-  "heavy_rain_mm_day": {"value": 20.0, "ref": "Same threshold the existing FieldShift rain summary uses (health/risks.py)."},
+  "bare_ndvi_threshold": {"value": 0.25, "ref": "Same threshold the existing Farmily erosion screening uses (health/risks.py)."},
+  "heavy_rain_mm_day": {"value": 20.0, "ref": "Same threshold the existing Farmily rain summary uses (health/risks.py)."},
   "percolation_months": {"value": [10, 11, 12, 1, 2, 3], "ref": "Model choice: months in which rainfall mostly drains below the root zone in a central European climate."},
   "timeline": {
     "hazard_bands": {"medium_from": 0.33, "high_from": 0.66},
@@ -37,6 +37,6 @@
   "traffic_light": {
     "heat_stress_esi": {"yellow_below": 0.6, "red_below": 0.4},
     "bare_days": {"yellow_from": 110, "red_from": 183},
-    "note": "Display colours for the risk card only. They do not feed the scores. 110 days is the 30 % of a year that the existing FieldShift erosion screening already uses for bare soil; 183 days is half a year. The ESI bands are display choices."
+    "note": "Display colours for the risk card only. They do not feed the scores. 110 days is the 30 % of a year that the existing Farmily erosion screening already uses for bare soil; 183 days is half a year. The ESI bands are display choices."
   }
 }

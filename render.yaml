@@ -1,0 +1,63 @@
+services:
+  # FastAPI Backend Service (Docker)
+  - type: web
+    name: nasa-space-hacks-backend
+    runtime: docker
+    rootDir: backend
+    plan: starter
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8000
+      # NASA Earthdata credentials (set in Render dashboard)
+      - key: EARTHDATA_USERNAME
+        sync: false
+      - key: EARTHDATA_PASSWORD
+        sync: false
+      - key: EARTHDATA_TOKEN
+        sync: false
+      # Google Gemini API
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      # CORS settings - update with your Vercel domain after deployment
+      - key: CORS_ORIGINS
+        value: https://nasa-space-hacks.vercel.app,http://localhost:5173
+      # Data directory
+      - key: DATA_DIR
+        value: /data
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 5  # Increased for satellite data caching
+
+  # Optional: Background Worker for NASA AppEEARS
+  - type: worker
+    name: nasa-worker
+    runtime: python
+    rootDir: backend
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m app.services.nasa.real.appeears worker
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      # Share the same credentials as web service
+      - key: EARTHDATA_USERNAME
+        fromService:
+          type: web
+          name: nasa-space-hacks-backend
+          envVarKey: EARTHDATA_USERNAME
+      - key: EARTHDATA_PASSWORD
+        fromService:
+          type: web
+          name: nasa-space-hacks-backend
+          envVarKey: EARTHDATA_PASSWORD
+      - key: EARTHDATA_TOKEN
+        fromService:
+          type: web
+          name: nasa-space-hacks-backend
+          envVarKey: EARTHDATA_TOKEN

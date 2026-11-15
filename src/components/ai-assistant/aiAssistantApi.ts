@@ -12,8 +12,6 @@ const API_BASE = '/api/ai-assistant';
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const urls = [
     `${API_BASE}${endpoint}`,
-    `http://127.0.0.1:8000/api/ai-assistant${endpoint}`,
-    `http://localhost:8000/api/ai-assistant${endpoint}`,
   ];
   let lastError: Error | null = null;
 

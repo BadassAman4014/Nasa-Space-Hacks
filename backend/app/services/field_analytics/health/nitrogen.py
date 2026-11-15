@@ -4,7 +4,7 @@ the German Fertiliser Ordinance (DüV 2020, § 4 and Anlage 4).
 
 This is not an official Düngebedarfsermittlung. The legal value must come from the
 farm's own calculation (in Brandenburg typically BESyD) with its measured Nmin.
-Red-zone (nitrate area) status is not known to FieldShift, so the 20 % reduction for
+Red-zone (nitrate area) status is not known to Farmily, so the 20 % reduction for
 those areas is not applied and the user is told so.
 """
 
@@ -145,7 +145,7 @@ def nitrogen_estimate(field_id: str, humus_pct: Optional[float]) -> Dict[str, An
         "inputs_provenance": FARMER_INPUT,
         "warnings": [
             "Estimate following DüV § 4 / Anlage 4, not an official Düngebedarfsermittlung. Use your BESyD or advisor calculation for the legal limit.",
-            "Red-zone (nitrate area) status is not known to FieldShift. In a red zone the requirement must be reduced by 20 %.",
+            "Red-zone (nitrate area) status is not known to Farmily. In a red zone the requirement must be reduced by 20 %.",
         ],
         **base,
     }

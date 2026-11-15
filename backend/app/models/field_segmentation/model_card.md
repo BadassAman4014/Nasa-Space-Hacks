@@ -1,4 +1,4 @@
-# FieldShift AI — Agricultural Field Boundary Segmentation Model Card
+# Farmily — Agricultural Field Boundary Segmentation Model Card
 
 ## Model Overview
 - **Architecture**: U-Net with MobileNetV3-Small Encoder

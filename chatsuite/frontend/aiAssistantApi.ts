@@ -7,7 +7,7 @@ import type {
   FieldCategory,
 } from './types';
 
-const API_BASE = 'http://localhost:8000/api/ai-assistant';
+const API_BASE = '/api/ai-assistant';
 
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const urls = [`${API_BASE}${endpoint}`, `/api/ai-assistant${endpoint}`];

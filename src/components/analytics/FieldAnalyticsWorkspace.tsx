@@ -11,14 +11,17 @@ import {
 import { FieldHeader, WorkspaceTab } from './FieldHeader';
 import { StatusTab } from './StatusTab';
 import { DataCatalogTab } from './DataCatalogTab';
-import { boundariesApi, type SavedField } from '../../services/boundariesApi';
+import { type SavedField } from '../../services/boundariesApi';
 import { FieldMapTab } from './health/FieldMapTab';
 import { FieldHealthTab } from './health/FieldHealthTab';
+import { CropNitrogenDrawer } from './health/CropNitrogenDrawer';
 
 interface FieldAnalyticsWorkspaceProps {
   fieldId: string;
   onClose: () => void;
   notify: (msg: string) => void;
+  fields: SavedField[];
+  locationLabel?: string;
   onSelectField?: (id: string) => void;
   onNavigate?: (page: string) => void;
 }
@@ -33,10 +36,18 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
   fieldId,
   onClose,
   notify,
+  fields,
+  locationLabel,
   onSelectField,
   onNavigate,
 }) => {
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('map');
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(() => {
+    const queryTab = new URLSearchParams(window.location.search).get('tab');
+    const requested = queryTab === 'risk' ? 'map' : sessionStorage.getItem('farmily_analytics_tab') || queryTab;
+    sessionStorage.removeItem('farmily_analytics_tab');
+    return requested === 'health' || requested === 'status' || requested === 'data' ? requested : 'map';
+  });
+  const initialMapLayer = window.location.pathname.replace(/\/$/, '') === '/risk' || new URLSearchParams(window.location.search).get('tab') === 'risk' ? 'risk' : 'water';
   const [loading, setLoading] = useState(true);
   const [, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,21 +57,15 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
   const [precipData, setPrecipData] = useState<PrecipitationTimeSeriesResponse | null>(null);
   const [gddData, setGddData] = useState<GDDTimeSeriesResponse | null>(null);
   const [fullReport, setFullReport] = useState<FullFieldReportResponse | null>(null);
+  const [inputsOpen, setInputsOpen] = useState(false);
+  const [inputRevision, setInputRevision] = useState(0);
 
   const [selectedBaseTemp, setSelectedBaseTemp] = useState<number>(4.4);
-  const [availableFields, setAvailableFields] = useState<SavedField[]>([]);
   const [batchProgress, setBatchProgress] = useState<ProgressiveBatchProgress>({
     loaded: 0,
     total: 0,
     isStreaming: false,
   });
-
-  // Load list of available user fields for the field switcher dropdown
-  useEffect(() => {
-    boundariesApi.listFields().then((fList) => {
-      if (Array.isArray(fList)) setAvailableFields(fList);
-    }).catch((e) => console.warn('Could not load fields for switcher:', e));
-  }, []);
 
   const loadAllData = useCallback(
     async (isRefresh = false) => {
@@ -174,8 +179,8 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
   );
 
   useEffect(() => {
-    loadAllData(false);
-  }, [fieldId]);
+    void loadAllData(false);
+  }, [fieldId, loadAllData]);
 
   const handleUpdatePlantingDate = async (date: string) => {
     try {
@@ -250,18 +255,22 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onClose={onClose}
-        fields={availableFields}
+        fields={fields}
+        locationLabel={locationLabel}
         onSelectField={onSelectField}
+        onOpenWeather={() => onNavigate?.('weather')}
       />
 
       {/* Main Tab Content */}
       <main className="flex-1 px-6 md:px-8 pb-10 pt-2">
         {activeTab === 'map' && (
           <FieldMapTab
+            key={`${fieldId}-${inputRevision}`}
             fieldId={fieldId}
             onSelectField={onSelectField}
             onOpenHealth={() => setActiveTab('health')}
-            onNavigate={onNavigate}
+            onOpenInputs={() => setInputsOpen(true)}
+            initialLayer={initialMapLayer}
           />
         )}
 
@@ -285,11 +294,21 @@ export const FieldAnalyticsWorkspace: React.FC<FieldAnalyticsWorkspaceProps> = (
             summary={summary}
             fullReport={fullReport}
             ndviData={ndviData}
+            locationLabel={locationLabel}
             notify={notify}
+            onOpenInputs={() => setInputsOpen(true)}
           />
         )}
 
       </main>
+
+      <CropNitrogenDrawer
+        fieldId={fieldId}
+        open={inputsOpen}
+        onClose={() => setInputsOpen(false)}
+        onSaved={() => setInputRevision((revision) => revision + 1)}
+        notify={notify}
+      />
     </div>
   );
 };

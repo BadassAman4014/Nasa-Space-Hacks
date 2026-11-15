@@ -1,6 +1,6 @@
-# FieldShift AI
+# Farmily
 
-FieldShift AI is a farmer-facing crop rotation decision-support workspace for Brandenburg, Germany. The frontend is a responsive React/Vite application with demonstration data clearly marked throughout the interface. The backend folder contains the intended FastAPI contract and service boundary for connecting validated farm records, NASA Earth observation datasets and calibrated recommendation models.
+Farmily is a farmer-facing crop rotation decision-support workspace. The frontend is a responsive React/Vite application connected to persisted field records and available environmental data sources. The backend contains the FastAPI contracts and services for validated farm records, Earth observation datasets, weather, soil evidence, and crop-planning recommendations.
 
 ## Frontend
 
@@ -20,14 +20,13 @@ Backend configuration is documented in `backend/.env.example`.
 
 ## Completed modules
 
-- Dashboard with farm selector, environmental cards, suitability, soil trend, weather and satellite-style field map
-- Field Explorer with field selection, map controls and demonstration layer toggles
-- Environmental Profile with overview, climate, soil, vegetation and data provenance views
-- Farmer Profile with multi-step details, crop history, priorities and constraints
-- Rotation Studio with baseline, water-resilient and soil-health-focused strategies
-- Climate Scenario Simulator with adjustable hypothetical assumptions and impact ranking
-- Reports & Evidence with sources, model limitations and report preview
-- Typed frontend API integration layer and FastAPI skeleton
+- Dashboard with farm and field selection, sourced environmental cards, soil evidence, weather, and field map
+- Field Explorer with boundary discovery, saved-field management, and map controls
+- Field Analytics with field map, health, risk, status, and source catalogue views
+- Crop Planner with farmer inputs, automatic SoilGrids evidence, rotation strategies, vulnerability timeline, and nutrient planning
+- Weather workspace with selected-field forecasts, DWD warnings, virtual stations, and spraying windows
+- AI assistant grounded in the selected field's available data
+- Typed frontend API integration and FastAPI services
 
 ## Remaining integrations
 

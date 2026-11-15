@@ -1,0 +1,32 @@
+# Ignore files for Vercel deployment
+.git
+.gitignore
+node_modules
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Development files
+.pytest_cache
+.vscode
+scratch
+chatsuite/backend  # Development backend code
+chatsuite/frontend # Development frontend code
+
+# Large data files
+*.zip
+*.tar
+*.gz
+*.7z
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Environment files (secrets should be set in Vercel dashboard)
+.env
+backend/.env
