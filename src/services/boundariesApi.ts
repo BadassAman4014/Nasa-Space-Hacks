@@ -101,10 +101,7 @@ export const CATEGORY_DESCRIPTIONS: Record<string, { label: string; desc: string
   'GL-MO': { label: 'Moor-Grünland', desc: 'Peatland grassland', color: '#64748b' },
 };
 
-const API_BASE =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
-  (import.meta.env.VITE_PUBLIC_API_URL as string | undefined) ??
-  '';
+const API_BASE = '';
 
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${endpoint}`;

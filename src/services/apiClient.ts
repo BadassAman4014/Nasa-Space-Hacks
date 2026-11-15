@@ -1,4 +1,5 @@
-const baseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_URL || '/api';
+// API traffic stays same-origin in production. Vercel rewrites /api/* to Render.
+const baseUrl = '/api';
 
 export async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {

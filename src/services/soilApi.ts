@@ -4,7 +4,7 @@
  * and depth intervals for saved user fields in Brandenburg, Germany.
  */
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+import { baseUrl } from './apiClient';
 
 export interface VariableMetadata {
   key: string;

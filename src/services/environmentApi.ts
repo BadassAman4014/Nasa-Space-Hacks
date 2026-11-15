@@ -4,7 +4,7 @@
  * and NASA MODIS (vegetation indices NDVI/EVI).
  */
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+import { baseUrl } from './apiClient';
 
 export type DatasetType = 'smap' | 'gpm' | 'modis';
 

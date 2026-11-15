@@ -12,10 +12,25 @@
   },
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://nasa-space-hacks-backend.onrender.com/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": {
         "service": "app"
       }
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/:path*",
+      "headers": [
+        {
+          "key": "x-vercel-enable-rewrite-caching",
+          "value": "0"
+        }
+      ]
     }
   ]
 }
