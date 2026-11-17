@@ -1,0 +1,38 @@
+/* Small, consistent density reduction for shared app cards. */
+#root .app-shell .card {
+  padding: 16px;
+  border-radius: 18px;
+}
+
+#root .app-shell :is(div, section, article, aside)[class~="rounded-2xl"][class~="border"][class~="bg-white"][class~="p-6"] {
+  padding: 18px !important;
+  border-radius: 18px;
+}
+
+#root .app-shell :is(div, section, article, aside)[class~="rounded-2xl"][class~="border"][class~="bg-white"][class~="p-5"] {
+  padding: 16px !important;
+  border-radius: 18px;
+}
+
+#root .app-shell :is(div, section, article, aside)[class~="rounded-2xl"][class~="border"][class~="bg-white"][class~="p-4"] {
+  padding: 14px !important;
+  border-radius: 18px;
+}
+
+#root .app-shell [class~="gap-6"] {
+  gap: 1rem !important;
+}
+
+#root .app-shell [class~="gap-5"] {
+  gap: 0.875rem !important;
+}
+
+.app-chart-point {
+  cursor: crosshair;
+  outline: none;
+}
+
+.app-chart-point:focus-visible {
+  stroke: #0f172a;
+  stroke-width: 3px;
+}

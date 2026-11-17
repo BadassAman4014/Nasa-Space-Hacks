@@ -103,12 +103,16 @@ function MapController({ center, zoom }: { center: [number, number]; zoom: numbe
 // Sparkline Step Curve for Microclimate Cards (Matches OneSoil UI)
 function StepSparkline({
   data,
+  labels = [],
+  unit = '',
   color = '#f59e0b',
   width = 110,
   height = 24,
   fillColor,
 }: {
   data: number[];
+  labels?: string[];
+  unit?: string;
   color?: string;
   width?: number;
   height?: number;
@@ -132,6 +136,12 @@ function StepSparkline({
     <svg width={width} height={height} className="overflow-visible">
       {fillColor && <path d={areaPath} fill={fillColor} />}
       <path d={path} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="miter" />
+      {data.map((value, i) => {
+        const cx = i * stepX;
+        const cy = height - ((value - min) / range) * (height - 6) - 3;
+        const label = labels[i] || `Point ${i + 1}`;
+        return <circle key={`${label}-${i}`} cx={cx} cy={cy} r="4" fill="white" stroke={color} strokeWidth="2" className="app-chart-point" tabIndex={0} aria-label={`${label}: ${value.toFixed(1)}${unit}`}><title>{`${label} · ${value.toFixed(1)}${unit}`}</title></circle>;
+      })}
     </svg>
   );
 }
@@ -139,11 +149,15 @@ function StepSparkline({
 // Sparkline Bar for Precipitation
 function BarSparkline({
   data,
+  labels = [],
+  unit = '',
   color = '#0284c7',
   width = 110,
   height = 24,
 }: {
   data: number[];
+  labels?: string[];
+  unit?: string;
   color?: string;
   width?: number;
   height?: number;
@@ -158,16 +172,12 @@ function BarSparkline({
         const barHeight = Math.max(val > 0 ? 3 : 1, (val / max) * (height - 3));
         const x = i * (width / data.length);
         const y = height - barHeight;
+        const label = labels[i] || `Point ${i + 1}`;
         return (
-          <rect
-            key={i}
-            x={x}
-            y={y}
-            width={barWidth}
-            height={barHeight}
-            fill={val > 0 ? color : '#e2e8f0'}
-            rx={1}
-          />
+          <g key={`${label}-${i}`} className="app-chart-point" tabIndex={0} aria-label={`${label}: ${val.toFixed(1)}${unit}`}>
+            <title>{`${label} · ${val.toFixed(1)}${unit}`}</title>
+            <rect x={x} y={y} width={barWidth} height={barHeight} fill={val > 0 ? color : '#e2e8f0'} rx={1} />
+          </g>
         );
       })}
     </svg>
@@ -193,7 +203,7 @@ function WeatherMetricChart({ hourly, daily, range, metric }: { hourly: HourlyFo
   const y = (v: number) => 108 - ((v - min) / rangeValue) * 76;
   const path = points.map((point, i) => `${i ? 'L' : 'M'} ${x(i)} ${y(point.value)}`).join(' ');
   const unit = metric === 'temperature' ? '°C' : metric === 'rain' ? 'mm' : 'm/s';
-  return <div className="mt-3"><svg viewBox="0 0 360 145" role="img" aria-label={`${metric} forecast`} className="h-36 w-full"><line x1="34" y1="32" x2="346" y2="32" stroke="#e2e8f0" /><line x1="34" y1="70" x2="346" y2="70" stroke="#e2e8f0" /><line x1="34" y1="108" x2="346" y2="108" stroke="#cbd5e1" /><text x="29" y="36" textAnchor="end" fontSize="9" fill="#64748b">{max.toFixed(0)} {unit}</text><text x="29" y="112" textAnchor="end" fontSize="9" fill="#64748b">{min.toFixed(0)} {unit}</text><path d={path} fill="none" stroke={metric === 'rain' ? '#0284c7' : metric === 'wind' ? '#7c3aed' : '#d97706'} strokeWidth="2.5" />{points.map((point, i) => <g key={`${point.label}-${i}`}><circle cx={x(i)} cy={y(point.value)} r="3" fill="#fff" stroke={metric === 'rain' ? '#0284c7' : metric === 'wind' ? '#7c3aed' : '#d97706'} strokeWidth="2"><title>{`${point.label}: ${point.value.toFixed(1)} ${unit}`}</title></circle>{(i === 0 || i === points.length - 1 || i === Math.floor(points.length / 2)) && <text x={x(i)} y="130" textAnchor="middle" fontSize="9" fill="#64748b">{point.label}</text>}</g>)}</svg><p className="text-right text-[10px] font-semibold text-slate-500">{metric === 'temperature' ? 'Temperature' : metric === 'rain' ? 'Rainfall' : 'Wind speed'} · {unit}</p></div>;
+  return <div className="mt-3"><svg viewBox="0 0 360 145" role="img" aria-label={`${metric} forecast`} className="h-36 w-full"><line x1="34" y1="32" x2="346" y2="32" stroke="#e2e8f0" /><line x1="34" y1="70" x2="346" y2="70" stroke="#e2e8f0" /><line x1="34" y1="108" x2="346" y2="108" stroke="#cbd5e1" /><text x="29" y="36" textAnchor="end" fontSize="9" fill="#64748b">{max.toFixed(0)} {unit}</text><text x="29" y="112" textAnchor="end" fontSize="9" fill="#64748b">{min.toFixed(0)} {unit}</text><path d={path} fill="none" stroke={metric === 'rain' ? '#0284c7' : metric === 'wind' ? '#7c3aed' : '#d97706'} strokeWidth="2.5" />{points.map((point, i) => <g key={`${point.label}-${i}`}><circle cx={x(i)} cy={y(point.value)} r="4" fill="#fff" stroke={metric === 'rain' ? '#0284c7' : metric === 'wind' ? '#7c3aed' : '#d97706'} strokeWidth="2" className="app-chart-point" tabIndex={0} aria-label={`${point.label}: ${point.value.toFixed(1)} ${unit}`}><title>{`${point.label}: ${point.value.toFixed(1)} ${unit}`}</title></circle>{(i === 0 || i === points.length - 1 || i === Math.floor(points.length / 2)) && <text x={x(i)} y="130" textAnchor="middle" fontSize="9" fill="#64748b">{point.label}</text>}</g>)}</svg><p className="text-right text-[10px] font-semibold text-slate-500">{metric === 'temperature' ? 'Temperature' : metric === 'rain' ? 'Rainfall' : 'Wind speed'} · {unit}</p></div>;
 }
 
 export function WeatherView({
@@ -407,14 +417,13 @@ export function WeatherView({
   const precips12 = useMemo(() => hourly12.map((h) => h.precipitation_mm), [hourly12]);
   const winds12 = useMemo(() => hourly12.map((h) => h.wind_speed_ms), [hourly12]);
   const clouds12 = useMemo(() => hourly12.map((h) => h.cloud_cover_percent), [hourly12]);
-  const hums12 = useMemo(
-    () => hourly12.map((h) => h.humidity_percent).filter((v): v is number => typeof v === 'number'),
-    [hourly12]
-  );
-  const dewPoints12 = useMemo(
-    () => hourly12.map((h) => h.dew_point_c).filter((v): v is number => typeof v === 'number'),
-    [hourly12]
-  );
+  const hourlyLabels = useMemo(() => hourly12.map((h) => h.label), [hourly12]);
+  const humidityPoints = useMemo(() => hourly12.filter((h) => typeof h.humidity_percent === 'number'), [hourly12]);
+  const hums12 = useMemo(() => humidityPoints.map((h) => h.humidity_percent as number), [humidityPoints]);
+  const humidityLabels = useMemo(() => humidityPoints.map((h) => h.label), [humidityPoints]);
+  const dewPointPoints = useMemo(() => hourly12.filter((h) => typeof h.dew_point_c === 'number'), [hourly12]);
+  const dewPoints12 = useMemo(() => dewPointPoints.map((h) => h.dew_point_c as number), [dewPointPoints]);
+  const dewPointLabels = useMemo(() => dewPointPoints.map((h) => h.label), [dewPointPoints]);
   const spanMid = hourly12.length > 2 ? hourly12[Math.floor(hourly12.length / 2)].label : '';
   const spanEnd = hourly12.length > 1 ? hourly12[hourly12.length - 1].label : '';
   return (
@@ -482,7 +491,7 @@ export function WeatherView({
       </div>
 
       {/* 2. TOP RIGHT FLOATING LAYER SWITCHER (Satellite, NDVI, Weather) */}
-      <div className="absolute left-4 top-4 z-[500] flex flex-row gap-1.5 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-lg backdrop-blur-md md:left-[420px]">
+      <div className="absolute left-4 top-4 z-[500] flex flex-row gap-1.5 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-lg backdrop-blur-md">
         <button
           onClick={() => setActiveLayer('satellite')}
           className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${activeLayer === 'satellite'
@@ -518,7 +527,7 @@ export function WeatherView({
       </div>
 
       {/* 3. VERTICAL LEGENDS (Light Theme) */}
-      <div className="pointer-events-none absolute left-4 top-28 z-[500] flex flex-col gap-3 md:left-[420px] md:top-20">
+      <div className="pointer-events-none absolute left-4 top-28 z-[500] flex flex-col gap-3 md:top-20">
         {/* NDVI Bar */}
         {activeLayer === 'ndvi' && (
           <div className="bg-white/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/90 shadow-lg flex flex-col items-center pointer-events-auto">
@@ -558,12 +567,12 @@ export function WeatherView({
         )}
       </div>
 
-      <aside className="absolute bottom-4 left-4 top-4 z-[600] hidden w-[360px] flex-col overflow-visible rounded-2xl border border-slate-200 bg-white shadow-xl md:flex">
-        <header className="sticky top-0 z-10 border-b border-slate-100 bg-white p-5">
+      <aside className="absolute bottom-4 left-1/2 z-[600] hidden max-h-[min(48vh,460px)] w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 flex-col overflow-hidden rounded-[28px] border border-white/80 bg-white/90 shadow-[0_24px_70px_-24px_rgba(15,23,42,0.55)] ring-1 ring-slate-900/5 backdrop-blur-xl md:flex">
+        <header className="sticky top-0 z-10 border-b border-slate-200/70 bg-gradient-to-r from-white via-emerald-50/70 to-sky-50/80 p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wide text-emerald-800">Weather at {currentAvailableField?.field_name || 'Field'}</p><details className="group relative mt-1"><summary className="flex cursor-pointer list-none items-center gap-2 text-xl font-extrabold text-slate-950">{currentAvailableField?.field_name || 'Select field'} <ChevronDown size={16} className="text-slate-500" /></summary><div className="absolute left-0 top-9 z-20 w-64 rounded-xl border border-slate-200 bg-white p-1 shadow-xl">{availableFields.map((field) => { const saved = fields.find((item) => item.id === field.field_id); return <button key={field.field_id} onClick={() => { onSelectField(field.field_id); const station = fieldsSummary.find((item) => item.field_id === field.field_id); setActiveStationPopup(station || null); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-emerald-50">{field.field_name} · {saved?.current_crop || 'Season not set'} · {field.has_station ? 'Station active' : 'By field coordinates'}</button>; })}</div></details><div className="mt-1 flex flex-wrap items-center gap-1.5"><span className="inline-flex rounded-full bg-slate-50 px-2 py-1 text-[11px] font-bold text-slate-600">{hasStation ? 'Station active' : 'By field coordinates'}</span><span className="inline-flex rounded-full bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-500">{selectedSavedField?.current_crop || 'Season not set'}</span></div></div><button onClick={refreshSelectedWeather} disabled={refreshing} aria-label="Refresh weather" title="Refresh weather" className="rounded-lg border border-slate-200 p-2 text-slate-700 hover:border-emerald-300"><RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} /></button></div>
           <p className="mt-3 text-xs text-slate-500">Updated {weatherUpdatedAt ? formatDate(weatherUpdatedAt, { dateStyle: 'medium', timeStyle: 'short' }) : '—'} · Modelled for your field’s location</p>
         </header>
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 sm:space-y-4 sm:p-5">
           {fieldWeather ? <>
             <section className="rounded-xl border border-slate-200 bg-slate-50 p-4"><h2 className="text-sm font-extrabold text-slate-950">Now</h2><div className="mt-3 flex items-center gap-3"><WeatherIcon icon={fieldWeather.current.icon} /><div><strong className="text-4xl font-extrabold text-slate-950">{Math.round(fieldWeather.current.temperature_c)}°C</strong><p className="text-sm font-semibold text-slate-600">{fieldWeather.current.condition} · Feels like {fieldWeather.current.feels_like_c == null ? '—' : `${Math.round(fieldWeather.current.feels_like_c)}°C`}</p></div></div><div className="mt-3 grid grid-cols-3 divide-x divide-slate-200 text-xs"><div className="pr-2"><strong className="block">{Math.round(fieldWeather.current.wind_speed_ms)} m/s {fieldWeather.current.wind_compass}</strong><span className="text-slate-500">Wind</span></div><div className="px-2"><strong className="block">{Math.round(fieldWeather.current.humidity_percent)}%</strong><span className="text-slate-500">Humidity</span></div><div className="pl-2"><strong className="block">{fieldWeather.current.precipitation_mm} mm</strong><span className="text-slate-500">Rain</span></div></div><p className="mt-3 border-t border-slate-200 pt-3 text-xs font-semibold text-slate-700">{fieldWeather.current.condition}, light wind - good for field work</p></section>
             <section className="rounded-xl border border-slate-200 p-4"><div className="flex items-center justify-between"><h2 className="text-sm font-extrabold text-slate-950">Spraying windows</h2><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${currentSprayStatus === 'safe' ? 'bg-emerald-50 text-emerald-800' : currentSprayStatus === 'caution' ? 'bg-amber-50 text-amber-800' : 'bg-red-50 text-red-800'}`}>{currentSprayStatus === 'safe' ? 'Good' : currentSprayStatus === 'caution' ? 'Moderate caution' : "Don't spray"}</span></div><p className="mt-2 text-sm font-bold text-slate-800">{sprayingSlots.some((slot) => slot.status === 'safe') ? `Best time to spray: ${sprayingSlots.find((slot) => slot.status === 'safe')?.label}–${[...sprayingSlots].reverse().find((slot) => slot.status === 'safe')?.label}` : 'No suitable spray window in the next 24 hours'}</p><div className="mt-3 flex gap-1">{sprayingSlots.map((slot) => <div key={slot.label} title={`${slot.label}: wind ${slot.wind_speed} m/s, rain ${slot.rain_mm} mm`} className={`min-w-0 flex-1 rounded-lg p-2 text-center ${slot.status === 'safe' ? 'bg-emerald-100' : slot.status === 'caution' ? 'bg-amber-100' : 'bg-red-100'}`}><span className="block truncate text-[10px] font-bold">{slot.label}</span><span className="block text-[9px] text-slate-600">{slot.wind_speed} m/s</span><span className="block text-[9px] text-slate-600">{slot.rain_mm} mm</span></div>)}</div><div className="mt-2 flex gap-3 text-[10px] font-semibold text-slate-500"><span>🟢 Good</span><span>🟡 Caution</span><span>🔴 Don’t spray</span><span title="Wind limit 6 m/s; rain limits 0.4 mm/hr">ⓘ Rules</span></div></section>
@@ -576,7 +585,7 @@ export function WeatherView({
       </aside>
 
       {/* 4. LEAFLET FULLSCREEN SATELLITE MAP */}
-      <div className="absolute inset-0 h-full min-h-0 bg-[#e2e8f0] md:left-[400px]">
+      <div className="absolute inset-0 h-full min-h-0 bg-[#e2e8f0]">
         <MapContainer
           center={mapCenter}
           zoom={15}
@@ -867,7 +876,7 @@ export function WeatherView({
                             {fieldWeather ? `${Math.round(fieldWeather.current.temperature_c)}°` : '--'}
                           </div>
                           <div className="pt-2">
-                            <StepSparkline data={temps12} color="#f59e0b" width={110} height={24} fillColor="rgba(245, 158, 11, 0.15)" />
+                            <StepSparkline data={temps12} labels={hourlyLabels} unit="°C" color="#f59e0b" width={110} height={24} fillColor="rgba(245, 158, 11, 0.15)" />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
                               <span>{spanMid}</span>
@@ -886,7 +895,7 @@ export function WeatherView({
                             {fieldWeather ? `${fieldWeather.current.precipitation_mm} mm` : '--'}
                           </div>
                           <div className="pt-2">
-                            <BarSparkline data={precips12} color="#0284c7" width={110} height={24} />
+                            <BarSparkline data={precips12} labels={hourlyLabels} unit=" mm" color="#0284c7" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
                               <span>{spanMid}</span>
@@ -905,7 +914,7 @@ export function WeatherView({
                             {fieldWeather ? `${Math.round(fieldWeather.current.wind_speed_ms)} m/s ${fieldWeather.current.wind_arrow}` : '--'}
                           </div>
                           <div className="pt-2">
-                            <StepSparkline data={winds12} color="#64748b" width={110} height={24} />
+                            <StepSparkline data={winds12} labels={hourlyLabels} unit=" m/s" color="#64748b" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
                               <span>{spanMid}</span>
@@ -924,7 +933,7 @@ export function WeatherView({
                             {fieldWeather ? `${fieldWeather.current.cloud_cover_percent}%` : '--'}
                           </div>
                           <div className="pt-2">
-                            <StepSparkline data={clouds12} color="#64748b" width={110} height={24} />
+                            <StepSparkline data={clouds12} labels={hourlyLabels} unit="%" color="#64748b" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
                               <span>{spanMid}</span>
@@ -943,7 +952,7 @@ export function WeatherView({
                             {fieldWeather ? `${Math.round(fieldWeather.current.humidity_percent)}%` : '--'}
                           </div>
                           <div className="pt-2">
-                            <StepSparkline data={hums12} color="#38bdf8" width={110} height={24} />
+                            <StepSparkline data={hums12} labels={humidityLabels} unit="%" color="#38bdf8" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
                               <span>{spanMid}</span>
@@ -964,7 +973,7 @@ export function WeatherView({
                               : '--'}
                           </div>
                           <div className="pt-2">
-                            <StepSparkline data={dewPoints12} color="#10b981" width={110} height={24} />
+                            <StepSparkline data={dewPoints12} labels={dewPointLabels} unit="°C" color="#10b981" width={110} height={24} />
                             <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
                               <span>Now</span>
                               <span>{spanMid}</span>
@@ -1230,16 +1239,10 @@ export function WeatherView({
                                     const barH = (d.precip_mm / 6) * 35;
                                     const y = 90 - barH;
                                     return (
-                                      <rect
-                                        key={`bar-${i}`}
-                                        x={x}
-                                        y={y}
-                                        width={6}
-                                        height={barH}
-                                        fill="#0284c7"
-                                        rx={1}
-                                        opacity={0.8}
-                                      />
+                                      <g key={`bar-${i}`} className="app-chart-point" tabIndex={0} aria-label={`${d.label}: ${d.precip_mm.toFixed(1)} mm rain`}>
+                                        <title>{`${d.label} · ${d.precip_mm.toFixed(1)} mm rain`}</title>
+                                        <rect x={x} y={y} width={6} height={barH} fill="#0284c7" rx={1} opacity={0.8} />
+                                      </g>
                                     );
                                   })}
 
@@ -1251,6 +1254,18 @@ export function WeatherView({
 
                                   {/* Min Temperature Line */}
                                   <path d={minPath} fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" />
+
+                                  {days.map((d, i) => {
+                                    const x = 25 + i * stepX;
+                                    const maxY = yOf(d.temp_max);
+                                    const minY = yOf(d.temp_min);
+                                    return (
+                                      <g key={`temperature-points-${i}`}>
+                                        <circle cx={x} cy={maxY} r="4" fill="white" stroke="#f59e0b" strokeWidth="2" className="app-chart-point" tabIndex={0} aria-label={`${d.label}: high ${d.temp_max}°C`}><title>{`${d.label} · High ${d.temp_max}°C`}</title></circle>
+                                        <circle cx={x} cy={minY} r="4" fill="white" stroke="#38bdf8" strokeWidth="2" className="app-chart-point" tabIndex={0} aria-label={`${d.label}: low ${d.temp_min}°C`}><title>{`${d.label} · Low ${d.temp_min}°C`}</title></circle>
+                                      </g>
+                                    );
+                                  })}
 
                                   {/* X-axis date labels */}
                                   {days.filter((_, idx) => idx % 5 === 0).map((d, idx) => {

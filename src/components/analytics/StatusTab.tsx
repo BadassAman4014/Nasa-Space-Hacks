@@ -647,7 +647,9 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                         fill={p.isSelected ? '#1fa35b' : '#ffffff'}
                         stroke="#1fa35b"
                         strokeWidth={p.isSelected ? 3 : 2}
-                        className="cursor-pointer transition-all hover:r-6"
+                        className="app-chart-point cursor-pointer transition-all hover:r-6"
+                        tabIndex={0}
+                        aria-label={`${p.o.acquisition_date}: NDVI ${p.o.mean_ndvi != null ? p.o.mean_ndvi.toFixed(2) : '—'}, cloud ${p.o.cloud_cover_percent}%`}
                         onClick={() => setSelectedObsId(p.o.id)}
                       >
                         <title>{`${p.o.acquisition_date}: NDVI ${p.o.mean_ndvi != null ? p.o.mean_ndvi.toFixed(2) : '—'} (Cloud: ${p.o.cloud_cover_percent}%)`}</title>
@@ -714,6 +716,11 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                     <>
                       <path d={areaD} fill="url(#precipGrad)" />
                       <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="2.5" />
+                      {points.map((point, i) => (
+                        <circle key={recs[i].date} cx={point.x} cy={point.y} r="4" fill="white" stroke="#2563eb" strokeWidth="2" className="app-chart-point" tabIndex={0} aria-label={`${recs[i].date}: ${recs[i].accumulated_mm.toFixed(1)} mm accumulated`}>
+                          <title>{`${recs[i].date} · ${recs[i].accumulated_mm.toFixed(1)} mm accumulated`}</title>
+                        </circle>
+                      ))}
                     </>
                   );
                 })()}
@@ -793,6 +800,11 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                     <>
                       <path d={areaD} fill="url(#gddGrad)" />
                       <path d={pathD} fill="none" stroke="#f59e0b" strokeWidth="2.5" />
+                      {points.map((point, i) => (
+                        <circle key={recs[i].date} cx={point.x} cy={point.y} r="4" fill="white" stroke="#d97706" strokeWidth="2" className="app-chart-point" tabIndex={0} aria-label={`${recs[i].date}: ${recs[i].accumulated_gdd.toFixed(1)} accumulated degree days`}>
+                          <title>{`${recs[i].date} · ${recs[i].accumulated_gdd.toFixed(1)} accumulated °C·days`}</title>
+                        </circle>
+                      ))}
                     </>
                   );
                 })()}

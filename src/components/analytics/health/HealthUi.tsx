@@ -130,7 +130,7 @@ export function LineChart({
   const ticks = [lo, hi];
   const month = (d: string) => new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: t1 - t0 > 200 * 86400000 ? '2-digit' : undefined });
   return (
-    <svg viewBox={`0 0 ${W} ${height}`} className="h-auto w-full overflow-visible" role="img">
+    <svg viewBox={`0 0 ${W} ${height}`} className="h-auto w-full overflow-visible" role="img" aria-label={`${series.map((item) => item.name).join(', ')} trend chart`}>
       {band && (
         <rect x={pad.l} width={W - pad.l - pad.r} y={Y(Math.min(hi, band.to))} height={Math.max(0, Y(Math.max(lo, band.from)) - Y(Math.min(hi, band.to)))} fill={band.colour} />
       )}
@@ -160,13 +160,24 @@ export function LineChart({
           return (
             <g key={s.name}>
               {pts.map((p, i) => (
-                <circle key={i} cx={X(p.x)} cy={Y(p.y)} r={3} fill={s.colour} stroke="white" strokeWidth={1} />
+                <circle key={i} cx={X(p.x)} cy={Y(p.y)} r={4} fill={s.colour} stroke="white" strokeWidth={1} className="app-chart-point" tabIndex={0} aria-label={`${s.name}, ${month(p.x)}: ${p.y.toFixed(decimals)}${unitLabel ? ` ${unitLabel}` : ''}`}>
+                  <title>{`${s.name} · ${month(p.x)}: ${p.y.toFixed(decimals)}${unitLabel ? ` ${unitLabel}` : ''}`}</title>
+                </circle>
               ))}
             </g>
           );
         }
         const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${X(p.x).toFixed(1)} ${Y(p.y).toFixed(1)}`).join(' ');
-        return <path key={s.name} d={d} fill="none" stroke={s.colour} strokeWidth={2.2} strokeDasharray={s.dashed ? '5 4' : undefined} strokeLinejoin="round" />;
+        return (
+          <g key={s.name}>
+            <path d={d} fill="none" stroke={s.colour} strokeWidth={2.2} strokeDasharray={s.dashed ? '5 4' : undefined} strokeLinejoin="round" />
+            {pts.map((p, i) => (
+              <circle key={i} cx={X(p.x)} cy={Y(p.y)} r={4} fill="white" stroke={s.colour} strokeWidth={2} className="app-chart-point" tabIndex={0} aria-label={`${s.name}, ${month(p.x)}: ${p.y.toFixed(decimals)}${unitLabel ? ` ${unitLabel}` : ''}`}>
+                <title>{`${s.name} · ${month(p.x)}: ${p.y.toFixed(decimals)}${unitLabel ? ` ${unitLabel}` : ''}`}</title>
+              </circle>
+            ))}
+          </g>
+        );
       })}
     </svg>
   );
